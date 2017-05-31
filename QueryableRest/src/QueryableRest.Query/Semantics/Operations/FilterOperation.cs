@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace QueryableRest.Query.Configuration
+namespace QueryableRest.Query.Semantics.Operations
 {
-    public enum SortDirection
+    public class FilterOperation
     {
-        Ascending,
-        Descending
     }
 }

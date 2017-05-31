@@ -1,40 +1,40 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using QueryableRest.Query.Configuration;
-using QueryableRest.Query.Models;
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿//using Microsoft.AspNetCore.Mvc.ModelBinding;
+//using QueryableRest.Query.Configuration;
+//using QueryableRest.Query.Models;
+//using System;
+//using System.Linq;
+//using System.Reflection;
+//using System.Threading.Tasks;
 
-namespace QueryableRest.Query.ModelBinders
-{
-    public class SelectQueryModelBinder : IModelBinder
-    {
-        private readonly QuerySemantics _semantics;
+//namespace QueryableRest.Query.ModelBinders
+//{
+//    public class SelectQueryModelBinder : IModelBinder
+//    {
+//        private readonly QuerySemantics _semantics;
 
-        public SelectQueryModelBinder(QuerySemantics semantics)
-        {
-            _semantics = semantics ?? QuerySemantics.Default;
-        }
+//        public SelectQueryModelBinder(QuerySemantics semantics)
+//        {
+//            _semantics = semantics;
+//        }
 
-        public Task BindModelAsync(ModelBindingContext bindingContext)
-        {
-            var key = bindingContext.ModelName;
+//        public Task BindModelAsync(ModelBindingContext bindingContext)
+//        {
+//            var key = bindingContext.ModelName;
 
-            var resourceType = bindingContext.ModelType.GetTypeInfo().GetGenericArguments()[0];
+//            var resourceType = bindingContext.ModelType.GetTypeInfo().GetGenericArguments()[0];
 
-            var selectObject = (SelectQuery)Activator.CreateInstance(bindingContext.ModelType, true);
+//            var selectObject = (SelectQuery)Activator.CreateInstance(bindingContext.ModelType, true);
 
-            if (bindingContext.ValueProvider.ContainsPrefix(key))
-            {
-                var selectBlocks = bindingContext.ValueProvider.GetValue(key).Values;
-                var entries = selectBlocks.SelectMany(_semantics.StatementSplitter);
+//            if (bindingContext.ValueProvider.ContainsPrefix(key))
+//            {
+//                var selectBlocks = bindingContext.ValueProvider.GetValue(key).Values;
+//                var entries = _semantics.SelectQueryParser(selectBlocks);
 
-                selectObject.Fields.AddRange(entries.Select(e => _semantics.FieldNameResolver(e, resourceType)));
-            }
+//                selectObject.Fields.AddRange(entries.Select(e => _semantics.FieldNameResolver(e, resourceType)));
+//            }
 
-            bindingContext.Model = selectObject;
-            return Task.CompletedTask;
-        }
-    }
-}
+//            bindingContext.Model = selectObject;
+//            return Task.CompletedTask;
+//        }
+//    }
+//}
