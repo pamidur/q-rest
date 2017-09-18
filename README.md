@@ -2,9 +2,9 @@
 
 Examples
 ```
-http://mydata.com/api/cars/:filter(color:eq(red)):select(id,price)
+http://mydata.com/api/cars/:filter(color:eq('red')):select(id,price)
 
-http://mydata.com/api/cars?query=:filter(color:eq(red)):select(id,price)
+http://mydata.com/api/cars?query=:filter(color:eq('red')):select(id,price)
 ```
 
 Both cases don't require escaping symbols
@@ -15,9 +15,9 @@ Bigger one
 ```
 Let me split it for you for better readability
 ```
-:filter(text:eq(qwerty),text:contains(@a))
-:select(id,text,data:select(id,value),blocks:filter(id:eq(1)):select(*,internal:select))
-:sort(blocks:max(id))
+:filter(.text:eq(qwerty),.text:contains(@a))
+:select(id,text,data:select(.id,.value),blocks:filter(id:eq(1)):select(*,internal:select))
+:sort(.blocks:max(.id))
 :skip(3)
 :take(10)
 ,a:let(1)
