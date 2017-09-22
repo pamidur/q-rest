@@ -15,13 +15,17 @@ Bigger one
 ```
 Let me split it for you for better readability
 ```
-:filter(.text:eq(qwerty),.text:contains(@a))
-:select(id,text,data:select(.id,.value),blocks:filter(id:eq(1)):select(*,internal:select))
-:sort(.blocks:max(.id))
+:filter(text:eq('qwerty'),text:contains(@a))
+:select(id,text,data:select(id,value),blocks:filter(id:eq(1)):select(*,internal:select))
+:sort(blocks:max(id))
 :skip(3)
 :take(10)
 ,a:let(1)
 ```
+
+Design notes:
+- System is extensible by adding new operations
+- The operation is a "static method" with context as a first argument (like c# extension methods)
 
 Ideas:
 - oData sucks
