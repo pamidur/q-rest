@@ -9,6 +9,17 @@ http://mydata.com/api/cars?query=:filter(color:eq('red')):select(id,price)
 
 Both cases don't require escaping symbols
 
+
+:filter(text:eq('qwerty'),text:contains(@a),:or(text:eq('ololo')))
+
+text = quert AND text = a OR text = ololo
+
+
+:filter(:or(text:eq('qwerty'),text:eq('ololo'):not):not,text:contains(@a))
+
+(text = quert OR text = ololo) AND text = a
+
+
 Bigger one 
 ```
 :filter(text:eq(qwerty),text:contains(@a)):select(id,text,data:select(id,value),blocks:filter(id:eq(1)):select(*,internal:select)):sort(blocks:max(id)):skip(3):take(10),a:let(1)
