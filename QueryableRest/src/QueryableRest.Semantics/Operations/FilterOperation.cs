@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+using System.Text;
 
 namespace QueryableRest.Semantics.Operations
 {
-    public abstract class FilterOperation<TTarget> : Operation<TTarget>
-    {
-        public Operation<TTarget> Value { get; }
+    //public class FilterOperation : IOperation
+    //{
+    //    public IReadOnlyCollection<string> Monikers => throw new NotImplementedException();
 
-        public override string Serialize()
-        {
-            throw new NotImplementedException();
-        }
-    }
+    //    public Expression CreateExpression(IReadOnlyList<Expression> arguments)
+    //    {
+    //        return Expression.Call(typeof(Queryable),"Where",)
+    //    }
+    //}
 }
