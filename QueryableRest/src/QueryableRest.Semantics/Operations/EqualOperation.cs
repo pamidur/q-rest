@@ -5,18 +5,25 @@ namespace QueryableRest.Semantics.Operations
 {
     public class EqualOperation : IOperation
     {
-        public Expression CreateExpression(IReadOnlyList<Expression> arguments)
+        public static readonly string DefaultMoniker = "eq";
+
+        public Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
-            if (arguments.Count != 2)
+            if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            var a = arguments[0];
-            var b = arguments[1];
+            var a = context;
+            var b = arguments[0];
 
             if (a.Type != b.Type)
                 b = Expression.Convert(b, a.Type);
 
             return Expression.Equal(a, b);
+        }
+
+        public Expression GetArgumentsRoot(Expression context)
+        {
+            return context;
         }
     }
 }

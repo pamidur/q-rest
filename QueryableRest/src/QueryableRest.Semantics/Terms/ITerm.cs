@@ -4,7 +4,7 @@ namespace QueryableRest.Semantics.Terms
 {
     public interface ITerm
     {
-        ITerm Parent { get; set; }
-        Expression CreateExpression(Registry registry);
+        ITerm Next { get; set; }
+        Expression CreateExpression(Expression context, Registry registry);        
     }
 }

@@ -5,7 +5,7 @@ namespace QueryableRest.Semantics.Operations
 {
     public interface IOperation
     {
-        IReadOnlyCollection<string> Monikers { get; }
-        Expression CreateExpression(IReadOnlyList<Expression> arguments);
+        Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments);
+        Expression GetArgumentsRoot(Expression context);
     }
 }

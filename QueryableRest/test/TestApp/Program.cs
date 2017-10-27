@@ -1,7 +1,4 @@
-﻿using QueryableRest.Semantics.Arguments;
-using QueryableRest.Semantics.Methods;
-using QueryableRest.Semantics.Operations;
-using QueryableRest.Semantics.SortOperations;
+﻿using QueryableRest.Semantics.Operations;
 using QueryableRest.Semantics.Terms;
 using System;
 using System.Collections.Generic;
@@ -17,11 +14,24 @@ namespace TestApp
         public string Text { get; set; }
         public int Number { get; set; }
 
+        public SubEntity Sub { get; set; }
+
         public override string ToString()
         {
             return $"{Text} {Number}";
         }
+    }
 
+    public class SubEntity
+    {
+        public string Text { get; set; }
+        public string Text2 { get; set; }
+        public int Number { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Text} {Number}";
+        }
     }
 
     //sort=-text@trim
@@ -30,18 +40,59 @@ namespace TestApp
     {
         public static void Main(string[] args)
         {
-            var prop = new PropertyTerm { PropertyName = "Text" };
+            var data = Expression.Constant(new List<Entity>
+            {
+                new Entity { Number = 1, Text = "CCC", Sub = new SubEntity { Text = "SubText" } },
+                new Entity { Number = 2, Text = "AAA", Sub = new SubEntity { Text = "SubText2" } },
+            }.AsQueryable());
 
-            var conts = new ConstantTerm { Value = "AAA" };
-
-            var call = new CallTerm { Method = "eq" };
-            call.Arguments.Add(conts);
+            // sub.text:eq('SubText'):not
 
 
-            var data = Expression.Constant(new Entity { Number = 1, Text = "CCC" });
 
-            call.CreateExpression(data, null);
+            var tree = new CallTerm
+            {
+                Method = FilterOperation.DefaultMoniker,
+                Arguments = new List<ITerm>
+                {
+                    new PropertyTerm
+                    {
+                        PropertyName = "Sub",
+
+                        Next = new PropertyTerm
+                        {
+                            PropertyName = "Text",
+
+                            Next = new CallTerm
+                            {
+                                Method = EqualOperation.DefaultMoniker,
+                                Arguments = new List<ITerm>
+                                {
+                                    new ConstantTerm
+                                    {
+                                        Value = "SubText"
+                                    }
+                                },
+
+                                Next = new CallTerm
+                                {
+                                    Method = NotOperation.DefaultMoniker
+                                }
+                            }
+                        }
+                    }                                                                                           
+                }
+            };
+
+            var dataParam = Expression.Parameter(data.Type);
+
+            var e = tree.CreateExpression(dataParam, new QueryableRest.Semantics.Registry());
+
+            var l = Expression.Lambda(e, dataParam);
             
+            var r = l.Compile().DynamicInvoke(data.Value);
+
+            var aaaa = 0;
 
             //var data = new List<Entity>
             //{
