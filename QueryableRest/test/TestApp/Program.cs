@@ -1,11 +1,15 @@
-﻿using QueryableRest.Semantics.Operations;
+﻿using Newtonsoft.Json;
+using QueryableRest.Semantics.Operations;
 using QueryableRest.Semantics.Terms;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace TestApp
 {
@@ -40,22 +44,46 @@ namespace TestApp
     {
         public static void Main(string[] args)
         {
+            var o = new ExpandoObject();
+            o.TryAdd("Test", 1);
+
+            //var site = CallSite<Func<CallSite, object, object>>.Create();
+
+
+            var ed = Expression.Dynamic(Microsoft.CSharp.RuntimeBinder.Binder.GetMember(0, "Test", o.GetType(), new[] { Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo.Create(0, null) }),
+                typeof(object),Expression.Constant(o));
+
+            var ep = Expression.Property(Expression.Convert(Expression.Constant(o), typeof(IDictionary<string, object>)), "Item", Expression.Constant("Test"));
+
+            var exp = Expression.Lambda<Func<object>>(ed);
+
+            var ao = exp.Compile()();
+
+            var os = JsonConvert.SerializeObject((IDictionary<string,object>)o);  
+
+
             var data = Expression.Constant(new List<Entity>
             {
                 new Entity { Number = 1, Text = "CCC", Sub = new SubEntity { Text = "SubText" } },
                 new Entity { Number = 2, Text = "AAA", Sub = new SubEntity { Text = "SubText2" } },
             }.AsQueryable());
 
-            // sub.text:eq('SubText'):not
+            // filter:(sub.text:eq('SubText'):not)
 
 
 
             var tree = new CallTerm
             {
-                Method = FilterOperation.DefaultMoniker,
+                Method = WhereOperation.DefaultMoniker,
+                IsPerEachCall = true,
                 Arguments = new List<ITerm>
                 {
-                    new PropertyTerm
+                    new CallTerm
+                    {
+                        Method = EveryOperation.DefaultMoniker,
+                        Arguments = new List<ITerm>
+                        {
+                            new PropertyTerm
                     {
                         PropertyName = "Sub",
 
@@ -72,34 +100,73 @@ namespace TestApp
                                     {
                                         Value = "SubText"
                                     }
-                                },
-
-                                Next = new CallTerm
-                                {
-                                    Method = NotOperation.DefaultMoniker
                                 }
                             }
                         }
-                    }                                                                                           
-                }
+                    },
+
+                    
+                        new PropertyTerm
+                        {
+                            PropertyName = "Text",
+
+                            Next = new CallTerm
+                            {
+                                Method = NotEqualOperation.DefaultMoniker,
+                                Arguments = new List<ITerm>
+                                {
+                                    new PropertyTerm
+                                    {
+                                        PropertyName = "Sub",
+                                        Next = new PropertyTerm
+                                        {
+                                            PropertyName = "Text",
+                                        }
+                                    }
+
+                                }
+                            }
+                        
+                    }
+                        }
+                    }
+                },
+                //Next = new CallTerm {
+                //    Method = SelectOperation.DefaultMoniker,
+                //    IsPerEachCall = true,
+                //    Arguments = new List<ITerm> {
+                //        new PropertyTerm
+                //        {
+                //            PropertyName = "Number",
+                //        }
+                //    }
+                //}
             };
+
+
+            // :where(-every(price-ne(6),-oneof(price-eq(2),price-eq(3)))):select(id,text)
+
+            // :where(-every(price-eq(cost))):select(id,text)
+            
+
+            var data2 = new List<Entity>
+            {
+                new Entity { Number = 1, Text = "CCC"},
+                new Entity { Number = 2, Text = "AAA"},
+                new Entity { Number = 3, Text = "BBB"},
+            }.AsQueryable().Select(d=>new { d.Number }).Where(g=>g.Number>1);
 
             var dataParam = Expression.Parameter(data.Type);
 
-            var e = tree.CreateExpression(dataParam, new QueryableRest.Semantics.Registry());
+            var e = tree.CreateExpression(dataParam, dataParam, new QueryableRest.Semantics.Registry());
 
             var l = Expression.Lambda(e, dataParam);
-            
+
             var r = l.Compile().DynamicInvoke(data.Value);
 
             var aaaa = 0;
 
-            //var data = new List<Entity>
-            //{
-            //    new Entity { Number = 1, Text = "CCC"},
-            //    new Entity { Number = 2, Text = "AAA"},
-            //    new Entity { Number = 3, Text = "BBB"},
-            //}.AsQueryable();
+            
 
             ////var sortQuery = new Sort<Entity>();
             ////sortQuery.Operations.Add(SortOperation<Entity>.ByAscending(e => e.Text));

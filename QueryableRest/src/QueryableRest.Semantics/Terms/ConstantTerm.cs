@@ -8,10 +8,10 @@ namespace QueryableRest.Semantics.Terms
         public object Value { get; set; }
         public ITerm Next { get; set; }
 
-        public Expression CreateExpression(Expression context, Registry registry)
+        public Expression CreateExpression(Expression context, Expression root, Registry registry)
         {
             var exp = Expression.Constant(Value, Value.GetType());
-            return Next?.CreateExpression(exp, registry) ?? exp;
+            return Next?.CreateExpression(exp, root, registry) ?? exp;
         }
 
         public override string ToString()

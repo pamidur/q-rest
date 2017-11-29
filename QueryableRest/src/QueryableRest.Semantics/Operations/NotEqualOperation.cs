@@ -3,9 +3,9 @@ using System.Linq.Expressions;
 
 namespace QueryableRest.Semantics.Operations
 {
-    public class EqualOperation : IOperation
+    public class NotEqualOperation : IOperation
     {
-        public static readonly string DefaultMoniker = "eq";
+        public static readonly string DefaultMoniker = "ne";
 
         public Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
@@ -18,7 +18,7 @@ namespace QueryableRest.Semantics.Operations
             if (a.Type != b.Type)
                 b = Expression.Convert(b, a.Type);
 
-            return Expression.Equal(a, b);
+            return Expression.NotEqual(a, b);
         }
     }
 }
