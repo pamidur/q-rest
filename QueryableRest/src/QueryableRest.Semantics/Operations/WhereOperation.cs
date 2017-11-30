@@ -9,7 +9,7 @@ namespace QueryableRest.Semantics.Operations
     {
         public static readonly string DefaultMoniker = "where";
 
-        public Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
@@ -17,12 +17,12 @@ namespace QueryableRest.Semantics.Operations
             if (arguments[0].Type != typeof(bool))
                 throw new ExpressionCreationException();
 
-            if (!typeof(IQueryable<>).MakeGenericType(argumentsRoot.Type).IsAssignableFrom(context.Type))
+            if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(context.Type))
                 throw new ExpressionCreationException();                
 
-            var lambda = Expression.Lambda(arguments[0], (ParameterExpression) argumentsRoot);
+            var lambda = Expression.Lambda(arguments[0], (ParameterExpression) root);
 
-            return Expression.Call(typeof(Queryable), "Where", new Type[] { argumentsRoot.Type }, context, lambda);
+            return Expression.Call(typeof(Queryable), "Where", new Type[] { root.Type }, context, lambda);
         }        
     }
 }

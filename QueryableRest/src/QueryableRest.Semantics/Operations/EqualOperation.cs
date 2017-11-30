@@ -7,7 +7,7 @@ namespace QueryableRest.Semantics.Operations
     {
         public static readonly string DefaultMoniker = "eq";
 
-        public Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
@@ -16,7 +16,13 @@ namespace QueryableRest.Semantics.Operations
             var b = arguments[0];
 
             if (a.Type != b.Type)
-                b = Expression.Convert(b, a.Type);
+            {
+                if (a.Type.IsAssignableFrom(b.Type))
+                    a = Expression.Convert(a, b.Type);
+                else if (b.Type.IsAssignableFrom(a.Type))
+                    b = Expression.Convert(b, a.Type);
+                else throw new ExpressionCreationException();
+            }
 
             return Expression.Equal(a, b);
         }

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
@@ -51,7 +52,7 @@ namespace TestApp
 
 
             var ed = Expression.Dynamic(Microsoft.CSharp.RuntimeBinder.Binder.GetMember(0, "Test", o.GetType(), new[] { Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo.Create(0, null) }),
-                typeof(object),Expression.Constant(o));
+                typeof(object), Expression.Constant(o));
 
             var ep = Expression.Property(Expression.Convert(Expression.Constant(o), typeof(IDictionary<string, object>)), "Item", Expression.Constant("Test"));
 
@@ -59,7 +60,11 @@ namespace TestApp
 
             var ao = exp.Compile()();
 
-            var os = JsonConvert.SerializeObject((IDictionary<string,object>)o);  
+            var os = JsonConvert.SerializeObject((IDictionary<string, object>)o);
+
+            var txt = new StringBuilder("asdas").ToString();
+
+            Expression<Func<SelectOperationContainer>> a = () => new SelectOperationContainer { { txt, new object() } };
 
 
             var data = Expression.Constant(new List<Entity>
@@ -105,7 +110,7 @@ namespace TestApp
                         }
                     },
 
-                    
+
                         new PropertyTerm
                         {
                             PropertyName = "Text",
@@ -126,35 +131,85 @@ namespace TestApp
 
                                 }
                             }
-                        
+
                     }
                         }
                     }
                 },
-                //Next = new CallTerm {
-                //    Method = SelectOperation.DefaultMoniker,
-                //    IsPerEachCall = true,
-                //    Arguments = new List<ITerm> {
-                //        new PropertyTerm
-                //        {
-                //            PropertyName = "Number",
-                //        }
-                //    }
-                //}
+                Next = new CallTerm
+                {
+                    Method = SelectOperation.DefaultMoniker,
+                    IsPerEachCall = true,
+                    Arguments = new List<ITerm> {
+                        new PropertyTerm
+                        {
+                            PropertyName = "Number",
+                        },
+                        new PropertyTerm
+                                    {
+                                        PropertyName = "Sub",
+                                        Next = new PropertyTerm
+                                        {
+                                            PropertyName = "Text",
+                                        }
+                                    }
+                    }
+                    ,
+                    Next = new CallTerm
+                    {
+                        Method = WhereOperation.DefaultMoniker,
+                        IsPerEachCall = true,
+                        Arguments = new List<ITerm> {
+                            new PropertyTerm
+                            {
+                                PropertyName = "Number",
+                                Next = new CallTerm
+                                {
+                                    Method = EqualOperation.DefaultMoniker,
+                                    Arguments = new List<ITerm>{
+                                        new ConstantTerm{ Value = 1}
+                                    }
+                                }
+                            },
+                        },
+
+                        Next = new CallTerm
+                        {
+                            Method = SelectOperation.DefaultMoniker,
+                            IsPerEachCall = true,
+                            Arguments = new List<ITerm> {
+                            new PropertyTerm
+                            {
+                                PropertyName = "Text",
+                            }
+                        }
+                        }
+                    }
+                }
             };
 
 
-            // :where(-every(price-ne(6),-oneof(price-eq(2),price-eq(3)))):select(id,text)
+            // :with(1@v):where(price-ne($v)):select(text,price@totalprice,$v)
+
+            // -with([1,2,3,4,5]@range):where-every(price-in($range),cost-in($range))
 
             // :where(-every(price-eq(cost))):select(id,text)
-            
-
+             
+                      
             var data2 = new List<Entity>
             {
                 new Entity { Number = 1, Text = "CCC"},
                 new Entity { Number = 2, Text = "AAA"},
                 new Entity { Number = 3, Text = "BBB"},
-            }.AsQueryable().Select(d=>new { d.Number }).Where(g=>g.Number>1);
+            }.AsQueryable();
+
+
+            var results = from store in data2
+                          let AveragePrice = store.Number * 2
+                          where AveragePrice < 500 && AveragePrice > 250
+                          select store;
+
+
 
             var dataParam = Expression.Parameter(data.Type);
 
@@ -166,7 +221,7 @@ namespace TestApp
 
             var aaaa = 0;
 
-            
+
 
             ////var sortQuery = new Sort<Entity>();
             ////sortQuery.Operations.Add(SortOperation<Entity>.ByAscending(e => e.Text));
@@ -186,6 +241,16 @@ namespace TestApp
 
             //var query_test = data.AsQueryable().OrderBy(e => e.Text).OrderByDescending(e => e.Number);
             //var result_test = query_test.ToList();
+
+        }
+    }
+
+    class SelectOperationContainer : Dictionary<string, object>
+    {
+        public SelectOperationContainer() { }
+
+        public SelectOperationContainer(IDictionary<string, object> initial) : base(initial)
+        {
 
         }
     }

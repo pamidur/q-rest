@@ -5,6 +5,6 @@ namespace QueryableRest.Semantics.Operations
 {
     public interface IOperation
     {
-        Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments);
+        Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments);
     }
 }

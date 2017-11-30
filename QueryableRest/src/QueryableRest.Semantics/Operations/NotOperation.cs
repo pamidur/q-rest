@@ -7,7 +7,7 @@ namespace QueryableRest.Semantics.Operations
     {
         public static readonly string DefaultMoniker = "not";
 
-        public Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 0)
                 throw new ExpressionCreationException();            

@@ -7,7 +7,7 @@ namespace QueryableRest.Semantics
 {
     public class Registry
     {
-        public IReadOnlyDictionary<string, IOperation> Operations => new Dictionary<string, IOperation>
+        public IReadOnlyDictionary<string, IOperation> Operations { get; } = new Dictionary<string, IOperation>
         {
             { NotEqualOperation.DefaultMoniker, new NotEqualOperation() },
             { EqualOperation.DefaultMoniker, new EqualOperation() },
@@ -18,8 +18,8 @@ namespace QueryableRest.Semantics
             { EveryOperation.DefaultMoniker, new EveryOperation() },
         };
 
-        public INameConvention PropertyNameConvention { get; set; } = new PascalCaseConvention();
-        public INameConvention MethodNameConvention { get; set; } = new PascalCaseConvention();
+        public INameConvention PropertyNameConvention { get; } = new PascalCaseConvention();
+        public INameConvention MethodNameConvention { get; } = new PascalCaseConvention();
 
     }
 }

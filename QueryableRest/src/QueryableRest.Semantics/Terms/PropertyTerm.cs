@@ -1,4 +1,6 @@
-﻿using System.Linq.Expressions;
+﻿using QueryableRest.Semantics.Containers;
+using QueryableRest.Semantics.Operations;
+using System.Linq.Expressions;
 
 namespace QueryableRest.Semantics.Terms
 {
@@ -9,7 +11,18 @@ namespace QueryableRest.Semantics.Terms
 
         public Expression CreateExpression(Expression context, Expression root, Registry registry)
         {
-            var exp = Expression.PropertyOrField(context, PropertyName);
+            Expression exp;
+
+            if(context.Type == PropertiesContainer.Type)
+            {
+                exp = Expression.Property(context, "Item", Expression.Constant(PropertyName));
+            }
+            else
+            {
+                exp = Expression.PropertyOrField(context, PropertyName);
+            }
+
+
             return Next?.CreateExpression(exp, root, registry) ?? exp;
         }
 

@@ -8,7 +8,7 @@ namespace QueryableRest.Semantics.Operations
     {
         public static readonly string DefaultMoniker = "oneof";
 
-        public Expression CreateExpression(Expression context, Expression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count < 1)
                 throw new ExpressionCreationException();
