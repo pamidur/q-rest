@@ -10,8 +10,6 @@ namespace QRest.Core.Operations
 {
     public class SelectOperation : IOperation
     {
-        public static readonly string DefaultMoniker = "select";
-
         public Expression CreateExpression(Expression parent, ParameterExpression root, IReadOnlyList<Expression> arguments)
         {
             if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(parent.Type))

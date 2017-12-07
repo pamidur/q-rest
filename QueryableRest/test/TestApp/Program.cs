@@ -59,7 +59,7 @@ namespace TestApp
             { ":where(-every(Sub.Text-eq('SubText'),Text-ne(Sub.Text))):select(Number,Sub.Text):where(Number-eq(1)):select(Text)" }
 
                 } });
-            
+
 
             // :with(1@v):where(price-ne($v)):select(text,price@totalprice,$v)
 

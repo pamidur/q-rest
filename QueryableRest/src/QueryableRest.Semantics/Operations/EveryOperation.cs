@@ -6,8 +6,6 @@ namespace QRest.Core.Operations
 {
     public class EveryOperation : IOperation
     {
-        public static readonly string DefaultMoniker = "every";
-
         public Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count < 1)

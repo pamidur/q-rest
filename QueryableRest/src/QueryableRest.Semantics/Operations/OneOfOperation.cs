@@ -6,8 +6,6 @@ namespace QRest.Core.Operations
 {
     public class OneOfOperation :IOperation
     {
-        public static readonly string DefaultMoniker = "oneof";
-
         public Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count < 1)
