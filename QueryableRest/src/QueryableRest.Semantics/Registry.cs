@@ -1,25 +1,36 @@
-﻿using QueryableRest.Semantics.Contracts;
-using QueryableRest.Semantics.Conventions;
-using QueryableRest.Semantics.Operations;
+﻿using QRest.Core.Contracts;
+using QRest.Core.Conventions;
+using QRest.Core.Operations;
 using System.Collections.Generic;
 
-namespace QueryableRest.Semantics
+namespace QRest.Core
 {
     public class Registry
     {
-        public IReadOnlyDictionary<string, IOperation> Operations { get; } = new Dictionary<string, IOperation>
+        private readonly Dictionary<string, IOperation> _operations = new Dictionary<string, IOperation>();
+        public IReadOnlyDictionary<string, IOperation> Operations => _operations;
+
+        public void RegisterOperation<T>(string name = null)
+            where T : IOperation, new()
         {
-            { NotEqualOperation.DefaultMoniker, new NotEqualOperation() },
-            { EqualOperation.DefaultMoniker, new EqualOperation() },
-            { NotOperation.DefaultMoniker,   new NotOperation() },
-            { WhereOperation.DefaultMoniker, new WhereOperation() },
-            { SelectOperation.DefaultMoniker, new SelectOperation() },
-            { OneOfOperation.DefaultMoniker, new OneOfOperation() },
-            { EveryOperation.DefaultMoniker, new EveryOperation() },
-        };
+            name = name ?? typeof(T).Name.ToLowerInvariant().Replace("operation", "");
+            _operations.Add(name, new T());
+        }
 
         public INameConvention PropertyNameConvention { get; } = new PascalCaseConvention();
         public INameConvention MethodNameConvention { get; } = new PascalCaseConvention();
+
+
+        public static void RegisterDefaultOperations(Registry registry)
+        {
+            registry.RegisterOperation<NotEqualOperation>("ne");
+            registry.RegisterOperation<EqualOperation>("eq");
+            registry.RegisterOperation<NotOperation>();
+            registry.RegisterOperation<WhereOperation>();
+            registry.RegisterOperation<SelectOperation>();
+            registry.RegisterOperation<OneOfOperation>();
+            registry.RegisterOperation<EveryOperation>();
+        }
 
     }
 }

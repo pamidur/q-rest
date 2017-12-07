@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace QueryableRest.Semantics.Operations
+namespace QRest.Core.Operations
 {
     public class WhereOperation : IOperation
     {
         public static readonly string DefaultMoniker = "where";
 
-        public Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
@@ -20,7 +20,7 @@ namespace QueryableRest.Semantics.Operations
             if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(context.Type))
                 throw new ExpressionCreationException();                
 
-            var lambda = Expression.Lambda(arguments[0], (ParameterExpression) root);
+            var lambda = Expression.Lambda(arguments[0], root);
 
             return Expression.Call(typeof(Queryable), "Where", new Type[] { root.Type }, context, lambda);
         }        

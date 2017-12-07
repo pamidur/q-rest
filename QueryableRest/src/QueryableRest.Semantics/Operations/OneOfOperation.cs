@@ -2,13 +2,13 @@
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace QueryableRest.Semantics.Operations
+namespace QRest.Core.Operations
 {
     public class OneOfOperation :IOperation
     {
         public static readonly string DefaultMoniker = "oneof";
 
-        public Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count < 1)
                 throw new ExpressionCreationException();

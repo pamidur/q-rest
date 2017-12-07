@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
-namespace QueryableRest.Semantics.Operations
+namespace QRest.Core.Operations
 {
     public class EveryOperation : IOperation
     {
         public static readonly string DefaultMoniker = "every";
 
-        public Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count < 1)
                 throw new ExpressionCreationException();

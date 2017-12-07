@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace QueryableRest.Semantics.Containers
+namespace QRest.Core.Containers
 {
     public class VariableContainer
     {

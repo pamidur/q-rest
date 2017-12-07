@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace QueryableRest.Semantics.Terms
+namespace QRest.Core.Terms
 {
     public class ConstantTerm : ITerm
     {
         public object Value { get; set; }
         public ITerm Next { get; set; }
 
-        public Expression CreateExpression(Expression context, Expression root, Registry registry)
+        public Expression CreateExpression(Expression prev, ParameterExpression root, Registry registry)
         {
             var exp = Expression.Constant(Value, Value.GetType());
             return Next?.CreateExpression(exp, root, registry) ?? exp;

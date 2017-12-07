@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.3
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}"
 EndProject
@@ -13,9 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryableRest.Query", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "test\TestApp\TestApp.csproj", "{EE8CCA2E-9D52-4C21-9ECA-9E860831B7D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryableRest.Semantics", "src\QueryableRest.Semantics\QueryableRest.Semantics.csproj", "{B19164B3-5611-45E1-A5BF-9E7A86191BF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Core", "src\QueryableRest.Semantics\QRest.Core.csproj", "{B19164B3-5611-45E1-A5BF-9E7A86191BF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueryableRest.AspNetCore", "src\QueryableRest.AspNetCore\QueryableRest.AspNetCore.csproj", "{BB83A844-C0D8-4CE1-8136-351729CFDF5E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueryableRest.AspNetCore", "src\QueryableRest.AspNetCore\QueryableRest.AspNetCore.csproj", "{BB83A844-C0D8-4CE1-8136-351729CFDF5E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain", "src\QueryableRest.Parser.MethodChain\QRest.Semantics.MethodChain.csproj", "{A5C7505F-A45C-427D-A47C-F3D09B6C251F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{BB83A844-C0D8-4CE1-8136-351729CFDF5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB83A844-C0D8-4CE1-8136-351729CFDF5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB83A844-C0D8-4CE1-8136-351729CFDF5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5C7505F-A45C-427D-A47C-F3D09B6C251F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5C7505F-A45C-427D-A47C-F3D09B6C251F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5C7505F-A45C-427D-A47C-F3D09B6C251F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5C7505F-A45C-427D-A47C-F3D09B6C251F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +54,7 @@ Global
 		{EE8CCA2E-9D52-4C21-9ECA-9E860831B7D8} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
 		{B19164B3-5611-45E1-A5BF-9E7A86191BF0} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
 		{BB83A844-C0D8-4CE1-8136-351729CFDF5E} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
+		{A5C7505F-A45C-427D-A47C-F3D09B6C251F} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {395047F8-3C58-47EF-81DB-C2ECE9E04D96}

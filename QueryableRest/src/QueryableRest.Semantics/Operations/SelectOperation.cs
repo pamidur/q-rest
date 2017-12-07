@@ -1,4 +1,4 @@
-﻿using QueryableRest.Semantics.Containers;
+﻿using QRest.Core.Containers;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -6,16 +6,13 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace QueryableRest.Semantics.Operations
+namespace QRest.Core.Operations
 {
-    
-
-
     public class SelectOperation : IOperation
     {
         public static readonly string DefaultMoniker = "select";
 
-        public Expression CreateExpression(Expression parent, Expression root, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression parent, ParameterExpression root, IReadOnlyList<Expression> arguments)
         {
             if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(parent.Type))
                 throw new ExpressionCreationException();
@@ -59,7 +56,7 @@ namespace QueryableRest.Semantics.Operations
             var createContainer = Expression.ListInit(Expression.New(PropertiesContainer.Type), initializers);
 
 
-            var lambda = Expression.Lambda(createContainer, (ParameterExpression)root);
+            var lambda = Expression.Lambda(createContainer, root);
 
             return
                 Expression.Call(typeof(Queryable), "AsQueryable", new[] { PropertiesContainer.Type },

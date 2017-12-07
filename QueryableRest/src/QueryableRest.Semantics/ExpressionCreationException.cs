@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QueryableRest.Semantics
+namespace QRest.Core
 {
     public class ExpressionCreationException : Exception
     {

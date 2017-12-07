@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace QueryableRest.Semantics.Operations
+namespace QRest.Core.Operations
 {
     public interface IOperation
     {
-        Expression CreateExpression(Expression context, Expression root, IReadOnlyList<Expression> arguments);
+        Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments);
     }
 }

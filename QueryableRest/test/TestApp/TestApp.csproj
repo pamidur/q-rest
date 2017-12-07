@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\QueryableRest.Semantics\QueryableRest.Semantics.csproj" />
+    <ProjectReference Include="..\..\src\QueryableRest.Parser.MethodChain\QRest.Semantics.MethodChain.csproj" />
+    <ProjectReference Include="..\..\src\QueryableRest.Semantics\QRest.Core.csproj" />
   </ItemGroup>
 
 </Project>

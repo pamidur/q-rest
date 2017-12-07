@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace QueryableRest.Semantics.Contracts
+namespace QRest.Core.Contracts
 {
     public interface INameConvention
     {

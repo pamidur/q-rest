@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 
-namespace QueryableRest.Semantics.Terms
+namespace QRest.Core.Terms
 {
     public interface ITerm
     {
         ITerm Next { get; set; }
-        Expression CreateExpression(Expression context, Expression root, Registry registry);        
+        Expression CreateExpression(Expression prev, ParameterExpression root, Registry registry);        
     }
 }

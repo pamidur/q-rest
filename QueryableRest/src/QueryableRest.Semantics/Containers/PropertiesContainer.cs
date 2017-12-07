@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace QueryableRest.Semantics.Containers
+namespace QRest.Core.Containers
 {
     class PropertiesContainer : Dictionary<string, object>
     {

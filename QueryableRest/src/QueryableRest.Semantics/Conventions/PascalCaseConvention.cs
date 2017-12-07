@@ -1,6 +1,6 @@
-﻿using QueryableRest.Semantics.Contracts;
+﻿using QRest.Core.Contracts;
 
-namespace QueryableRest.Semantics.Conventions
+namespace QRest.Core.Conventions
 {
     public class PascalCaseConvention : INameConvention
     {
