@@ -5,6 +5,6 @@ namespace QRest.Core.Operations
 {
     public interface IOperation
     {
-        Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments);
+        Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context);
     }
 }

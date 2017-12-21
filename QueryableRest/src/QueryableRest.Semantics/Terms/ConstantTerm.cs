@@ -8,10 +8,10 @@ namespace QRest.Core.Terms
         public object Value { get; set; }
         public ITerm Next { get; set; }
 
-        public Expression CreateExpression(Expression prev, ParameterExpression root, Registry registry)
+        public Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
         {
             var exp = Expression.Constant(Value, Value.GetType());
-            return Next?.CreateExpression(exp, root, registry) ?? exp;
+            return Next?.CreateExpression(exp, root, context) ?? exp;
         }
 
         public override string ToString()
@@ -23,8 +23,8 @@ namespace QRest.Core.Terms
 
             if (type == typeof(string))
             {
-                del_r = "'";
-                del_l = "'";
+                del_r = "`";
+                del_l = "`";
             }
             else if (type == typeof(Guid))
             {

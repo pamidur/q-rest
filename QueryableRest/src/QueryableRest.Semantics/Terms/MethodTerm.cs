@@ -10,14 +10,14 @@ namespace QRest.Core.Terms
         public List<ITerm> Arguments { get; set; } = new List<ITerm>();
         public ITerm Next { get; set; }
 
-        public virtual Expression CreateExpression(Expression prev, ParameterExpression root, Registry registry)
+        public virtual Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
         {
-            var op = registry.Operations[Method];
+            var op = context.Registry.Operations[Method];
 
-            var args = Arguments.Select(a => a.CreateExpression(root, root, registry)).ToList();
-            var exp = op.CreateExpression(prev, root, args);
+            var args = Arguments.Select(a => a.CreateExpression(prev, root, context)).ToList();
+            var exp = op.CreateExpression(prev, root, args, context);
 
-            return Next?.CreateExpression(exp, root, registry) ?? exp;
+            return Next?.CreateExpression(exp, root, context) ?? exp;
         }
 
         public override string ToString()

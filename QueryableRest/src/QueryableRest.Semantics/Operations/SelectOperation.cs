@@ -10,29 +10,27 @@ namespace QRest.Core.Operations
 {
     public class SelectOperation : IOperation
     {
-        public Expression CreateExpression(Expression parent, ParameterExpression root, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
         {
-            if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(parent.Type))
-                throw new ExpressionCreationException();
-
-
-            var initializers = new List<ElementInit>();
+            var initializers = new Dictionary<string, Expression>();
 
             foreach (var arg in arguments)
             {
                 string name;
 
-                if (arg.NodeType == ExpressionType.MemberAccess)
+                if (context.NamedExpressions.Values.Any(v=>v==arg))
+                {
+                    name = context.NamedExpressions.First(p => p.Value == arg).Key;
+                }
+                else if (arg.NodeType == ExpressionType.MemberAccess)
                 {
                     name = ((MemberExpression)arg).Member.Name;
-                }
+                }                
                 else if (arg.NodeType == ExpressionType.Parameter)
                 {
                     name = ((ParameterExpression)arg).Name;
-                }
-                else if (arg.NodeType == ExpressionType.Parameter)
-                {
-                    name = ((ParameterExpression)arg).Name;
+                    if (string.IsNullOrEmpty(name))
+                        name = "Data";
                 }
                 else if (arg.NodeType == ExpressionType.Index)
                 {
@@ -45,23 +43,45 @@ namespace QRest.Core.Operations
                         throw new ExpressionCreationException();
 
                     name = ((ConstantExpression)indexArg).Value.ToString();
-                }                
+                }    
+                else if(arg.NodeType == ExpressionType.Call)
+                {
+                    var call = (MethodCallExpression)arg;
+                    name = call.Method.Name;
+                    if (name == "AsQueryable" || name == "AsEnumerable" || name == "ToList" || name == "ToArray")
+                        name = "Data";
+                }
+                else if(arg.NodeType == ExpressionType.Dynamic)
+                {
+                    var dyn = (DynamicExpression)arg;
+
+                    if (dyn.Binder is GetMemberBinder)
+                        name = ((GetMemberBinder)dyn.Binder).Name;
+                    else
+                        throw new ExpressionCreationException();
+                }
                 else throw new ExpressionCreationException();
 
-                initializers.Add(Expression.ElementInit(PropertiesContainer.AddMethod, Expression.Constant(name), Expression.Convert(arg, typeof(object))));
+                initializers.Add(name, arg);
+            }            
+
+            var createContainer =  initializers.Any() ? context.Registry.ContainerProvider.CreateContainer(initializers) : root;
+
+            if (typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
+            {
+                var lambda = Expression.Lambda(createContainer, root);
+
+                return
+                    Expression.Call(typeof(Queryable), "AsQueryable", new[] { createContainer.Type },
+                        Expression.Call(typeof(Enumerable), "AsEnumerable", new[] { createContainer.Type },
+                            Expression.Call(typeof(Queryable), "Select", new Type[] { root.Type, createContainer.Type }, last, lambda)
+                        )
+                    );
             }
-
-            var createContainer = Expression.ListInit(Expression.New(PropertiesContainer.Type), initializers);
-
-
-            var lambda = Expression.Lambda(createContainer, root);
-
-            return
-                Expression.Call(typeof(Queryable), "AsQueryable", new[] { PropertiesContainer.Type },
-                    Expression.Call(typeof(Enumerable), "AsEnumerable", new[] { PropertiesContainer.Type },
-                        Expression.Call(typeof(Queryable), "Select", new Type[] { root.Type, PropertiesContainer.Type }, parent, lambda)
-                    )
-                );
+            else
+            {
+                return createContainer;
+            }            
         }
     }
 }

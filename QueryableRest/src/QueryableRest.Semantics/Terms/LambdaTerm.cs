@@ -7,16 +7,16 @@ namespace QRest.Core.Terms
 {
     public class LambdaTerm : MethodTerm
     {      
-        public override Expression CreateExpression(Expression prev, ParameterExpression root, Registry registry)
+        public override Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
         {
             var execRoot = Expression.Parameter(GetQueryElementType(prev));
 
-            var op = registry.Operations[Method];
+            var op = context.Registry.Operations[Method];
 
-            var args = Arguments.Select(a => a.CreateExpression(execRoot, execRoot, registry)).ToList();
-            var exp = op.CreateExpression(prev, execRoot, args);
+            var args = Arguments.Select(a => a.CreateExpression(execRoot, execRoot, context)).ToList();
+            var exp = op.CreateExpression(prev, execRoot, args, context);
 
-            return Next?.CreateExpression(exp, root, registry) ?? exp;
+            return Next?.CreateExpression(exp, root, context) ?? exp;
         }
 
         public override string ToString()

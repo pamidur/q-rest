@@ -19,18 +19,25 @@ namespace QRest.Semantics.MethodChain
 
         public ITerm Parse(IReadOnlyDictionary<string, string[]> queryParts)
         {
+            var query = queryParts.FirstOrDefault().Value.FirstOrDefault();
+
+            if (string.IsNullOrEmpty(query))
+                return null;
+
             return _parser.Parse(queryParts.First().Value[0]);
         }
 
-        public bool QuerySelector(string queryparam, string modelname)
+        public string[] QuerySelector(string modelname)
         {
-            return queryparam == modelname;
+            return new[] { modelname };
         }
 
         private static Parser<ITerm> CallChain { get; } = Read.Ref(() =>
             from root in CallChainRoot
             from chunks in CallChainChunk.Many()
-            select chunks.Aggregate(root, (c1, c2) => { c1.GetLatestCall().Next = c2; return c1; })
+            from name in Read.Optional(Name)
+            select chunks.Concat(new[] { name.GetOrDefault() }).Where(c => c != null)
+            .Aggregate(root, (c1, c2) => { c1.GetLatestCall().Next = c2; return c1; })
             );
 
         private static Parser<ITerm> CallChainRoot { get; } = Read.Ref(() =>
@@ -51,7 +58,7 @@ namespace QRest.Semantics.MethodChain
                 new MethodTerm { Method = method, Arguments = ReadCallParameters(parameters) }
                 : new LambdaTerm { Method = method, Arguments = ReadCallParameters(parameters) }
             );
-        
+
         private static Parser<ITerm> Property { get; } =
             from nav in Read.Optional(Read.Char('.'))
             from str1 in Read.Letter.Once().Text()
@@ -61,7 +68,7 @@ namespace QRest.Semantics.MethodChain
 
         private static Parser<ConstantTerm> Constant { get; } =
             new List<Parser<ConstantTerm>> {
-                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('\''), Read.Char('\''))
+                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('`'), Read.Char('`'))
                 select new ConstantTerm { Value = str },
 
                 from str in Read.Digit.AtLeastOnce().Text()
@@ -71,6 +78,12 @@ namespace QRest.Semantics.MethodChain
                 select new ConstantTerm { Value = Guid.Parse(str) }
             }.Aggregate((p1, p2) => p1.XOr(p2));
 
+
+        private static Parser<NameTerm> Name { get; } =
+            from at in Read.Char('@')
+            from str1 in Read.Letter.Once().Text()
+            from str2 in Read.LetterOrDigit.Many().Text()
+            select new NameTerm { Name = str1 + str2 };
 
         private static List<ITerm> ReadCallParameters(IOption<IOption<IEnumerable<ITerm>>> data)
         {

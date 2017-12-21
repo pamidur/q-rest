@@ -47,16 +47,16 @@ namespace TestApp
     {
         public static void Main(string[] args)
         {            
-            var data = Expression.Constant(new List<Entity>
+            var data = new List<Entity>
             {
                 new Entity { Number = 1, Text = "CCC", Sub = new SubEntity { Text = "SubText" } },
                 new Entity { Number = 2, Text = "AAA", Sub = new SubEntity { Text = "SubText2" } },
-            }.AsQueryable());
+            }.AsQueryable();
 
             var parser = new MethodChainParser();
             var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[] 
 
-            { ":where(-every(Sub.Text-eq('SubText'),Text-ne(Sub.Text))):select(Number,Sub.Text):where(Number-eq(1)):select(Text)" }
+            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(Sub.Text))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
 
                 } });
 
@@ -73,16 +73,16 @@ namespace TestApp
 
             // :where(-gt(price,1))     
 
-            var dataParam = Expression.Parameter(data.Type);
+            var dataParam = Expression.Parameter(data.GetType());
 
             var registry = new Registry();
             Registry.RegisterDefaultOperations(registry);
 
-            var e = tree.CreateExpression(dataParam, dataParam, registry);
+            var e = tree.CreateExpression(dataParam, dataParam, new QueryContext { Registry = registry });
 
             var l = Expression.Lambda(e, dataParam);
 
-            var r = l.Compile().DynamicInvoke(data.Value);
+            var r = l.Compile().DynamicInvoke(data);
 
             var brakepoint = 0;   
         }

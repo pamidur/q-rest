@@ -6,7 +6,7 @@ namespace QRest.Core.Operations
 {
     public class OneOfOperation :IOperation
     {
-        public Expression CreateExpression(Expression context, ParameterExpression root, IReadOnlyList<Expression> arguments)
+        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
         {
             if (arguments.Count < 1)
                 throw new ExpressionCreationException();

@@ -1,4 +1,5 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core.Containers;
+using QRest.Core.Contracts;
 using QRest.Core.Conventions;
 using QRest.Core.Operations;
 using System.Collections.Generic;
@@ -20,6 +21,8 @@ namespace QRest.Core
         public INameConvention PropertyNameConvention { get; } = new PascalCaseConvention();
         public INameConvention MethodNameConvention { get; } = new PascalCaseConvention();
 
+        public IContainerProvider ContainerProvider { get; } = new DynamicContainerProvider();
+
 
         public static void RegisterDefaultOperations(Registry registry)
         {
@@ -30,6 +33,11 @@ namespace QRest.Core
             registry.RegisterOperation<SelectOperation>();
             registry.RegisterOperation<OneOfOperation>();
             registry.RegisterOperation<EveryOperation>();
+            registry.RegisterOperation<FirstOperation>();
+            registry.RegisterOperation<CountOperation>();
+            registry.RegisterOperation<ItOperation>();
+            registry.RegisterOperation<SelfOperation>();
+            registry.RegisterOperation<SumOperation>();
         }
 
     }

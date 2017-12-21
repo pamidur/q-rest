@@ -1,19 +1,16 @@
-﻿using QRest.Core.Containers;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
+﻿using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    //public class NameTerm : ITerm
-    //{
-    //    public ITerm Next { get; set; }
-    //    public string Name { get; set; }
+    public class NameTerm : ITerm
+    {
+        public ITerm Next { get; set; }
+        public string Name { get; set; }        
 
-    //    public Expression CreateExpression(Expression context, Expression root, Registry registry)
-    //    {
-    //        return Expression.Constant(new VariableContainer { Name = Name, Type = context.Type})
-    //    }
-    //}
+        public Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
+        {
+            context.NamedExpressions.Add(Name, prev);
+            return prev;
+        }
+    }
 }
