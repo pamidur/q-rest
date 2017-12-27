@@ -16,7 +16,11 @@ namespace QRest.Core.Operations
             if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
                 throw new ExpressionCreationException();
 
-            return Expression.Call(typeof(Queryable), "Count", new Type[] { root.Type }, last);
+            var exp = Expression.Call(typeof(Queryable), "Count", new Type[] { root.Type }, last);
+
+            context.NamedExpressions.AddOrUpdate("Count", exp);
+
+            return exp;
         }
     }
 }

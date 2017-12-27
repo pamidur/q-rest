@@ -78,6 +78,18 @@ namespace QRest.Semantics.MethodChain
                 select new ConstantTerm { Value = Guid.Parse(str) }
             }.Aggregate((p1, p2) => p1.XOr(p2));
 
+        private static Parser<ConstantTerm> Primitives { get; } =
+            new List<Parser<ConstantTerm>> {
+                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('`'), Read.Char('`'))
+                select new ConstantTerm { Value = str },
+
+                from str in Read.Digit.AtLeastOnce().Text()
+                select new ConstantTerm { Value = Int32.Parse(str) },
+
+                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('{'), Read.Char('}'))
+                select new ConstantTerm { Value = Guid.Parse(str) }
+            }.Aggregate((p1, p2) => p1.XOr(p2));
+
 
         private static Parser<NameTerm> Name { get; } =
             from at in Read.Char('@')

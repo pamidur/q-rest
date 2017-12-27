@@ -14,8 +14,10 @@ namespace QRest.Core.Terms
         {
             var op = context.Registry.Operations[Method];
 
-            var args = Arguments.Select(a => a.CreateExpression(prev, root, context)).ToList();
-            var exp = op.CreateExpression(prev, root, args, context);
+            var newCtx = context.Derive();
+
+            var args = Arguments.Select(a => a.CreateExpression(prev, root, newCtx)).ToList();
+            var exp = op.CreateExpression(prev, root, args, newCtx);
 
             return Next?.CreateExpression(exp, root, context) ?? exp;
         }

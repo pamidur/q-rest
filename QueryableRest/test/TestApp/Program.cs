@@ -56,7 +56,7 @@ namespace TestApp
             var parser = new MethodChainParser();
             var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[] 
 
-            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(Sub.Text))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
+            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
 
                 } });
 
@@ -78,7 +78,7 @@ namespace TestApp
             var registry = new Registry();
             Registry.RegisterDefaultOperations(registry);
 
-            var e = tree.CreateExpression(dataParam, dataParam, new QueryContext { Registry = registry });
+            var e = tree.CreateExpression(dataParam, dataParam, new QueryContext(registry));
 
             var l = Expression.Lambda(e, dataParam);
 

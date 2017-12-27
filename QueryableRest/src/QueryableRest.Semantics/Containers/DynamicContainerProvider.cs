@@ -10,7 +10,7 @@ namespace QRest.Core.Containers
 {
     public class DynamicContainerProvider : IContainerProvider
     {
-        public Expression CreateContainer(IDictionary<string, Expression> properties)
+        public Expression CreateContainer(IReadOnlyDictionary<string, Expression> properties)
         {
             var initializers = properties.Select(p => Expression.ElementInit(PropertiesContainer.ArgAddMethod, Expression.Constant(p.Key), Expression.Convert(p.Value, typeof(object))));
             var createContainer = Expression.New(PropertiesContainer.TypeCtor, Expression.ListInit(Expression.New(PropertiesContainer.ArgType), initializers));

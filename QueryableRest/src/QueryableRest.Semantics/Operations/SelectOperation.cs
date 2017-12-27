@@ -16,72 +16,101 @@ namespace QRest.Core.Operations
 
             foreach (var arg in arguments)
             {
-                string name;
+                var name = GetName(arg, context);
 
-                if (context.NamedExpressions.Values.Any(v=>v==arg))
-                {
-                    name = context.NamedExpressions.First(p => p.Value == arg).Key;
-                }
-                else if (arg.NodeType == ExpressionType.MemberAccess)
-                {
-                    name = ((MemberExpression)arg).Member.Name;
-                }                
-                else if (arg.NodeType == ExpressionType.Parameter)
-                {
-                    name = ((ParameterExpression)arg).Name;
-                    if (string.IsNullOrEmpty(name))
-                        name = "Data";
-                }
-                else if (arg.NodeType == ExpressionType.Index)
-                {
-                    var index = (IndexExpression)arg;
-                    var indexArg = index.Arguments.FirstOrDefault();
-                    if (indexArg == null)
-                        throw new ExpressionCreationException();
-
-                    if (indexArg.NodeType != ExpressionType.Constant)
-                        throw new ExpressionCreationException();
-
-                    name = ((ConstantExpression)indexArg).Value.ToString();
-                }    
-                else if(arg.NodeType == ExpressionType.Call)
-                {
-                    var call = (MethodCallExpression)arg;
-                    name = call.Method.Name;
-                    if (name == "AsQueryable" || name == "AsEnumerable" || name == "ToList" || name == "ToArray")
-                        name = "Data";
-                }
-                else if(arg.NodeType == ExpressionType.Dynamic)
-                {
-                    var dyn = (DynamicExpression)arg;
-
-                    if (dyn.Binder is GetMemberBinder)
-                        name = ((GetMemberBinder)dyn.Binder).Name;
-                    else
-                        throw new ExpressionCreationException();
-                }
-                else throw new ExpressionCreationException();
+                if (string.IsNullOrEmpty(name) || initializers.ContainsKey(name))
+                    name = CreateUniquePropName(initializers);                
 
                 initializers.Add(name, arg);
-            }            
+            }
 
-            var createContainer =  initializers.Any() ? context.Registry.ContainerProvider.CreateContainer(initializers) : root;
+            var createContainer = initializers.Any() ? context.Registry.ContainerProvider.CreateContainer(initializers) : root;
+
+            var resultExpression = createContainer;
 
             if (typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
             {
                 var lambda = Expression.Lambda(createContainer, root);
 
-                return
+                resultExpression =
                     Expression.Call(typeof(Queryable), "AsQueryable", new[] { createContainer.Type },
                         Expression.Call(typeof(Enumerable), "AsEnumerable", new[] { createContainer.Type },
                             Expression.Call(typeof(Queryable), "Select", new Type[] { root.Type, createContainer.Type }, last, lambda)
                         )
                     );
             }
-            else
+
+            var resultExpressionName = GetName(last, context) ?? "Select";
+
+
+            context.NamedExpressions.AddOrUpdate(resultExpressionName, resultExpression);
+
+            return resultExpression;
+        }
+
+        private string GetName(Expression arg, QueryContext context)
+        {
+            string name = null;
+
+            if (context.NamedExpressions.Contains(arg))
             {
-                return createContainer;
-            }            
+                name = context.NamedExpressions.Get(arg);
+            }
+            else if (arg.NodeType == ExpressionType.MemberAccess)
+            {
+                name = ((MemberExpression)arg).Member.Name;
+            }
+            else if (arg.NodeType == ExpressionType.Parameter)
+            {
+                name = ((ParameterExpression)arg).Name;
+            }
+            else if (arg.NodeType == ExpressionType.Index)
+            {
+                var index = (IndexExpression)arg;
+                var indexArg = index.Arguments.FirstOrDefault();
+                if (indexArg == null)
+                    throw new ExpressionCreationException();
+
+                if (indexArg.NodeType != ExpressionType.Constant)
+                    throw new ExpressionCreationException();
+
+                name = ((ConstantExpression)indexArg).Value.ToString();
+            }
+            else if (arg.NodeType == ExpressionType.Call)
+            {
+                var call = (MethodCallExpression)arg;
+                name = call.Method.Name;
+            }
+            else if (arg.NodeType == ExpressionType.Dynamic)
+            {
+                var dyn = (DynamicExpression)arg;
+
+                if (dyn.Binder is GetMemberBinder)
+                    name = ((GetMemberBinder)dyn.Binder).Name;
+                else
+                    throw new ExpressionCreationException();
+            }
+            else if (context.Registry.ContainerProvider.IsContainerType(arg.Type))
+            {
+                name = null;
+            }
+
+            return name;
+        }
+
+        private string CreateUniquePropName(Dictionary<string, Expression> initializers)
+        {
+            var namePrefix = "Data";
+            var ind = 0;
+
+            var name = "";
+
+            do
+            {
+                name = $"{namePrefix}{ind++}";
+            } while (initializers.ContainsKey(name));
+
+            return name;
         }
     }
 }

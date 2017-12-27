@@ -27,7 +27,7 @@ namespace TestWebApp
             var registry = new Registry();
             Registry.RegisterDefaultOperations(registry);
 
-            var e = RootTerm.CreateExpression(dataParam, dataParam, new QueryContext { Registry = registry });
+            var e = RootTerm.CreateExpression(dataParam, dataParam, new QueryContext(registry));
 
             var l = Expression.Lambda(e, dataParam);
 
