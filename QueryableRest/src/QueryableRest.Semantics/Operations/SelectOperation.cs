@@ -1,4 +1,6 @@
 ﻿using QRest.Core.Containers;
+using QRest.Core.Expressions;
+using QRest.Core.Terms;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -19,7 +21,7 @@ namespace QRest.Core.Operations
                 var name = GetName(arg, context);
 
                 if (string.IsNullOrEmpty(name) || initializers.ContainsKey(name))
-                    name = CreateUniquePropName(initializers);                
+                    name = CreateUniquePropName(initializers);
 
                 initializers.Add(name, arg);
             }
@@ -42,19 +44,16 @@ namespace QRest.Core.Operations
 
             var resultExpressionName = GetName(last, context) ?? "Select";
 
-
-            context.NamedExpressions.AddOrUpdate(resultExpressionName, resultExpression);
-
-            return resultExpression;
+            return new NamedExpression(resultExpression, resultExpressionName); 
         }
 
         private string GetName(Expression arg, QueryContext context)
         {
             string name = null;
 
-            if (context.NamedExpressions.Contains(arg))
+            if (arg.NodeType == NamedExpression.NamedExpressionType)
             {
-                name = context.NamedExpressions.Get(arg);
+                name = ((NamedExpression)arg).Name;
             }
             else if (arg.NodeType == ExpressionType.MemberAccess)
             {

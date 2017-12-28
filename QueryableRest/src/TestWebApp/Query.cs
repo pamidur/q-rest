@@ -29,6 +29,8 @@ namespace TestWebApp
 
             var e = RootTerm.CreateExpression(dataParam, dataParam, new QueryContext(registry));
 
+            e = e.Reduce();
+
             var l = Expression.Lambda(e, dataParam);
 
             var r = l.Compile().DynamicInvoke(target);

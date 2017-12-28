@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QRest.Core.Expressions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,11 +17,9 @@ namespace QRest.Core.Operations
             if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
                 throw new ExpressionCreationException();
 
-            var exp = Expression.Call(typeof(Queryable), "Count", new Type[] { root.Type }, last);
+            var exp = Expression.Call(typeof(Queryable), "Count", new Type[] { root.Type }, last);            
 
-            context.NamedExpressions.AddOrUpdate("Count", exp);
-
-            return exp;
+            return new NamedExpression(exp, "Count");
         }
     }
 }
