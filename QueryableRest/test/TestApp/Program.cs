@@ -46,7 +46,7 @@ namespace TestApp
     public class Program
     {
         public static void Main(string[] args)
-        {            
+        {
             var data = new List<Entity>
             {
                 new Entity { Number = 1, Text = "CCC", Sub = new SubEntity { Text = "SubText" } },
@@ -54,11 +54,30 @@ namespace TestApp
             }.AsQueryable();
 
             var parser = new MethodChainParser();
-            var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[] 
+            var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[]
 
             { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
 
                 } });
+
+
+            tree = new LambdaTerm
+            {
+                Operation = new WhereOperation(),
+                Arguments = new List<ITerm> {
+                    new PropertyTerm{
+                        PropertyName = "Text",
+                        Next = new MethodTerm{
+                            Operation = new EqualOperation(),
+                            Arguments = new List<ITerm>{
+                                new ConstantTerm {
+                                    Value = "dadsa"
+                                }
+                            }
+                        }
+                    }
+                }
+            };
 
 
             // :with(1@v):where(price-ne($v)):select(text,price@totalprice,$v)
@@ -78,13 +97,11 @@ namespace TestApp
             var registry = new Registry();
             Registry.RegisterDefaultOperations(registry);
 
-            var e = tree.CreateExpression(dataParam, dataParam, new QueryContext(registry));
+            var e = tree.CreateExpression(dataParam, dataParam, new QueryContext());
 
             var l = Expression.Lambda(e, dataParam);
 
-            var r = l.Compile().DynamicInvoke(data);
-
-            var brakepoint = 0;   
+            var r = l.Compile().DynamicInvoke(data);            
         }
     }
 
