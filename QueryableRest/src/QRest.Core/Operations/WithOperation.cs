@@ -3,11 +3,19 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations
 {
-    public class WithOperation : IOperation
+    public class WithOperation : OperationBase 
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsQuery => true;
+        public override bool SupportsCall => true;
+
+        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
-            return last;
+            return context;
+        }
+
+        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        {
+            return context;
         }
     }
 }

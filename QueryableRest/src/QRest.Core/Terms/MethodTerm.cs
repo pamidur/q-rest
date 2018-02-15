@@ -11,14 +11,15 @@ namespace QRest.Core.Terms
         public List<ITerm> Arguments { get; set; } = new List<ITerm>();
         public ITerm Next { get; set; }
 
-        public virtual Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
+        public virtual Expression CreateExpression(Expression prev, ParameterExpression root)
         {
-            var newCtx = context.Derive();
+            if (!Operation.SupportsCall)
+                throw new ExpressionCreationException();
 
-            var args = Arguments.Select(a => a.CreateExpression(prev, root, newCtx)).ToList();
-            var exp = Operation.CreateExpression(prev, root, args, newCtx);
+            var args = Arguments.Select(a => a.CreateExpression(prev, root)).ToList();
+            var exp = Operation.CreateCallExpression(root, prev, args);
 
-            return Next?.CreateExpression(exp, root, context) ?? exp;
+            return Next?.CreateExpression(exp, root) ?? exp;
         }
 
         public override string ToString()

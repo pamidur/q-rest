@@ -55,20 +55,14 @@ namespace TestWebApp.Controllers
             collection = client.GetDatabase("test").GetCollection<Entity>("entities");
             //collection.InsertOne(new Entity { Number = 2, Text = "ODataSucks" });
         }
-        
-        class testi<T1,T2>{          
-            
-            public T1 v1 { get; set; }
-            public T2 v2 { get; set; }   
-        }
 
         // GET api/values
         [HttpGet("{query?}")]
         public ActionResult Get(Query query)
         {
             var data = collection.AsQueryable();
-            var result = query.Apply(data);
-            
+            var result = query.Apply(data);          
+
             return Ok(result);
         }        
     }

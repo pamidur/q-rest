@@ -3,23 +3,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Aggregations
 {
-    public class CountOperation : IOperation
+    public class CountOperation : OperationBase
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsQuery => true;
+
+        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 0)
-                throw new ExpressionCreationException();
+                throw new ExpressionCreationException();            
 
-            if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
-                throw new ExpressionCreationException();
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Count), new Type[] { argumentsRoot.Type }, context);
 
-            var exp = Expression.Call(typeof(Queryable), "Count", new Type[] { root.Type }, last);            
-
-            return new NamedExpression(exp, "Count");
+            return new NamedExpression(exp, nameof(Queryable.Count));
         }
     }
 }

@@ -7,12 +7,16 @@ using Read = Sprache.Parse;
 using System.Linq;
 using QRest.Core.Operations;
 using QRest.Core.Operations.Boolean;
+using QRest.Core.Operations.Query;
+using QRest.Core.Operations.Aggregations;
 
 namespace QRest.Semantics.MethodChain
 {
     public class MethodChainParser : IQuerySemanticsProvider
     {
-        private readonly Parser<ITerm> _parser;
+        internal static readonly Parser<char> StringDelimiter = Read.Char('`');
+
+        internal readonly Parser<ITerm> _parser;
 
         public MethodChainParser()
         {
@@ -26,7 +30,9 @@ namespace QRest.Semantics.MethodChain
             if (string.IsNullOrEmpty(query))
                 return null;
 
-            return _parser.Parse(queryParts.First().Value[0]);
+            var result = _parser.TryParse(queryParts.First().Value[0]);
+
+            return result.Value;
         }
 
         public string[] QuerySelector(string modelname)
@@ -34,7 +40,7 @@ namespace QRest.Semantics.MethodChain
             return new[] { modelname };
         }
 
-        private static IOperation SelectOperation(string opName)
+        internal static IOperation SelectOperation(string opName)
         {
             switch (opName)
             {
@@ -42,14 +48,13 @@ namespace QRest.Semantics.MethodChain
                 case "eq": return new EqualOperation();
                 case "not": return new NotOperation();
                 case "where": return new WhereOperation();
-                case "select": return new SelectOperation();
+                case "select": return new SelectOperation() { UseStaticTerminatingQuery = true };
                 case "oneof": return new OneOfOperation();
                 case "every": return new EveryOperation();
                 case "first": return new FirstOperation();
                 case "count": return new CountOperation();
                 case "with": return new WithOperation();
                 case "it": return new ItOperation();
-                case "self": return new SelfOperation();
                 case "sum": return new SumOperation();
                 case "contains": return new ContainsOperation();
                 case "skip": return new SkipOperation();
@@ -58,7 +63,7 @@ namespace QRest.Semantics.MethodChain
             }
         }
 
-        private static Parser<ITerm> CallChain { get; } = Read.Ref(() =>
+        internal static Parser<ITerm> CallChain { get; } = Read.Ref(() =>
             from root in CallChainRoot
             from chunks in CallChainChunk.Many()
             from name in Read.Optional(Name)
@@ -66,64 +71,71 @@ namespace QRest.Semantics.MethodChain
             .Aggregate(root, (c1, c2) => { c1.GetLatestCall().Next = c2; return c1; })
             );
 
-        private static Parser<ITerm> CallChainRoot { get; } = Read.Ref(() =>
+        internal static Parser<ITerm> CallChainRoot { get; } = Read.Ref(() =>
             from chunk in Property.XOr(Constant).XOr(Method)
             select chunk
         );
 
-        private static Parser<ITerm> CallChainChunk { get; } = Read.Ref(() =>
-            from chunk in Property.XOr(Method)
+        internal static Parser<ITerm> CallChainChunk { get; } = Read.Ref(() =>
+            from chunk in SubProperty.XOr(Method)
             select chunk
         );
 
-        private static Parser<ITerm> Method { get; } = Read.Ref(() =>
+        internal static Parser<ITerm> Method { get; } = Read.Ref(() =>
             from semic in Read.Char('-').XOr(Read.Char(':'))
-            from method in Read.LetterOrDigit.Many().Text()
-            from parameters in Read.Optional(Read.Contained(Read.Optional(Read.XDelimitedBy(CallChain, Read.Char(','))), Read.Char('('), Read.Char(')')))
+            from method in MemberName
+            from parameters in Read.Contained(Read.XDelimitedBy(CallChain, Read.Char(',')).Optional(), Read.Char('('), Read.Char(')')).Optional()
             select semic == '-' ?
                 new MethodTerm { Operation = SelectOperation(method), Arguments = ReadCallParameters(parameters) }
                 : new LambdaTerm { Operation = SelectOperation(method), Arguments = ReadCallParameters(parameters) }
             );
 
-        private static Parser<ITerm> Property { get; } =
-            from nav in Read.Optional(Read.Char('.'))
-            from str1 in Read.Letter.Once().Text()
-            from str2 in Read.LetterOrDigit.Many().Text()
-            select new PropertyTerm { PropertyName = str1 + str2 };
+        internal static Parser<ITerm> SubProperty { get; } = Read.Ref(() =>
+             from nav in Read.Char('.')
+             from prop in Property
+             select prop
+            );
 
+        internal static Parser<ITerm> Property { get; } = Read.Ref(() =>
+             from name in MemberName
+             select new PropertyTerm { PropertyName = name }
+            );
 
-        private static Parser<ConstantTerm> Constant { get; } =
-            new List<Parser<ConstantTerm>> {
-                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('`'), Read.Char('`'))
-                select new ConstantTerm { Value = str },
+        internal static Parser<ConstantTerm> Constant { get; } = Read.Ref(() =>
+            new Parser<ConstantTerm>[] {
+                StringConstant,
+                NumberConstant,
+                GuidConstant
+            }.Aggregate((p1, p2) => p1.XOr(p2)).Select(o => new ConstantTerm { Value = o })
+        );
 
-                from str in Read.Digit.AtLeastOnce().Text()
-                select new ConstantTerm { Value = Int32.Parse(str) },
+        internal static Parser<ConstantTerm> NumberConstant { get; } = Read.Ref(() =>
+            from str in Read.Digit.AtLeastOnce().Text()
+            select new ConstantTerm { Value = Int32.Parse(str) }
+        );
 
-                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('{'), Read.Char('}'))
-                select new ConstantTerm { Value = Guid.Parse(str) }
-            }.Aggregate((p1, p2) => p1.XOr(p2));
+        internal static Parser<ConstantTerm> GuidConstant { get; } = Read.Ref(() =>
+            from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('{'), Read.Char('}'))
+            select new ConstantTerm { Value = Guid.Parse(str) }
+        );
 
-        private static Parser<ConstantTerm> Primitives { get; } =
-            new List<Parser<ConstantTerm>> {
-                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('`'), Read.Char('`'))
-                select new ConstantTerm { Value = str },
+        internal static Parser<ConstantTerm> StringConstant { get; } = Read.Ref(() =>
+            from str in Read.Contained(Read.AnyChar.Except(StringDelimiter).Many().Text().Optional(), StringDelimiter, StringDelimiter)
+            select new ConstantTerm { Value = str.GetOrDefault() ?? "" }
+        );
 
-                from str in Read.Digit.AtLeastOnce().Text()
-                select new ConstantTerm { Value = Int32.Parse(str) },
-
-                from str in Read.Contained(Read.LetterOrDigit.Many().Text(), Read.Char('{'), Read.Char('}'))
-                select new ConstantTerm { Value = Guid.Parse(str) }
-            }.Aggregate((p1, p2) => p1.XOr(p2));
-
-
-        private static Parser<NameTerm> Name { get; } =
+        internal static Parser<NameTerm> Name { get; } = Read.Ref(() =>
             from at in Read.Char('@')
+            from name in MemberName
+            select new NameTerm { Name = name }
+        );
+
+        internal static Parser<string> MemberName { get; } =
             from str1 in Read.Letter.Once().Text()
             from str2 in Read.LetterOrDigit.Many().Text()
-            select new NameTerm { Name = str1 + str2 };
+            select str1 + str2;
 
-        private static List<ITerm> ReadCallParameters(IOption<IOption<IEnumerable<ITerm>>> data)
+        internal static List<ITerm> ReadCallParameters(IOption<IOption<IEnumerable<ITerm>>> data)
         {
             var parameters = data.GetOrDefault()?.GetOrDefault();
             if (parameters == null)

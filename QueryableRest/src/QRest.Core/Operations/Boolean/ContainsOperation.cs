@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace QRest.Core.Operations.Boolean
 {
-    public class ContainsOperation : IOperation
+    public class ContainsOperation : OperationBase
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsCall => true;
+
+        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            if(last.Type == typeof(string))
+            if (context.Type == typeof(string))
             {
-                return Expression.Call(last, "Contains", new Type[] { }, arguments[0]);
+                return Expression.Call(context, nameof(String.Contains), new Type[] { }, arguments[0]);
             }
 
-            throw new Exception();
+            throw new ExpressionCreationException();
         }
     }
 }

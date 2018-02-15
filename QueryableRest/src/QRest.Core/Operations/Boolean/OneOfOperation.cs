@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Boolean
 {
-    public class OneOfOperation :IOperation
+    public class OneOfOperation :OperationBase
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsCall => true;
+
+        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count < 1)
                 throw new ExpressionCreationException();

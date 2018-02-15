@@ -8,10 +8,10 @@ namespace QRest.Core.Terms
         public object Value { get; set; }
         public ITerm Next { get; set; }
 
-        public Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
+        public Expression CreateExpression(Expression prev, ParameterExpression root)
         {
             var exp = Expression.Constant(Value, Value.GetType());
-            return Next?.CreateExpression(exp, root, context) ?? exp;
+            return Next?.CreateExpression(exp, root) ?? exp;
         }
 
         public override string ToString()

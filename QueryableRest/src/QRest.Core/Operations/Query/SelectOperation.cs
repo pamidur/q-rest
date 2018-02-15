@@ -1,50 +1,91 @@
-﻿using QRest.Core.Expressions;
+﻿using QRest.Core.Containers;
+using QRest.Core.Expressions;
+using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Query
 {
-    public class SelectOperation : IOperation
+    public class SelectOperation : OperationBase
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsCall => true;
+        public override bool SupportsQuery => true;
+
+
+        public bool UseStaticTerminatingQuery { get; set; } = false;
+
+
+        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
-            var initializers = new Dictionary<string, Expression>();
+            var expression = arguments.Any() ? DynamicContainer.CreateContainer(GetInitializers(arguments)) : root;
 
-            foreach (var arg in arguments)
-            {
-                var name = GetName(arg, context);
-
-                if (string.IsNullOrEmpty(name) || initializers.ContainsKey(name))
-                    name = CreateUniquePropName(initializers);
-
-                initializers.Add(name, arg);
-            }
-
-            var createContainer = initializers.Any() ? context.ContainerProvider.CreateContainer(initializers) : root;
-
-            var resultExpression = createContainer;
-
-            if (typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
-            {
-                var lambda = Expression.Lambda(createContainer, root);
-
-                resultExpression =
-                    Expression.Call(typeof(Queryable), "AsQueryable", new[] { createContainer.Type },
-                        Expression.Call(typeof(Enumerable), "AsEnumerable", new[] { createContainer.Type },
-                            Expression.Call(typeof(Queryable), "Select", new Type[] { root.Type, createContainer.Type }, last, lambda)
-                        )
-                    );
-            }
-
-            var resultExpressionName = GetName(last, context) ?? "Select";
-
-            return new NamedExpression(resultExpression, resultExpressionName);
+            var expName = GetName(context) ?? NamedExpression.DefaultObjectResultName;
+            return new NamedExpression(expression, expName);
         }
 
-        private string GetName(Expression arg, QueryContext context)
+        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        {
+            var queryElement = argumentsRoot.Type;
+
+            var fields = GetInitializers(arguments);
+
+            var expression = DynamicContainer.IsContainerType(queryElement) || !UseStaticTerminatingQuery ?
+                QueryDynamic(context, argumentsRoot, fields) :
+                QueryNonDynamic(context, argumentsRoot, fields);
+
+            var expName = GetName(context) ?? NamedExpression.DefaultQueryResultName;
+            return new NamedExpression(expression, expName);
+
+        }
+
+        public IReadOnlyDictionary<string, Expression> GetInitializers(IReadOnlyList<Expression> arguments)
+        {
+            var fields = new Dictionary<string, Expression>();
+            foreach (var arg in arguments)
+            {
+                var name = GetName(arg);
+                if (string.IsNullOrEmpty(name) || fields.ContainsKey(name))
+                    name = CreateUniquePropName(fields);
+                fields.Add(name, arg);
+            }
+
+            return fields;
+        }
+
+        private Expression QueryDynamic(Expression last, ParameterExpression root, IReadOnlyDictionary<string, Expression> fields)
+        {
+            var expression = fields.Any() ? DynamicContainer.CreateContainer(fields) : root;
+            var lambda = Expression.Lambda(expression, root);
+
+            return Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, expression.Type }, last, lambda);
+        }
+
+        private Expression QueryNonDynamic(Expression last, ParameterExpression root, IReadOnlyDictionary<string, Expression> fields)
+        {
+            var valuesList = fields.Select(e => e.Value).ToList();
+            var staticExpression = fields.Any() ? StaticContainer.CreateContainer(valuesList) : root;
+
+            var staticLambda = Expression.Lambda(staticExpression, root);
+
+            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { staticExpression.Type },
+                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] { staticExpression.Type },
+                        Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, staticExpression.Type }, last, staticLambda)
+                    )
+                );
+
+            if (!fields.Any())
+                return resultExpression;
+
+            var dynParam = Expression.Parameter(StaticContainer.ContainerType);
+            var dynamicFields = fields.ToDictionary(f => f.Key, f => StaticContainer.CreateReadProperty(dynParam, valuesList.IndexOf(f.Value)));
+
+            return QueryDynamic(resultExpression, dynParam, dynamicFields);
+        }
+
+        private string GetName(Expression arg)
         {
             string name = null;
 
@@ -86,8 +127,9 @@ namespace QRest.Core.Operations
                 else
                     throw new ExpressionCreationException();
             }
-            else if (context.ContainerProvider.IsContainerType(arg.Type))
+            else if (DynamicContainer.IsContainerType(arg.Type))
             {
+                throw new ExpressionCreationException();
                 name = null;
             }
 

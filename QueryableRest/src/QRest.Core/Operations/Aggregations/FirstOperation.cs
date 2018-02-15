@@ -1,22 +1,23 @@
-﻿using System;
+﻿using QRest.Core.Expressions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Aggregations
 {
-    public class FirstOperation : IOperation
+    public class FirstOperation : OperationBase
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsQuery => true;
+
+        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 0)
                 throw new ExpressionCreationException();
 
-            if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
-                throw new ExpressionCreationException();            
+            var exp =  Expression.Call(typeof(Queryable), nameof(Queryable.FirstOrDefault), new Type[] { argumentsRoot.Type }, context);
 
-            return Expression.Call(typeof(Queryable), "FirstOrDefault", new Type[] { root.Type }, last);
+            return new NamedExpression(exp, NamedExpression.DefaultObjectResultName);
         }
     }
 }

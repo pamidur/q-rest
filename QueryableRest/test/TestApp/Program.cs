@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using QRest.Core;
 using QRest.Core.Operations;
+using QRest.Core.Operations.Boolean;
+using QRest.Core.Operations.Query;
 using QRest.Core.Terms;
 using QRest.Semantics.MethodChain;
 using System;
@@ -97,7 +99,7 @@ namespace TestApp
             var registry = new Registry();
             Registry.RegisterDefaultOperations(registry);
 
-            var e = tree.CreateExpression(dataParam, dataParam, new QueryContext());
+            var e = tree.CreateExpression(dataParam, dataParam);
 
             var l = Expression.Lambda(e, dataParam);
 

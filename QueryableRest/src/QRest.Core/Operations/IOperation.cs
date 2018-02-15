@@ -5,6 +5,10 @@ namespace QRest.Core.Operations
 {
     public interface IOperation
     {
-        Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context);
+        bool SupportsQuery { get; }
+        bool SupportsCall{ get; }
+
+        Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments);
+        Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments);
     }
 }

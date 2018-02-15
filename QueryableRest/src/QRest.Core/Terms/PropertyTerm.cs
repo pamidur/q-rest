@@ -9,13 +9,13 @@ namespace QRest.Core.Terms
         public string PropertyName { get; set; }
         public ITerm Next { get; set; }
 
-        public Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
+        public Expression CreateExpression(Expression prev, ParameterExpression root)
         {
             Expression exp;
 
-            if (context.ContainerProvider.IsContainerType(prev.Type))
+            if (DynamicContainer.IsContainerType(prev.Type))
             {
-                exp = context.ContainerProvider.CreateReadProperty(prev, PropertyName);
+                exp = DynamicContainer.CreateReadProperty(prev, PropertyName);
             }
             else
             {
@@ -23,7 +23,7 @@ namespace QRest.Core.Terms
             }
 
 
-            return Next?.CreateExpression(exp, root, context) ?? exp;
+            return Next?.CreateExpression(exp, root) ?? exp;
         }
 
         public override string ToString()

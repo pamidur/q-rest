@@ -5,6 +5,10 @@ namespace QRest.Core.Expressions
 {
     class NamedExpression : Expression
     {
+        public static readonly string DefaultQueryResultName = "Query";
+        public static readonly string DefaultObjectResultName = "Object";
+        public static readonly string DefaultValueResultName = "Value";
+
         public static readonly ExpressionType NamedExpressionType = (ExpressionType)100;
 
         public NamedExpression(Expression expression, string name)

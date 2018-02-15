@@ -1,21 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Boolean
 {
-    public class NotOperation : IOperation
+    public class NotOperation : OperationBase
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsCall => true;
+
+        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 0)
-                throw new ExpressionCreationException();            
+                throw new ExpressionCreationException();
 
-            return Expression.Not(last);
-        }
-
-        public Expression GetArgumentsRoot(Expression context)
-        {
-            return context;
+            return Expression.Not(context);
         }
     }
 }

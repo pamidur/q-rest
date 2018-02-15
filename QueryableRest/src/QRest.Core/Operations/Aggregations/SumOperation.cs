@@ -1,24 +1,25 @@
-﻿using System;
+﻿using QRest.Core.Expressions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Aggregations
 {
-    public class SumOperation : IOperation
+    public class SumOperation : OperationBase
     {
-        public Expression CreateExpression(Expression last, ParameterExpression root, IReadOnlyList<Expression> arguments, QueryContext context)
+        public override bool SupportsQuery => true;
+
+        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            if (!typeof(IQueryable<>).MakeGenericType(root.Type).IsAssignableFrom(last.Type))
-                throw new ExpressionCreationException();
+            var lambda = Expression.Lambda(arguments[0], argumentsRoot);
 
-            var lambda = Expression.Lambda(arguments[0], root);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Sum), new Type[] { argumentsRoot.Type }, context, lambda);
 
-            return Expression.Call(typeof(Queryable), "Sum", new Type[] { root.Type }, last, lambda);
-        }
+            return new NamedExpression(exp, nameof(Queryable.Sum));
+        }        
     }
 }

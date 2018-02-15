@@ -2,6 +2,9 @@
 using QRest.Core.Contracts;
 using QRest.Core.Conventions;
 using QRest.Core.Operations;
+using QRest.Core.Operations.Aggregations;
+using QRest.Core.Operations.Boolean;
+using QRest.Core.Operations.Query;
 using System.Collections.Generic;
 
 namespace QRest.Core
@@ -34,7 +37,6 @@ namespace QRest.Core
             registry.RegisterOperation<FirstOperation>();
             registry.RegisterOperation<CountOperation>();
             registry.RegisterOperation<ItOperation>();
-            registry.RegisterOperation<SelfOperation>();
             registry.RegisterOperation<SumOperation>();
             registry.RegisterOperation<WithOperation>();
         }

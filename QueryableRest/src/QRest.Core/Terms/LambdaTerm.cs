@@ -1,37 +1,27 @@
-﻿using System;
+﻿using QRest.Core.Extensions;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace QRest.Core.Terms
 {
     public class LambdaTerm : MethodTerm
     {
-        public override Expression CreateExpression(Expression prev, ParameterExpression root, QueryContext context)
+        public override Expression CreateExpression(Expression prev, ParameterExpression root)
         {
-            var execRoot = Expression.Parameter(GetQueryElementType(prev), $"p_{GetHashCode()}");
+            if (!Operation.SupportsQuery)
+                throw new ExpressionCreationException();
 
-            var args = Arguments.Select(a => a.CreateExpression(execRoot, execRoot, context)).ToList();
-            var exp = Operation.CreateExpression(prev, execRoot, args, context);
+            var argsroot = Expression.Parameter(prev.GetQueryElementType(), $"p_{GetHashCode()}");
 
-            return Next?.CreateExpression(exp, root, context) ?? exp;
+            var args = Arguments.Select(a => a.CreateExpression(argsroot, argsroot)).ToList();
+            var exp = Operation.CreateQueryExpression(root, prev, argsroot, args);
+
+            return Next?.CreateExpression(exp, root) ?? exp;
         }
 
         public override string ToString()
         {
             return $":{base.ToString().Substring(1)}";
-        }
-
-        protected Type GetQueryElementType(Expression query)
-        {
-            var typeInfo = query.Type.GetTypeInfo();
-
-            if ($"{typeInfo.Namespace}.{typeInfo.Name}" != "System.Linq.IQueryable`1")
-            {
-                typeInfo = typeInfo.GetInterface("System.Linq.IQueryable`1").GetTypeInfo();
-            }
-
-            return typeInfo.GetGenericArguments()[0];
-        }
+        }       
     }
 }
