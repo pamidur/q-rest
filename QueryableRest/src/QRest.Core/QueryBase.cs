@@ -18,7 +18,7 @@ namespace QRest.Core
 
             var dataParam = Expression.Parameter(typeof(IQueryable<T>));
 
-            var e = RootTerm.CreateExpression(dataParam, dataParam);
+            var e = RootTerm.CreateExpressionChain(dataParam, dataParam);
 
             e = e.Reduce();
 

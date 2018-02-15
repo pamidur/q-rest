@@ -3,36 +3,37 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class ConstantTerm : ITerm
+    public class ConstantTerm : TermBase
     {
         public object Value { get; set; }
-        public ITerm Next { get; set; }
 
-        public Expression CreateExpression(Expression prev, ParameterExpression root)
+        protected override Expression CreateExpression(Expression prev, ParameterExpression root)
         {
-            var exp = Expression.Constant(Value, Value.GetType());
-            return Next?.CreateExpression(exp, root) ?? exp;
+            return Expression.Constant(Value, Value.GetType());
         }
 
-        public override string ToString()
+        protected override string Debug
         {
-            var type = Value.GetType();
-
-            var del_r = "";
-            var del_l = "";
-
-            if (type == typeof(string))
+            get
             {
-                del_r = "`";
-                del_l = "`";
-            }
-            else if (type == typeof(Guid))
-            {
-                del_r = "}";
-                del_l = "{";
-            }
+                var type = Value.GetType();
 
-            return $"{del_l}{Value.ToString()}{del_r}{Next?.ToString()}";
+                var del_r = "";
+                var del_l = "";
+
+                if (type == typeof(string))
+                {
+                    del_r = "`";
+                    del_l = "`";
+                }
+                else if (type == typeof(Guid))
+                {
+                    del_r = "}";
+                    del_l = "{";
+                }
+
+                return $"{del_l}{Value.ToString()}{del_r}";
+            }
         }
     }
 }

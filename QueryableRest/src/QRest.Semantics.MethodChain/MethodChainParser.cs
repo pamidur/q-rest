@@ -9,6 +9,7 @@ using QRest.Core.Operations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
 using QRest.Core.Operations.Aggregations;
+using QRest.Core.Operations.Query.OrderDirectionOperations;
 
 namespace QRest.Semantics.MethodChain
 {
@@ -48,7 +49,7 @@ namespace QRest.Semantics.MethodChain
                 case "eq": return new EqualOperation();
                 case "not": return new NotOperation();
                 case "where": return new WhereOperation();
-                case "select": return new SelectOperation() { UseStaticTerminatingQuery = true };
+                case "get": return new SelectOperation() { UseStaticTerminatingQuery = true };
                 case "oneof": return new OneOfOperation();
                 case "every": return new EveryOperation();
                 case "first": return new FirstOperation();
@@ -56,9 +57,12 @@ namespace QRest.Semantics.MethodChain
                 case "with": return new WithOperation();
                 case "it": return new ItOperation();
                 case "sum": return new SumOperation();
-                case "contains": return new ContainsOperation();
+                case "has": return new ContainsOperation();
                 case "skip": return new SkipOperation();
                 case "take": return new TakeOperation();
+                case "order": return new OrderOperation();
+                case "asc": return new AscendingOperation();
+                case "desc": return new DescendingOperation();
                 default: throw new Exception();
             }
         }
@@ -66,8 +70,8 @@ namespace QRest.Semantics.MethodChain
         internal static Parser<ITerm> CallChain { get; } = Read.Ref(() =>
             from root in CallChainRoot
             from chunks in CallChainChunk.Many()
-            from name in Read.Optional(Name)
-            select chunks.Concat(new[] { name.GetOrDefault() }).Where(c => c != null)
+            //from name in Read.Optional(Name)
+            select chunks//.Concat(new[] { name.GetOrDefault() }).Where(c => c != null)
             .Aggregate(root, (c1, c2) => { c1.GetLatestCall().Next = c2; return c1; })
             );
 
@@ -77,7 +81,7 @@ namespace QRest.Semantics.MethodChain
         );
 
         internal static Parser<ITerm> CallChainChunk { get; } = Read.Ref(() =>
-            from chunk in SubProperty.XOr(Method)
+            from chunk in SubProperty.XOr(Method).XOr(Name)
             select chunk
         );
 
@@ -106,7 +110,7 @@ namespace QRest.Semantics.MethodChain
                 StringConstant,
                 NumberConstant,
                 GuidConstant
-            }.Aggregate((p1, p2) => p1.XOr(p2)).Select(o => new ConstantTerm { Value = o })
+            }.Aggregate((p1, p2) => p1.XOr(p2))
         );
 
         internal static Parser<ConstantTerm> NumberConstant { get; } = Read.Ref(() =>

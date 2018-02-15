@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -16,6 +17,14 @@ namespace QRest.Core.Extensions
             }
 
             return typeInfo?.GetGenericArguments()[0];
+        }
+
+        public static Expression ReduceTo(this Expression expression, ExpressionType[] expressionTypes)
+        {
+            while (expression.CanReduce && !expressionTypes.Contains(expression.NodeType))
+                expression = expression.Reduce();
+
+            return expression;
         }
     }
 }

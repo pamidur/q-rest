@@ -4,12 +4,11 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class PropertyTerm : ITerm
+    public class PropertyTerm : TermBase
     {
         public string PropertyName { get; set; }
-        public ITerm Next { get; set; }
 
-        public Expression CreateExpression(Expression prev, ParameterExpression root)
+        protected override Expression CreateExpression(Expression prev, ParameterExpression root)
         {
             Expression exp;
 
@@ -23,12 +22,9 @@ namespace QRest.Core.Terms
             }
 
 
-            return Next?.CreateExpression(exp, root) ?? exp;
+            return exp;
         }
 
-        public override string ToString()
-        {
-            return $".{PropertyName}{Next?.ToString()}";
-        }
+        protected override string Debug => $".{PropertyName}";
     }
 }

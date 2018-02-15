@@ -6,22 +6,19 @@ namespace QRest.Core.Terms
 {
     public class LambdaTerm : MethodTerm
     {
-        public override Expression CreateExpression(Expression prev, ParameterExpression root)
+        protected override Expression CreateExpression(Expression prev, ParameterExpression root)
         {
             if (!Operation.SupportsQuery)
                 throw new ExpressionCreationException();
 
             var argsroot = Expression.Parameter(prev.GetQueryElementType(), $"p_{GetHashCode()}");
 
-            var args = Arguments.Select(a => a.CreateExpression(argsroot, argsroot)).ToList();
+            var args = Arguments.Select(a => a.CreateExpressionChain(argsroot, argsroot)).ToList();
             var exp = Operation.CreateQueryExpression(root, prev, argsroot, args);
 
-            return Next?.CreateExpression(exp, root) ?? exp;
+            return exp;
         }
 
-        public override string ToString()
-        {
-            return $":{base.ToString().Substring(1)}";
-        }       
+        protected override string Debug => $":{base.Debug.Substring(1)}";               
     }
 }

@@ -99,7 +99,7 @@ namespace TestApp
             var registry = new Registry();
             Registry.RegisterDefaultOperations(registry);
 
-            var e = tree.CreateExpression(dataParam, dataParam);
+            var e = tree.CreateExpressionChain(dataParam, dataParam);
 
             var l = Expression.Lambda(e, dataParam);
 

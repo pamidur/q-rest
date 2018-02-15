@@ -3,14 +3,15 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class NameTerm : ITerm
+    public class NameTerm : TermBase
     {
-        public ITerm Next { get; set; }
         public string Name { get; set; }
 
-        public Expression CreateExpression(Expression prev, ParameterExpression root)
+        protected override Expression CreateExpression(Expression prev, ParameterExpression root)
         {
             return new NamedExpression(prev, Name);
         }
+
+        protected override string Debug => $"@{Name}";
     }
 }

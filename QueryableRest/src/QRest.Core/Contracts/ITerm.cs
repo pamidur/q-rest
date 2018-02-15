@@ -5,6 +5,6 @@ namespace QRest.Core.Terms
     public interface ITerm
     {
         ITerm Next { get; set; }
-        Expression CreateExpression(Expression prev, ParameterExpression root);        
+        Expression CreateExpressionChain(Expression prev, ParameterExpression root);        
     }
 }
