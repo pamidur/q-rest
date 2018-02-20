@@ -25,7 +25,7 @@ namespace QRest.Core.Terms
         {
             get
             {
-                var args = string.Join(",", Arguments.Select(a => a.ToString().TrimStart('.')));
+                var args = string.Join(",", Arguments.Select(a => a.ToString()));
                 var argsLiteral = args.Length > 0 ? $"({args})" : "";
                 return $"-{Operation.GetType().Name.ToLowerInvariant().Replace("operation", "")}{argsLiteral}";
             }

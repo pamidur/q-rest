@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}"
 EndProject
@@ -17,7 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApp", "test\TestWebApp\TestWebApp.csproj", "{68E69C34-C182-4033-B931-BBD9581B1000}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRest.Semantics.MethodChain.Tests", "test\QRest.Semantics.MethodChain.Tests\QRest.Semantics.MethodChain.Tests.csproj", "{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain.Tests", "test\QRest.Semantics.MethodChain.Tests\QRest.Semantics.MethodChain.Tests.csproj", "{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.OData", "src\QRest.OData\QRest.OData.csproj", "{5563C697-FF53-403C-A3BA-700DDED99E66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRest.OData.Tests", "test\QRest.OData.Tests\QRest.OData.Tests.csproj", "{EC7CA698-87C1-4648-A83E-D5590C31DDDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +53,14 @@ Global
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5563C697-FF53-403C-A3BA-700DDED99E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5563C697-FF53-403C-A3BA-700DDED99E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5563C697-FF53-403C-A3BA-700DDED99E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5563C697-FF53-403C-A3BA-700DDED99E66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC7CA698-87C1-4648-A83E-D5590C31DDDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC7CA698-87C1-4648-A83E-D5590C31DDDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC7CA698-87C1-4648-A83E-D5590C31DDDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC7CA698-87C1-4648-A83E-D5590C31DDDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +72,8 @@ Global
 		{BA0ADEB8-5AC0-42DB-A00E-8E6D4C0CBF1F} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
 		{68E69C34-C182-4033-B931-BBD9581B1000} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
+		{5563C697-FF53-403C-A3BA-700DDED99E66} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
+		{EC7CA698-87C1-4648-A83E-D5590C31DDDF} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {395047F8-3C58-47EF-81DB-C2ECE9E04D96}

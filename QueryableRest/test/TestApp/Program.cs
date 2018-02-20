@@ -67,17 +67,36 @@ namespace TestApp
             {
                 Operation = new WhereOperation(),
                 Arguments = new List<ITerm> {
-                    new PropertyTerm{
-                        PropertyName = "Text",
-                        Next = new MethodTerm{
-                            Operation = new EqualOperation(),
-                            Arguments = new List<ITerm>{
-                                new ConstantTerm {
-                                    Value = "dadsa"
+                    new MethodTerm{
+                        Operation = new EveryOperation(),
+                        Arguments = new List<ITerm>{
+                            new PropertyTerm{
+                                PropertyName = "Text",
+                                Next = new MethodTerm{
+                                    Operation = new EqualOperation(),
+                                    Arguments = new List<ITerm>{
+                                        new ConstantTerm {
+                                            Value = "dadsa"
+                                        }
+                                    }
                                 }
-                            }
+                            },
+                             new PropertyTerm{
+                                PropertyName = "Number",
+                                Next = new MethodTerm{
+                                    Operation = new NotEqualOperation(),
+                                    Arguments = new List<ITerm>{
+                                        new ConstantTerm {
+                                            Value = 2
+                                        }
+                                    }
+                                }
+                            },
+
                         }
-                    }
+                    },
+
+
                 }
             };
 
@@ -103,7 +122,7 @@ namespace TestApp
 
             var l = Expression.Lambda(e, dataParam);
 
-            var r = l.Compile().DynamicInvoke(data);            
+            var r = l.Compile().DynamicInvoke(data);
         }
     }
 
