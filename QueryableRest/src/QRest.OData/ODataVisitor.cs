@@ -10,7 +10,6 @@ namespace QRest.OData
 {
     public class ODataVisitor : ODataGrammarBaseVisitor<ITerm>
     {
-
         public override ITerm VisitFilter([NotNull] ODataGrammarParser.FilterContext context)
         {
             var termFilter = new LambdaTerm
@@ -21,9 +20,6 @@ namespace QRest.OData
 
             termFilter.Arguments.Add(Visit(context.filterexpr));
             return termFilter;
-
-
-
         }
 
         public override ITerm VisitStringExpression([NotNull] ODataGrammarParser.StringExpressionContext context)
@@ -39,46 +35,41 @@ namespace QRest.OData
 
             (op as MethodTerm).Arguments = new System.Collections.Generic.List<ITerm> { right };
 
-            left.Next = op;
+            if (left.Next == null) left.Next = op; // for constants
+            else left.Next.Next = op; // for ItOperation
             return left;
         }
 
         private IOperation GetOperation(ODataGrammarParser.ComparatorContext context)
         {
-            switch (context.GetText())
+            var op = ((TerminalNodeImpl)context.children[0]).Symbol.Type;
+            switch (op)
             {
-                case "eq":
+                case ODataGrammarParser.EQ:
                     return new EqualOperation();
                 default:
                     throw new Exception("Operation not supported");
             }
         }
 
-
         public override ITerm VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context)
         {
-            return 
-                new 
-                PropertyTerm { PropertyName = context.GetText() };
+            return new MethodTerm
+            {
+                Operation = new ItOperation(),
+                Next = new PropertyTerm { PropertyName = context.GetText() }
+            };
         }
 
         public override ITerm VisitParenExpression([NotNull] ODataGrammarParser.ParenExpressionContext context)
         {
-            return Visit(context);
+            return Visit(context.children[1]);
         }
 
         public override ITerm VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context)
         {
-
             return base.VisitBoolExpression(context);
         }
-
-        public override ITerm VisitComparator([NotNull] ODataGrammarParser.ComparatorContext context)
-        {
-
-            return new MethodTerm { Operation = GetOperation(context) };
-        }
-
 
         public override ITerm VisitBinaryExpression([NotNull] ODataGrammarParser.BinaryExpressionContext context)
         {
@@ -86,35 +77,32 @@ namespace QRest.OData
             var right = Visit(context.right);
 
             var op = VisitBinary(context.op);
+            ((MethodTerm)op).Arguments = new System.Collections.Generic.List<ITerm> { left, right };
 
-
-            return base.VisitBinaryExpression(context);
+            return op;
         }
 
-        public override ITerm VisitBinary([NotNull] ODataGrammarParser.BinaryContext context)
+        public override ITerm VisitTerminal(ITerminalNode node)
         {
-            var operation = new MethodTerm
-            {
-                Operation = PickBinaryOperation(context)
-            };
-
-            return operation;
-        }
-
-        private IOperation PickBinaryOperation(ODataGrammarParser.BinaryContext context)
-        {
-            var op = ((TerminalNodeImpl)context.children[0]).Symbol.Type;
-          switch (op)
+            OperationBase operation;
+            switch (node.Symbol.Type)
             {
                 case ODataGrammarParser.AND:
-                    return new EveryOperation();
+                    operation = new EveryOperation();
+                    break;
+                case ODataGrammarParser.OR:
+                    operation = new OneOfOperation();
+                    break;
+
+                case ODataGrammarParser.EQ:
+                    operation = new EqualOperation();
+                    break;
                 default:
                     throw new Exception("Operation not supported");
             }
+            return new MethodTerm { Operation = operation };
         }
 
-      
 
-      
     }
 }
