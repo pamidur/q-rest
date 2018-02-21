@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Boolean
 {
-    public class OneOfOperation :OperationBase
+    public class OneOfOperation : OperationBase
     {
         public override bool SupportsCall => true;
 

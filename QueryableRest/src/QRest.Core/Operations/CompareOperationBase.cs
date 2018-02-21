@@ -6,7 +6,7 @@ namespace QRest.Core.Operations
 {
     public abstract class CompareOperationBase : OperationBase
     {
-        public override bool SupportsCall => false;
+        public override bool SupportsCall => true;
 
         public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
