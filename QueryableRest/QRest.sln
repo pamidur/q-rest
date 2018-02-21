@@ -19,9 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApp", "test\TestWebA
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain.Tests", "test\QRest.Semantics.MethodChain.Tests\QRest.Semantics.MethodChain.Tests.csproj", "{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.OData", "src\QRest.OData\QRest.OData.csproj", "{5563C697-FF53-403C-A3BA-700DDED99E66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData", "src\QRest.OData\QRest.Semantics.OData.csproj", "{5563C697-FF53-403C-A3BA-700DDED99E66}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRest.OData.Tests", "test\QRest.OData.Tests\QRest.OData.Tests.csproj", "{EC7CA698-87C1-4648-A83E-D5590C31DDDF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData.Tests", "test\QRest.OData.Tests\QRest.Semantics.OData.Tests.csproj", "{EC7CA698-87C1-4648-A83E-D5590C31DDDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

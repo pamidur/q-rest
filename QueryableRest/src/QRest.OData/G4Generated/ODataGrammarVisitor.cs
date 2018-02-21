@@ -96,6 +96,13 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>intExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>identifierExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
 	/// </summary>

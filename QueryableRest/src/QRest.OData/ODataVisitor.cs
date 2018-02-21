@@ -5,6 +5,9 @@ using QRest.Core.Operations.Query;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations;
 using Antlr4.Runtime.Tree;
+using System.Linq;
+using static ODataGrammarParser;
+using QRest.Core;
 
 namespace QRest.OData
 {
@@ -22,9 +25,31 @@ namespace QRest.OData
             return termFilter;
         }
 
+        public override ITerm VisitNotExpression([NotNull] NotExpressionContext context)
+        {
+            var exp = Visit(context.expression());
+            var tail = exp.GetLatestCall();
+            tail.Next = new MethodTerm
+            {
+                Operation = new NotOperation(),
+            };
+
+            return exp;
+        }
+
         public override ITerm VisitStringExpression([NotNull] ODataGrammarParser.StringExpressionContext context)
         {
             return new ConstantTerm { Value = context.GetText().Trim('\'') };
+        }
+
+        public override ITerm VisitDecimalExpression([NotNull] ODataGrammarParser.DecimalExpressionContext context)
+        {
+            return new ConstantTerm { Value = decimal.Parse(context.GetText()) };
+        }
+
+        public override ITerm VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context)
+        {
+            return new ConstantTerm { Value = int.Parse(context.GetText()) };
         }
 
         public override ITerm VisitComparatorExpression([NotNull] ODataGrammarParser.ComparatorExpressionContext context)
@@ -34,22 +59,8 @@ namespace QRest.OData
             var op = Visit(context.op);
 
             (op as MethodTerm).Arguments = new System.Collections.Generic.List<ITerm> { right };
-
-            if (left.Next == null) left.Next = op; // for constants
-            else left.Next.Next = op; // for ItOperation
+            left.GetLatestCall().Next = op;
             return left;
-        }
-
-        private IOperation GetOperation(ODataGrammarParser.ComparatorContext context)
-        {
-            var op = ((TerminalNodeImpl)context.children[0]).Symbol.Type;
-            switch (op)
-            {
-                case ODataGrammarParser.EQ:
-                    return new EqualOperation();
-                default:
-                    throw new Exception("Operation not supported");
-            }
         }
 
         public override ITerm VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context)
@@ -68,7 +79,7 @@ namespace QRest.OData
 
         public override ITerm VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context)
         {
-            return base.VisitBoolExpression(context);
+            return new ConstantTerm { Value = bool.Parse(context.GetText()) };
         }
 
         public override ITerm VisitBinaryExpression([NotNull] ODataGrammarParser.BinaryExpressionContext context)
@@ -97,12 +108,66 @@ namespace QRest.OData
                 case ODataGrammarParser.EQ:
                     operation = new EqualOperation();
                     break;
+
+                case ODataGrammarParser.NE:
+                    operation = new NotEqualOperation();
+                    break;
+
+                case ODataGrammarParser.LT:
+                    throw new Exception("Operation not supported");
+                    break;
+                case ODataGrammarParser.GT:
+                    throw new Exception("Operation not supported");
+                    break;
+                case ODataGrammarParser.LE:
+                    throw new Exception("Operation not supported");
+                    break;
+                case ODataGrammarParser.GE:
+                    throw new Exception("Operation not supported");
+                    break;
+
                 default:
                     throw new Exception("Operation not supported");
             }
             return new MethodTerm { Operation = operation };
         }
 
+        public override ITerm VisitFuncCallExpression([NotNull] FuncCallExpressionContext context)
+        {
+            var parameters = context.functionParams().children.Where((c, i) => i % 2 == 0).Select(c => Visit(c));
+            if (!parameters.Any()) throw new ArgumentException("Need more arguments!");
+            var funcRoot = parameters.First();
+            var func = GetFuncTerm(context.func.Text);
+            func.Arguments = parameters.Skip(1).ToList();
+            funcRoot.GetLatestCall().Next = func;
+
+            return funcRoot;
+        }
+
+
+        public override ITerm VisitFunctionParams([NotNull] FunctionParamsContext context)
+        {
+            return base.VisitFunctionParams(context);
+        }
+
+
+        private MethodTerm GetFuncTerm(string funcName)
+        {
+            OperationBase operation;
+
+            switch (funcName)
+            {
+                //case "IsEmpty":
+                //    return typeof(string).GetMethod("IsNullOrWhiteSpace", new Type[] { typeof(string) });
+                case "contains":
+                    operation = new ContainsOperation();
+                    break;
+                default:
+                    throw new Exception($"Function {funcName} not found");
+            }
+
+            return new MethodTerm { Operation = operation };
+        }
 
     }
 }

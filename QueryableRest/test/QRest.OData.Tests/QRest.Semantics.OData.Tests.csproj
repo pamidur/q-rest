@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\QRest.OData\QRest.OData.csproj" />
+    <ProjectReference Include="..\..\src\QRest.OData\QRest.Semantics.OData.csproj" />
   </ItemGroup>
 
 </Project>

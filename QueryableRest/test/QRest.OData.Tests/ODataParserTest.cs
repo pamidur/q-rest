@@ -27,9 +27,9 @@ namespace QRest.OData.Tests
         }
 
         [Fact]
-        public void ShouldParseANDORFilterQueryOption()
+        public void ShouldParseFuncAndNOT()
         {
-            var input = @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ";
+            var input = @"$filter = not contains(param,'b')";
 
             ICharStream stream = CharStreams.fromstring(input);
             ITokenSource lexer = new ODataGrammarLexer(stream);
@@ -40,8 +40,7 @@ namespace QRest.OData.Tests
 
             var vis = new ODataVisitor();
             var exp = vis.Visit(context);
-            Assert.Equal(":where(-every(-it.param1-equal(`L72`),-oneof(-it.param2-equal(`qwerty`),-it.param3-equal(`asdf`))))",
-                exp.ToString());
+            Assert.Equal(":where(-it.param-contains(`b`)-not)", exp.ToString());
 
         }
     }

@@ -10,6 +10,7 @@ using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
 using QRest.Core.Operations.Aggregations;
 using QRest.Core.Operations.Query.OrderDirectionOperations;
+using QRest.Core;
 
 namespace QRest.Semantics.MethodChain
 {

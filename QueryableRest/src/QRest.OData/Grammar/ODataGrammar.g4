@@ -26,6 +26,7 @@ expression
  | bool                                           #boolExpression
  | IDENTIFIER                                     #identifierExpression
  | DECIMAL                                        #decimalExpression
+ | INT                                            #intExpression
  | STRINGLITERAL                                  #stringExpression
  | func=IDENTIFIER LPAREN functionParams RPAREN   #funcCallExpression
  ;
@@ -51,19 +52,21 @@ DOLLAR     : '$' ;
 AMPERSAND  : '&' ;
 COMMA      : ',' ;
 SQ         : ['];
-AND        : 'AND' ;
-OR         : 'OR' ;
-NOT        : 'NOT' | '!' | '<>' ;
-TRUE       : 'TRUE' ;
-FALSE      : 'FALSE' ;
-GT         : 'gt' ;
-GE         : 'ge' ;
-LT         : 'lt' ;
-LE         : 'le' ;
-EQ         : 'eq' ;
+AND        : 'AND' | 'and' ;
+OR         : 'OR' | 'or' ;
+NOT        : 'NOT' | '!' | '<>' | 'not' ;
+TRUE       : 'TRUE' | 'true' ;
+FALSE      : 'FALSE' | 'false' ;
+GT         : 'gt' | 'GT' ;
+GE         : 'ge' | 'GE' ;
+LT         : 'lt' | 'LT' ;
+LE         : 'le' | 'LE' ;
+EQ         : 'eq' | 'EQ' ;
+NE         : 'ne' | 'NE' ;
 LPAREN     : '(' ;
 RPAREN     : ')' ;
-DECIMAL    : '-'? [0-9]+ ( '.' [0-9]+ )? ;
+DECIMAL    : INT '.' [0-9]+  ;
+INT        : '-'? [0-9]+ ;
 IDENTIFIER : [a-zA-Z_] [a-zA-Z_0-9]* ;
 STRINGLITERAL : SQ [a-zA-Z_0-9]* SQ ;
 WS         : [ \r\t\u000C\n]+ -> skip;
