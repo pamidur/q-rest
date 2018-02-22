@@ -13,16 +13,7 @@ namespace QRest.OData.Tests
             @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ")]
         public void ShouldParseFilterQueryOption(string expected, string input)
         {
-            ICharStream stream = CharStreams.fromstring(input);
-            ITokenSource lexer = new ODataGrammarLexer(stream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
-
-            var parser = new ODataGrammarParser(tokens);
-            var context = parser.parse();
-
-            var vis = new ODataVisitor();
-            var exp = vis.Visit(context);
-
+            ITerm exp = Parse(input);
             Assert.Equal(expected, ((LambdaTerm)exp).ToString()); // "Debug" property is protected
         }
 
@@ -30,16 +21,7 @@ namespace QRest.OData.Tests
         public void ShouldParseFuncAndNOT()
         {
             var input = @"$filter = not contains(param,'b')";
-
-            ICharStream stream = CharStreams.fromstring(input);
-            ITokenSource lexer = new ODataGrammarLexer(stream);
-            ITokenStream tokens = new CommonTokenStream(lexer);
-
-            var parser = new ODataGrammarParser(tokens);
-            var context = parser.parse();
-
-            var vis = new ODataVisitor();
-            var exp = vis.Visit(context);
+            ITerm exp = Parse(input);
             Assert.Equal(":where(-it.param-contains(`b`)-not)", exp.ToString());
 
         }
@@ -49,7 +31,13 @@ namespace QRest.OData.Tests
         [InlineData(":where(-it.a-equal(-it.b))", @"$filter = a eq b&$count=false")]
         public void ShouldParseCount(string expected, string input)
         {
+            ITerm exp = Parse(input);
+            Assert.Equal(expected, exp.ToString());
 
+        }
+
+        private static ITerm Parse(string input)
+        {
             ICharStream stream = CharStreams.fromstring(input);
             ITokenSource lexer = new ODataGrammarLexer(stream);
             ITokenStream tokens = new CommonTokenStream(lexer);
@@ -59,8 +47,7 @@ namespace QRest.OData.Tests
 
             var vis = new ODataVisitor();
             var exp = vis.Visit(context);
-            Assert.Equal(expected, exp.ToString());
-
+            return exp;
         }
     }
 }
