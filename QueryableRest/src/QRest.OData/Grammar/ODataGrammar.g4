@@ -7,16 +7,14 @@ parse
 
 queryOptions : queryOption ( AMPERSAND queryOption )*; 
 
-queryOption  : odataQueryOption  ;
-
-odataQueryOption :
+queryOption :
   filter 
   | count
 ;
 
 filter : DOLLAR 'filter' EQPARAM filterexpr=expression ;
 
-count : DOLLAR 'count' EQPARAM bool ;
+count : DOLLAR 'count' EQPARAM decexpr=bool ;
 
 expression
  : LPAREN expression RPAREN                       #parenExpression

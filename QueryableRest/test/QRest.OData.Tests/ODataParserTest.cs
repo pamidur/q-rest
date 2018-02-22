@@ -18,7 +18,7 @@ namespace QRest.OData.Tests
             ITokenStream tokens = new CommonTokenStream(lexer);
 
             var parser = new ODataGrammarParser(tokens);
-            var context = parser.filter();
+            var context = parser.parse();
 
             var vis = new ODataVisitor();
             var exp = vis.Visit(context);
@@ -36,11 +36,30 @@ namespace QRest.OData.Tests
             ITokenStream tokens = new CommonTokenStream(lexer);
 
             var parser = new ODataGrammarParser(tokens);
-            var context = parser.filter();
+            var context = parser.parse();
 
             var vis = new ODataVisitor();
             var exp = vis.Visit(context);
             Assert.Equal(":where(-it.param-contains(`b`)-not)", exp.ToString());
+
+        }
+
+        [Theory]
+        [InlineData(":where(-it.a-equal(-it.b)):count", @"$filter = a eq b&$count=true")]
+        [InlineData(":where(-it.a-equal(-it.b))", @"$filter = a eq b&$count=false")]
+        public void ShouldParseCount(string expected, string input)
+        {
+
+            ICharStream stream = CharStreams.fromstring(input);
+            ITokenSource lexer = new ODataGrammarLexer(stream);
+            ITokenStream tokens = new CommonTokenStream(lexer);
+
+            var parser = new ODataGrammarParser(tokens);
+            var context = parser.parse();
+
+            var vis = new ODataVisitor();
+            var exp = vis.Visit(context);
+            Assert.Equal(expected, exp.ToString());
 
         }
     }

@@ -50,12 +50,6 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitQueryOption([NotNull] ODataGrammarParser.QueryOptionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by <see cref="ODataGrammarParser.odataQueryOption"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitOdataQueryOption([NotNull] ODataGrammarParser.OdataQueryOptionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by <see cref="ODataGrammarParser.filter"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>

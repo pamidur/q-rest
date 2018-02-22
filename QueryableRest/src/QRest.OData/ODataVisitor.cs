@@ -8,11 +8,41 @@ using Antlr4.Runtime.Tree;
 using System.Linq;
 using static ODataGrammarParser;
 using QRest.Core;
+using QRest.Core.Operations.Aggregations;
+using QRest.Semantics.OData;
 
 namespace QRest.OData
 {
     public class ODataVisitor : ODataGrammarBaseVisitor<ITerm>
     {
+        public override ITerm VisitParse([NotNull] ParseContext context)
+        {
+            return Visit(context.queryOptions());
+        }
+
+        public override ITerm VisitQueryOptions([NotNull] QueryOptionsContext context)
+        {
+            var operationLambdas = context.children.OfType<QueryOptionContext>().Select(c => Visit(c)).Cast<LambdaTerm>();
+
+            var sortedLambdas = operationLambdas.Where(c => c != null)
+                .OrderBy(c => c.Operation.GetType(), new ODataOperationOrder()).ToList();
+
+            var firstOperation = sortedLambdas.First();
+            var prev = firstOperation;
+            foreach (var op in sortedLambdas.Skip(1))
+            {
+                prev.Next = op;
+                prev = op;
+            }
+            return firstOperation;
+        }
+
+        private static QueryOptionContext GetContext<T>(System.Collections.Generic.IEnumerable<QueryOptionContext> opts)
+        {
+            return opts.Where(c => c.children.Any(x => x is T)).FirstOrDefault();
+        }
+
+
         public override ITerm VisitFilter([NotNull] ODataGrammarParser.FilterContext context)
         {
             var termFilter = new LambdaTerm
@@ -114,18 +144,19 @@ namespace QRest.OData
                     break;
 
                 case ODataGrammarParser.LT:
-                    throw new Exception("Operation not supported");
+                    operation = new LessThanOperation();
                     break;
                 case ODataGrammarParser.GT:
-                    throw new Exception("Operation not supported");
+                    operation = new GreaterThanOperation();
                     break;
                 case ODataGrammarParser.LE:
-                    throw new Exception("Operation not supported");
+                    operation = new LessThanOrEqualOperation();
                     break;
                 case ODataGrammarParser.GE:
-                    throw new Exception("Operation not supported");
+                    operation = new GreaterThanOrEqualOperation();
                     break;
-
+                case ODataGrammarParser.Eof:
+                    return base.VisitTerminal(node);
                 default:
                     throw new Exception("Operation not supported");
             }
@@ -144,12 +175,22 @@ namespace QRest.OData
             return funcRoot;
         }
 
-
         public override ITerm VisitFunctionParams([NotNull] FunctionParamsContext context)
         {
             return base.VisitFunctionParams(context);
         }
 
+
+        public override ITerm VisitCount([NotNull] CountContext context)
+        {
+
+            if (context.decexpr.GetText().Equals("true", StringComparison.OrdinalIgnoreCase))
+                return new LambdaTerm
+                {
+                    Operation = new CountOperation()
+                };
+            else return null;
+        }
 
         private MethodTerm GetFuncTerm(string funcName)
         {
