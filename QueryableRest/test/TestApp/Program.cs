@@ -62,6 +62,9 @@ namespace TestApp
 
                 } });
 
+            //:where()-select(:count,:select)
+            //:where()-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))    
+            //-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))
 
             tree = new LambdaTerm
             {

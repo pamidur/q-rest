@@ -10,6 +10,8 @@ using static ODataGrammarParser;
 using QRest.Core;
 using QRest.Core.Operations.Aggregations;
 using QRest.Semantics.OData;
+using System.Collections.Generic;
+using QRest.Core.Operations.Query.OrderDirectionOperations;
 
 namespace QRest.OData
 {
@@ -27,17 +29,53 @@ namespace QRest.OData
             var sortedLambdas = operationLambdas.Where(c => c != null)
                 .OrderBy(c => c.Operation.GetType(), new ODataOperationOrder()).ToList();
 
-            var firstOperation = sortedLambdas.First();
-            var prev = firstOperation;
-            foreach (var op in sortedLambdas.Skip(1))
-            {
-                prev.Next = op;
-                prev = op;
-            }
-            return firstOperation;
+            return BuildTerms(sortedLambdas);
         }
 
-        private static QueryOptionContext GetContext<T>(System.Collections.Generic.IEnumerable<QueryOptionContext> opts)
+        private ITerm BuildTerms(List<LambdaTerm> sortedLambdas)
+        {
+            var selectTerm = new MethodTerm { Operation = new SelectOperation(), Arguments = new List<ITerm>() };
+
+            if (!sortedLambdas.Any()) return selectTerm;
+
+            ITerm firstTerm;
+            if (sortedLambdas.First().Operation is WhereOperation)
+            {
+                firstTerm = sortedLambdas.First();
+                firstTerm.Next = selectTerm;
+                sortedLambdas = sortedLambdas.Skip(1).ToList();
+            }
+            else
+            {
+                firstTerm = selectTerm;
+            }
+            var countTerm = sortedLambdas.Where(c => c.Operation is CountOperation).FirstOrDefault();
+            if (countTerm != null) selectTerm.Arguments.Add(countTerm);
+
+            var selectArg = BuildSelectArgs(sortedLambdas);
+            selectTerm.Arguments.Add(selectArg);
+
+            return firstTerm;
+        }
+
+        private ITerm BuildSelectArgs(List<LambdaTerm> sortedLambdas)
+        {
+            var emptySelect= new LambdaTerm { Operation = new SelectOperation() }; ;
+            var selectArgTerms = sortedLambdas.Where(c => !(c.Operation is CountOperation)).ToList();
+            if (!selectArgTerms.Any()) return emptySelect;
+
+            var current = selectArgTerms.First();
+            foreach (var lambda in selectArgTerms.Skip(1))
+            {
+                current.Next = lambda;
+                current = lambda;
+            }
+            if (!(current.Operation is SelectOperation)) current.Next = emptySelect;
+
+            return selectArgTerms.First();
+        }
+
+        private static QueryOptionContext GetContext<T>(IEnumerable<QueryOptionContext> opts)
         {
             return opts.Where(c => c.children.Any(x => x is T)).FirstOrDefault();
         }
@@ -54,6 +92,23 @@ namespace QRest.OData
             termFilter.Arguments.Add(Visit(context.filterexpr));
             return termFilter;
         }
+
+        public override ITerm VisitSelect([NotNull] SelectContext context)
+        {
+            var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
+            var lambda =  new LambdaTerm { Operation = new SelectOperation { }, Arguments = selectArgs };
+            return lambda;
+        }
+
+        public override ITerm VisitSelectItem([NotNull] SelectItemContext context)
+        {
+            return new MethodTerm
+            {
+                Operation = new ItOperation(),
+                Next = new PropertyTerm { PropertyName = context.GetText() }
+            };
+        }
+
 
         public override ITerm VisitNotExpression([NotNull] NotExpressionContext context)
         {
@@ -190,6 +245,49 @@ namespace QRest.OData
                     Operation = new CountOperation()
                 };
             else return null;
+        }
+
+        public override ITerm VisitOrderby([NotNull] OrderbyContext context)
+        {
+            var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).ToList();
+
+            return new LambdaTerm { Operation = new OrderOperation(), Arguments = args };
+        }
+
+        public override ITerm VisitOrderbyItem([NotNull] OrderbyItemContext context)
+        {
+            ITerm order = context.ChildCount > 1 ?
+                Visit(context.children[1])
+                : new MethodTerm { Operation = new AscendingOperation() };
+
+            var prop = new PropertyTerm {
+                PropertyName = context.children[0].GetText(),
+                Next = order
+            };
+
+            return new MethodTerm
+            {
+                Operation = new ItOperation(),
+                Next = prop
+            };
+        }
+
+        public override ITerm VisitOrder([NotNull] OrderContext context)
+        {
+            var method = new MethodTerm();
+            switch (context.GetText())
+            {
+                case "asc":
+                    method.Operation = new AscendingOperation();
+                    break;
+                case "desc":
+                    method.Operation = new DescendingOperation();
+                    break;
+                default:
+                    throw new Exception($"Order direction {context.GetText()} is unknown");
+
+            }
+            return method;
         }
 
         private MethodTerm GetFuncTerm(string funcName)

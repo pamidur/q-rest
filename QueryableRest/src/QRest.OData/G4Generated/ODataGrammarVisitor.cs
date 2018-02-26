@@ -56,11 +56,41 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitFilter([NotNull] ODataGrammarParser.FilterContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.select"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSelect([NotNull] ODataGrammarParser.SelectContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.selectItem"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSelectItem([NotNull] ODataGrammarParser.SelectItemContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="ODataGrammarParser.count"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitCount([NotNull] ODataGrammarParser.CountContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.orderby"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOrderby([NotNull] ODataGrammarParser.OrderbyContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.orderbyItem"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOrderbyItem([NotNull] ODataGrammarParser.OrderbyItemContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.order"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitOrder([NotNull] ODataGrammarParser.OrderContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>binaryExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.

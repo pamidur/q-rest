@@ -9,12 +9,24 @@ queryOptions : queryOption ( AMPERSAND queryOption )*;
 
 queryOption :
   filter 
+  | select
   | count
+  | orderby
 ;
 
 filter : DOLLAR 'filter' EQPARAM filterexpr=expression ;
 
+select: DOLLAR 'select' EQPARAM selectItem ( COMMA selectItem )* ;
+
+selectItem : IDENTIFIER ;
+
 count : DOLLAR 'count' EQPARAM decexpr=bool ;
+
+orderby : DOLLAR 'orderby' EQPARAM orderbyItem ( COMMA orderbyItem) ;
+
+orderbyItem : IDENTIFIER order? ;
+
+order : 'asc' | 'desc' ;
 
 expression
  : LPAREN expression RPAREN                       #parenExpression

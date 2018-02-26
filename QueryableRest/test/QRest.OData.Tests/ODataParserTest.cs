@@ -7,9 +7,9 @@ namespace QRest.OData.Tests
     public class ODataParserTest
     {
         [Theory]
-        [InlineData(":where(-it.param1-equal(`L72`))", @"$filter =   param1 eq 'L72'")]
-        [InlineData(":where(`L72`-equal(-it.param1))", @"$filter =  'L72' eq param1 ")]
-        [InlineData(":where(-every(-it.param1-equal(`L72`),-oneof(-it.param2-equal(`qwerty`),-it.param3-equal(`asdf`))))",
+        [InlineData(":where(-it.param1-equal(`L72`))-select(:select)", @"$filter =   param1 eq 'L72'")]
+        [InlineData(":where(`L72`-equal(-it.param1))-select(:select)", @"$filter =  'L72' eq param1 ")]
+        [InlineData(":where(-every(-it.param1-equal(`L72`),-oneof(-it.param2-equal(`qwerty`),-it.param3-equal(`asdf`))))-select(:select)",
             @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ")]
         public void ShouldParseFilterQueryOption(string expected, string input)
         {
@@ -22,19 +22,47 @@ namespace QRest.OData.Tests
         {
             var input = @"$filter = not contains(param,'b')";
             ITerm exp = Parse(input);
-            Assert.Equal(":where(-it.param-contains(`b`)-not)", exp.ToString());
+            Assert.Equal(":where(-it.param-contains(`b`)-not)-select(:select)", exp.ToString());
 
         }
 
         [Theory]
-        [InlineData(":where(-it.a-equal(-it.b)):count", @"$filter = a eq b&$count=true")]
-        [InlineData(":where(-it.a-equal(-it.b))", @"$filter = a eq b&$count=false")]
+        [InlineData(":where(-it.a-equal(-it.b))-select(:count,:select)", @"$filter = a eq b&$count=true")]
+        [InlineData(":where(-it.a-equal(-it.b))-select(:select)", @"$filter = a eq b&$count=false")]
         public void ShouldParseCount(string expected, string input)
         {
             ITerm exp = Parse(input);
             Assert.Equal(expected, exp.ToString());
-
         }
+
+
+        [Fact]
+        public void ShouldParseEmptyString()
+        {
+            ITerm exp = Parse(string.Empty);
+            Assert.Equal("-select", exp.ToString());
+        }
+
+        [Theory]
+        [InlineData(":where(-it.a-equal(-it.b))-select(:select(-it.f1,-it.f2))", @"$filter = a eq b&$count=false&$select=f1,f2")]
+        [InlineData(":where(-it.a-equal(-it.b))-select(:count,:select(-it.f1,-it.f2))", @"$filter = a eq b&$count=true&$select=f1,f2")]
+        public void ShouldParseSelect(string expected, string input)
+        {
+            ITerm exp = Parse(input);
+            Assert.Equal(expected, exp.ToString());
+        }
+
+
+        [Theory]
+        [InlineData("-select(:order(-it.f1-ascending,-it.f2-ascending):select)", @"$orderby=f1,f2")]
+        [InlineData("-select(:order(-it.f1-ascending,-it.f2-descending):select)", @"$orderby=f1 asc,f2 desc" )]
+        [InlineData("-select(:count,:order(-it.f1-ascending,-it.f2-descending):select)", @"$orderby=f1 asc,f2 desc&$count=true")]
+        public void ShouldParseOrderBy(string expected, string input)
+        {
+            ITerm exp = Parse(input);
+            Assert.Equal(expected, exp.ToString());
+        }
+
 
         private static ITerm Parse(string input)
         {
