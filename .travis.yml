@@ -2,8 +2,9 @@ language: csharp
 mono: none
 dotnet: 2.0.0
 env:
-  - NUGETURL=https://api.nuget.org/v3/index.json
-  - VERSION=${TRAVIS_TAG:-0.0.0-dev}
+  global:
+    - NUGETURL=https://api.nuget.org/v3/index.json
+    - VERSION=${TRAVIS_TAG:-0.0.0-dev}
 script:
   - echo $VERSION
   - dotnet restore ./QueryableRest/
@@ -12,9 +13,11 @@ script:
 deploy:
   skip_cleanup: true
   tags: true
+  condition: $TRAVIS_TAG
   provider: script
   script: 
-  - dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$TRAVIS_TAG -p:Product=QRest -p:Authors='QRest Contributors'
-  - dotnet nuget push .\QueryableRest\src\QRest.AspNetCore\*.nupkg -s $NUGETURL -k $NUGETKEY
-  - dotnet nuget push .\QueryableRest\src\QRest.Core\*.nupkg -s $NUGETURL -k $NUGETKEY
-  - dotnet nuget push .\QueryableRest\src\QRest.QRest.Semantics.MethodChain\*.nupkg -s $NUGETURL -k $NUGETKEY
+    -|
+      dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$TRAVIS_TAG -p:Product=QRest -p:Authors='QRest Contributors' &&
+      dotnet nuget push .\QueryableRest\src\QRest.AspNetCore\*.nupkg -s $NUGETURL -k $NUGETKEY &&
+      dotnet nuget push .\QueryableRest\src\QRest.Core\*.nupkg -s $NUGETURL -k $NUGETKEY &&
+      dotnet nuget push .\QueryableRest\src\QRest.QRest.Semantics.MethodChain\*.nupkg -s $NUGETURL -k $NUGETKEY
