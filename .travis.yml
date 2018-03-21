@@ -3,5 +3,5 @@ mono: none
 dotnet: 2.0.0
 script:
   - dotnet restore ./QueryableRest/
-  - dotnet build ./QueryableRest/
-  - dotnet test ./QueryableRest/test/
+  - dotnet build ./QueryableRest/ -c Release -p:Version=${TRAVIS_TAG:-0.0.0-dev} -p:InformationalVersion=${TRAVIS_TAG:-0.0.0-dev}:$TRAVIS_COMMIT
+  - dotnet test ./QueryableRest/test/QRest.Semantics.MethodChain.Tests -c Release --no-build
