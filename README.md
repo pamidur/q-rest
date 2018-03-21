@@ -1,12 +1,39 @@
-# queryable-rest
-[![Build Status](https://travis-ci.org/pamidur/q-rest.svg?branch=master)](https://travis-ci.org/pamidur/q-rest)
+# q-rest
 
-Examples
-```
-http://mydata.com/api/cars/:filter(color:eq('red')):select(id,price)
+## Project Status
+**Master** [![Build Status](https://travis-ci.org/pamidur/q-rest.svg?branch=master)](https://travis-ci.org/pamidur/q-rest)
 
-http://mydata.com/api/cars?query=:filter(color:eq('red')):select(id,price)
+Package | Release | Pre-release
+--- | --- | ---
+**Core** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Core.svg)](https://www.nuget.org/packages/QRest.Core)
+**Semantics.MethodChain** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Semantics.MethodChain.svg)](https://www.nuget.org/packages/QRest.Semantics.MethodChain)
+**AspNetCore** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.AspNetCore.svg)](https://www.nuget.org/packages/QRest.AspNetCore)
+
+
+## HowTo
+
+#### Install
 ```
+dotnet add package QRest.AspNetCore
+```
+
+#### Use
+```csharp
+[HttpGet("{query?}")]
+public ActionResult Get(Query query)
+{
+      var data = collection.AsQueryable();
+      var result = query.Apply(data);   
+      return Ok(result);
+} 
+```
+
+#### Execute ##
+```
+GET http://localhost:5000/api/data/:where(Text-eq(`123`)):take(10)
+```
+
+## Outdated
 
 Both cases don't require escaping symbols
 
