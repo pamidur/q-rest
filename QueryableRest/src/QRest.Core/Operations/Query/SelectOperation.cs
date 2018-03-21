@@ -130,7 +130,6 @@ namespace QRest.Core.Operations.Query
             else if (DynamicContainer.IsContainerType(arg.Type))
             {
                 throw new ExpressionCreationException();
-                name = null;
             }
 
             return name;
