@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>Core lib for QRest</Description>
+    <Description>Core library for QRest</Description>    
   </PropertyGroup>
 
   <ItemGroup>

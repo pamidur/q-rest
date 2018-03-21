@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Method chain semantics for data queries over HTTP.</Description>
   </PropertyGroup>
 
   <ItemGroup>

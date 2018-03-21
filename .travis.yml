@@ -1,7 +1,20 @@
 language: csharp
 mono: none
 dotnet: 2.0.0
+env:
+  - NUGETURL=https://api.nuget.org/v3/index.json
+  - VERSION=${TRAVIS_TAG:-0.0.0-dev}
 script:
+  - echo $VERSION
   - dotnet restore ./QueryableRest/
-  - dotnet build ./QueryableRest/ -c Release -p:Version=${TRAVIS_TAG:-0.0.0-dev} -p:InformationalVersion=${TRAVIS_TAG:-0.0.0-dev}:$TRAVIS_COMMIT
+  - dotnet build ./QueryableRest/ -c Release -p:Version=${TRAVIS_TAG:-0.0.0-dev} -p:InformationalVersion=${TRAVIS_TAG:-0.0.0-dev}:$TRAVIS_COMMIT -p:Product=QRest -p:Authors='QRest Contributors'
   - dotnet test ./QueryableRest/test/QRest.Semantics.MethodChain.Tests -c Release --no-build
+deploy:
+  skip_cleanup: true
+  tags: true
+  provider: script
+  script: 
+  - dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$TRAVIS_TAG -p:Product=QRest -p:Authors='QRest Contributors'
+  - dotnet nuget push .\QueryableRest\src\QRest.AspNetCore\*.nupkg -s $NUGETURL -k $NUGETKEY
+  - dotnet nuget push .\QueryableRest\src\QRest.Core\*.nupkg -s $NUGETURL -k $NUGETKEY
+  - dotnet nuget push .\QueryableRest\src\QRest.QRest.Semantics.MethodChain\*.nupkg -s $NUGETURL -k $NUGETKEY
