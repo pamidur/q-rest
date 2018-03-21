@@ -1,4 +1,5 @@
-# queryable-rest 
+# queryable-rest
+[![Build Status](https://travis-ci.org/pamidur/q-rest.svg?branch=master)](https://travis-ci.org/pamidur/q-rest)
 
 Examples
 ```
