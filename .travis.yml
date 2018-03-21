@@ -10,13 +10,13 @@ env:
 script:
   - echo $VERSION
   - dotnet restore ./QueryableRest/
-  - dotnet build ./QueryableRest/ -c Release -p:Version=$VERSION -p:InformationalVersion=$VERSION:$TRAVIS_COMMIT -p:Product=$PRODUCT -p:Authors=$AUTHORS
+  - dotnet build ./QueryableRest/ -c Release -p:Version=$VERSION -p:InformationalVersion=$VERSION:$TRAVIS_COMMIT -p:Product="$PRODUCT" -p:Authors="$AUTHORS"
   - dotnet test ./QueryableRest/test/QRest.Semantics.MethodChain.Tests -c Release --no-build
 deploy:
   skip_cleanup: true
   provider: script
   script: |
-      dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$VERSION -p:Product=$PRODUCT -p:Authors=$AUTHORS && \
+      dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$VERSION -p:Product="$PRODUCT" -p:Authors="$AUTHORS" && \
       dotnet nuget push .\QueryableRest\src\QRest.AspNetCore\*.nupkg -s $NUGETURL -k $NUGETKEY && \
       dotnet nuget push .\QueryableRest\src\QRest.Core\*.nupkg -s $NUGETURL -k $NUGETKEY && \
       dotnet nuget push .\QueryableRest\src\QRest.QRest.Semantics.MethodChain\*.nupkg -s $NUGETURL -k $NUGETKEY
