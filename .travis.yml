@@ -15,10 +15,6 @@ script:
 deploy:
   skip_cleanup: true
   provider: script
-  script: |
-      dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$VERSION -p:Product="$PRODUCT" -p:Authors="$AUTHORS" && \
-      dotnet nuget push .\QueryableRest\src\QRest.AspNetCore\*.nupkg -s $NUGETURL -k $NUGETKEY && \
-      dotnet nuget push .\QueryableRest\src\QRest.Core\*.nupkg -s $NUGETURL -k $NUGETKEY && \
-      dotnet nuget push .\QueryableRest\src\QRest.QRest.Semantics.MethodChain\*.nupkg -s $NUGETURL -k $NUGETKEY
+  script: dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$VERSION -p:Product="$PRODUCT" -p:Authors="$AUTHORS" && dotnet nuget push .\QueryableRest\src\*.nupkg -s $NUGETURL -k $NUGETKEY
   on:
     tags: true
