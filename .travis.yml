@@ -14,13 +14,11 @@ script:
   - dotnet test ./QueryableRest/test/QRest.Semantics.MethodChain.Tests -c Release --no-build
 deploy:
   skip_cleanup: true
-  tags: true
   provider: script
-  script: 
-    -|
-      dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$VERSION -p:Product=$PRODUCT -p:Authors=$AUTHORS &&
-      dotnet nuget push .\QueryableRest\src\QRest.AspNetCore\*.nupkg -s $NUGETURL -k $NUGETKEY &&
-      dotnet nuget push .\QueryableRest\src\QRest.Core\*.nupkg -s $NUGETURL -k $NUGETKEY &&
+  script: |
+      dotnet pack ./QueryableRest/ -c Release --no-build -p:Version=$VERSION -p:Product=$PRODUCT -p:Authors=$AUTHORS && \
+      dotnet nuget push .\QueryableRest\src\QRest.AspNetCore\*.nupkg -s $NUGETURL -k $NUGETKEY && \
+      dotnet nuget push .\QueryableRest\src\QRest.Core\*.nupkg -s $NUGETURL -k $NUGETKEY && \
       dotnet nuget push .\QueryableRest\src\QRest.QRest.Semantics.MethodChain\*.nupkg -s $NUGETURL -k $NUGETKEY
   on:
-    branch: master
+    tags: true
