@@ -33,6 +33,8 @@ public ActionResult Get(Query query)
 GET http://localhost:5000/api/data/:where(Text-eq(`123`)):take(10)
 ```
 
+See more on supported method in [wiki](https://github.com/pamidur/q-rest/wiki/Method-Chain-Semantics)
+
 ## Outdated
 
 Both cases don't require escaping symbols
