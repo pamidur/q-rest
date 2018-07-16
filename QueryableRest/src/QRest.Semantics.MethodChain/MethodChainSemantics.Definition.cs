@@ -44,26 +44,27 @@ namespace QRest.Semantics.MethodChain
             select chunk
         );
 
-        internal static Parser<ITerm> Call(MethodChainSemantics parser) => Read.Ref(() => Lambda(parser).XOr(Method(parser)));
+        internal static Parser<ITerm> Call(MethodChainSemantics parser) => Read.Ref<ITerm>(() => Lambda(parser).XOr(Method(parser))).Named("Call");
 
         internal static Parser<List<ITerm>> CallArguments(MethodChainSemantics parser) => Read.Ref(() =>
+            //from parameters in Read.Contained(Read.XDelimitedBy(CallChain(parser), ArgumentDelimiter).Optional(), CallOpenBracket, CallCloseBracket).Optional()
             from parameters in Read.Contained(Read.XDelimitedBy(CallChain(parser), ArgumentDelimiter).Optional(), CallOpenBracket, CallCloseBracket).Optional()
             select parameters.GetOrDefault()?.GetOrDefault()?.Where(r => r != null)?.ToList() ?? new List<ITerm>()
         );
 
-        internal static Parser<ITerm> Lambda(MethodChainSemantics parser) => Read.Ref(() =>
+        internal static Parser<LambdaTerm> Lambda(MethodChainSemantics parser) => Read.Ref(() =>
             from semic in LambdaIndicator
             from method in MemberName
             from arguments in CallArguments(parser)
             select new LambdaTerm { Operation = parser.SelectOperation(method), Arguments = arguments }
-            );
+            ).Named("Query");
 
-        internal static Parser<ITerm> Method(MethodChainSemantics parser) => Read.Ref(() =>
+        internal static Parser<MethodTerm> Method(MethodChainSemantics parser) => Read.Ref(() =>
             from semic in MethodIndicator
             from method in MemberName
             from arguments in CallArguments(parser)
             select new MethodTerm { Operation = parser.SelectOperation(method), Arguments = arguments }
-            );
+            ).Named("Method");
 
         internal static Parser<ITerm> SubProperty { get; } = Read.Ref(() =>
              from nav in PropertyNavigator
@@ -113,10 +114,8 @@ namespace QRest.Semantics.MethodChain
         );
 
         internal static Parser<string> MemberName { get; } =
-            from str1 in Read.Letter.Once().Text()
-            from str2 in Read.LetterOrDigit.XMany().Text()
-            select str1 + str2;
-
-
+            (from str1 in Read.Letter.Once().Text()
+            from str2 in Read.LetterOrDigit.XMany().Text().Optional()
+            select str1 + (str2.GetOrDefault() ?? "")).Named("Member");
     }
 }

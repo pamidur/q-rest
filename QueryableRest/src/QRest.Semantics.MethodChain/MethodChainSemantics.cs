@@ -11,6 +11,7 @@ using QRest.Core.Operations.Query.OrderDirectionOperations;
 using QRest.Core;
 using System;
 using System.Globalization;
+using QRest.Core.Exceptions;
 
 namespace QRest.Semantics.MethodChain
 {
@@ -32,10 +33,10 @@ namespace QRest.Semantics.MethodChain
             foreach (var customOp in CustomOperations)
                 AddOperation(customOp.Key, customOp.Value);
 
-            return CallChain(this);
+            return CallChain(this).End();
         }
 
-        private void AddDefaultOperations()
+        protected internal void AddDefaultOperations()
         {
             AddOperation("ne", new NotEqualOperation());
             AddOperation("eq", new EqualOperation());
@@ -81,7 +82,7 @@ namespace QRest.Semantics.MethodChain
             if (string.IsNullOrEmpty(query))
                 return null;
 
-            var result = Parser.Value.TryParse(queryParts.First().Value[0]);
+            var result = Parser.Value.TryParse(query);            
 
             return result.Value;
         }
@@ -119,7 +120,7 @@ namespace QRest.Semantics.MethodChain
         protected IOperation SelectOperation(string opName)
         {
             if (!_operationMap.TryGetValue(opName, out var op))
-                throw new ExpressionParsingException();
+                throw new UnknownOperationException(opName);
 
             return op;
         }

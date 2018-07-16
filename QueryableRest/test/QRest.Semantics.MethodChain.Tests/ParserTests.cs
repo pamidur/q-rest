@@ -6,11 +6,19 @@ namespace QRest.Semantics.MethodChain.Tests
 {
     public class ParserTests
     {
+        private readonly MethodChainSemantics _parser;
+
+        public ParserTests()
+        {
+            _parser = new MethodChainSemantics() { UseDefferedConstantParsing = DefferedConstantParsing.Disabled };
+            _parser.AddDefaultOperations();
+        }
+
         [Fact(DisplayName = "Correct String Constant Is Parsed")]
         public void ValidStringConstant()
         {
             var expected = "Test123-:=/\\+()!@#$%$String\r\n\t!";
-            var actual = MethodChainSemantics.StringConstant(new MethodChainSemantics()).TryParse($"`{expected}`");
+            var actual = MethodChainSemantics.StringConstant(_parser).TryParse($"`{expected}`");
 
             Assert.True(actual.Remainder.AtEnd);
             Assert.Empty(actual.Remainder.Memos);
@@ -25,7 +33,7 @@ namespace QRest.Semantics.MethodChain.Tests
         public void ValidEmptyStringConstant()
         {
             var expected = "";
-            var actual = MethodChainSemantics.StringConstant(new MethodChainSemantics()).TryParse($"`{expected}`");
+            var actual = MethodChainSemantics.StringConstant(_parser).TryParse($"`{expected}`");
 
             Assert.True(actual.WasSuccessful);
             Assert.Empty(actual.Expectations);
@@ -36,7 +44,7 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Incorrect String Constant Shows Error")]
         public void InValidStringConstant1()
         {
-            var actual = MethodChainSemantics.StringConstant(new MethodChainSemantics()).TryParse($"`text");
+            var actual = MethodChainSemantics.StringConstant(_parser).TryParse($"`text");
 
             Assert.NotEmpty(actual.Expectations);
             Assert.False(actual.WasSuccessful);
@@ -45,7 +53,7 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Correct Float Constant Is Parsed")]
         public void FloatParseTest()
         {
-            var actual = MethodChainSemantics.NumberConstant(new MethodChainSemantics { UseDefferedConstantParsing = DefferedConstantParsing.Disabled }).TryParse($"1.12");
+            var actual = MethodChainSemantics.NumberConstant(_parser).TryParse($"1.12");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
@@ -55,11 +63,33 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Correct Int Constant Is Parsed")]
         public void IntParseTest()
         {
-            var actual = MethodChainSemantics.NumberConstant(new MethodChainSemantics { UseDefferedConstantParsing = DefferedConstantParsing.Disabled }).TryParse($"567");
+            var actual = MethodChainSemantics.NumberConstant(_parser).TryParse($"567");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
             Assert.Equal(567, (int)actual.Value.Value);
+        }
+
+        [Fact(DisplayName = "Parsed Method Without Params and Brakets")]
+        public void MethodWithoutParamsAndBrakets()
+        {
+            var actual = MethodChainSemantics.Method(_parser).TryParse($"-where");
+
+            Assert.Empty(actual.Expectations);
+            Assert.True(actual.WasSuccessful);
+            Assert.Equal("where", actual.Value.Operation.ToString());
+            Assert.Empty(actual.Value.Arguments);
+        }
+
+        [Fact(DisplayName = "Parsed Method Without Params")]
+        public void MethodWithoutParams()
+        {
+            var actual = MethodChainSemantics.Method(_parser).TryParse($"-where()");
+
+            Assert.Empty(actual.Expectations);
+            Assert.True(actual.WasSuccessful);
+            Assert.Equal("where", actual.Value.Operation.ToString());
+            Assert.Empty(actual.Value.Arguments);
         }
     }
 }
