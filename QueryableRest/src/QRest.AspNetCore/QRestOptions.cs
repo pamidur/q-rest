@@ -5,6 +5,6 @@ namespace QRest.AspNetCore
 {
     public class QRestOptions
     {
-        public IQuerySemanticsProvider Parser { get; set; } = new MethodChainParser();
+        public IQuerySemanticsProvider Semantics { get; set; } = new MethodChainSemantics();
     }
 }

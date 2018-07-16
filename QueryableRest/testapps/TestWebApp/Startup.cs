@@ -28,11 +28,11 @@ namespace TestWebApp
             services
                 .AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
-                .AddQRestOptions(qrest => qrest.Parser = new MethodChainParser(options =>
-                 {
-                     options.UseDefferedConstantParsing = DefferedConstantParsing.None;
-                     options.UseStaticQueryTerminator = true;
-                 }))
+                .AddQRestOptions(qrest => qrest.Semantics = new MethodChainSemantics
+                {
+                    UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers,
+                    UseStaticQueryTerminator = true
+                })
             ;
         }
 

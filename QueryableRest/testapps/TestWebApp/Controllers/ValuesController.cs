@@ -60,7 +60,7 @@ namespace TestWebApp.Controllers
         {
             var client = new MongoClient(new MongoClientSettings() { Server = new MongoServerAddress("localhost", 27017) });
             collection = client.GetDatabase("test").GetCollection<Entity>("entities");
-            //collection.InsertOne(new Entity { Number = 2, Text = "ODataSucks" });
+            collection.InsertOne(new Entity { Number = 3, Text = "Olo" });
         }
 
         // GET api/values

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 using QRest.Core;
 using QRest.Core.Contracts;
-using QRest.Semantics.MethodChain;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,9 +17,9 @@ namespace QRest.AspNetCore
     {
         private readonly IQuerySemanticsProvider _parser;
 
-        public QueryModelBinder(QRestOptions options)
+        public QueryModelBinder(IOptions<QRestOptions> options)
         {
-            _parser = options.Parser;
+            _parser = options.Value.Semantics;
         }
 
         public Task BindModelAsync(ModelBindingContext bindingContext)

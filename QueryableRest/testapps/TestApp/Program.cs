@@ -55,7 +55,7 @@ namespace TestApp
                 new Entity { Number = 2, Text = "AAA", Sub = new SubEntity { Text = "SubText2" } },
             }.AsQueryable();
 
-            var parser = new MethodChainParser();
+            var parser = new MethodChainSemantics();
             var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[]
 
             { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text), Status-eq({true}))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }

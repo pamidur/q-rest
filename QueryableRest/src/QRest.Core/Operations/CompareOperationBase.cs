@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Operations
 {
     public abstract class CompareOperationBase : OperationBase
     {
+        private static readonly string _parseMethodName = "Parse";
+        private static readonly Type[] _parseWithFormatSignature = new[] { typeof(string), typeof(IFormatProvider) };
+        private static readonly Type[] _parseSignature = new[] { typeof(string) };
+
+
         public override bool SupportsCall => true;
 
         public Dictionary<Type, Func<string, object>> Parsers { get; set; } = new Dictionary<Type, Func<string, object>>();
@@ -57,19 +63,24 @@ namespace QRest.Core.Operations
         {
             if (!Parsers.ContainsKey(type))
             {
-                try
+                var source = Expression.Parameter(typeof(string));
+                var format = Expression.Constant(CultureInfo.InvariantCulture, typeof(IFormatProvider));
+
+                Expression[] parameters;
+
+                var method = type.GetMethod(_parseMethodName, _parseWithFormatSignature);
+                if (method != null) parameters = new Expression[] { source, format };
+                else
                 {
-                    var param = Expression.Parameter(typeof(string));
-                    var call = Expression.Call(type, "Parse", new Type[] { }, param);
-                    var convert = Expression.Convert(call, typeof(object));
-                    var lambda = Expression.Lambda<Func<string, object>>(convert, param);
-                    Parsers.Add(type, lambda.Compile());
-                }
-                catch
-                {
-                    throw new NotSupportedException($"Cannot create parser for {type.FullName}.");
+                    method = type.GetMethod(_parseMethodName, _parseSignature);
+                    if (method != null) parameters = new Expression[] { source };
+                    else throw new NotSupportedException($"Cannot create parser for {type.FullName}.");
                 }
 
+                var call = Expression.Call(method, parameters);
+                var convert = Expression.Convert(call, typeof(object));
+                var lambda = Expression.Lambda<Func<string, object>>(convert, source);
+                Parsers.Add(type, lambda.Compile());
             }
 
             return Parsers[type];
