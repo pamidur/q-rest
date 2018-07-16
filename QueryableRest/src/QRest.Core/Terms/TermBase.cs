@@ -1,4 +1,5 @@
-﻿using QRest.Core.Extensions;
+﻿using QRest.Core.Expressions;
+using QRest.Core.Extensions;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -18,9 +19,16 @@ namespace QRest.Core.Terms
         private Expression Finalize(Expression exp)
         {
             var eType = exp.GetQueryElementType();
-            //todo:: get prev name
-            exp = eType == null ? exp :
-                Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] { eType }, exp);
+
+            if (eType == null)
+                return exp;
+
+            var name = NamedExpression.DefaultQueryResultName;
+
+            if (exp.NodeType == NamedExpression.NamedExpressionType)
+                name = ((NamedExpression)exp).Name;
+
+            exp = new NamedExpression(Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { eType }, exp), name);
 
             return exp;
         }

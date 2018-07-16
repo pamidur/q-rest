@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using QRest.AspNetCore;
 
 namespace TestWebApp.Controllers
 {
+    [BsonIgnoreExtraElements]
     public class Entity
     {
         public ObjectId Id { get; set; }

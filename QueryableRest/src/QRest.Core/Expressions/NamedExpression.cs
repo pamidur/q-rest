@@ -25,5 +25,10 @@ namespace QRest.Core.Expressions
 
         public override Expression Reduce() => Expression;
         public override bool CanReduce => true;
+
+        public override string ToString()
+        {
+            return $"{Expression.ToString()}.NameAs(\"{Name}\")";
+        }
     }
 }

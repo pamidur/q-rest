@@ -71,7 +71,7 @@ namespace QRest.Core.Operations.Query
             var staticLambda = Expression.Lambda(staticExpression, root);
 
             var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { staticExpression.Type },
-                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToList), new[] { staticExpression.Type },
+                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { staticExpression.Type },
                         Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, staticExpression.Type }, last, staticLambda)
                     )
                 );

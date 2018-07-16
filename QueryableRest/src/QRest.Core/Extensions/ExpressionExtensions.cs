@@ -7,13 +7,16 @@ namespace QRest.Core.Extensions
 {
     internal static class ExpressionExtensions
     {
+        private static readonly Type _queryableIface = typeof(IQueryable<>);
+        private static readonly string _queryableIfaceName = $"{_queryableIface.Namespace}.{_queryableIface.Name}";
+
         public static Type GetQueryElementType(this Expression query)
         {
             var typeInfo = query.Type.GetTypeInfo();
 
-            if ($"{typeInfo.Namespace}.{typeInfo.Name}" != "System.Linq.IQueryable`1")
+            if (!typeInfo.IsGenericType || (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() != _queryableIface))
             {
-                typeInfo = typeInfo.GetInterface("System.Linq.IQueryable`1")?.GetTypeInfo();
+                typeInfo = typeInfo.GetInterface(_queryableIfaceName)?.GetTypeInfo();
             }
 
             return typeInfo?.GetGenericArguments()[0];
