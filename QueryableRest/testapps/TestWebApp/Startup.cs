@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Serialization;
+using QRest.Semantics.MethodChain;
 
 namespace TestWebApp
 {
@@ -27,11 +28,11 @@ namespace TestWebApp
             services
                 .AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
-            //.AddJsonOptions(options =>
-            //    {
-            //        options.SerializerSettings.ContractResolver
-            //            = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver() { NamingStrategy = new Newtonsoft.Json.Serialization.CamelCaseNamingStrategy { } };
-            //    })
+                .AddQRestOptions(qrest => qrest.Parser = new MethodChainParser(options =>
+                 {
+                     options.UseDefferedConstantParsing = DefferedConstantParsing.None;
+                     options.UseStaticQueryTerminator = true;
+                 }))
             ;
         }
 

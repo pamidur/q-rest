@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using Newtonsoft.Json;
 using QRest.AspNetCore;
 
 namespace TestWebApp.Controllers
@@ -14,6 +16,9 @@ namespace TestWebApp.Controllers
     [BsonIgnoreExtraElements]
     public class Entity
     {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        [JsonConverter(typeof(ObjectIdConverter))]
         public ObjectId Id { get; set; }
         public string Text { get; set; }
         public int Number { get; set; }
@@ -62,7 +67,14 @@ namespace TestWebApp.Controllers
         [HttpGet("{query?}")]
         public ActionResult Get(Query query)
         {
+            var cr = Expression.Call(typeof(Int32), "Parse", new Type[] { }, Expression.Constant("1"));
+
             var data = collection.AsQueryable();
+
+            var r = data.Where(e => e.Number == int.Parse("1"));
+            
+            var rr = r.ToArray();
+
             var result = query.Apply(data);          
 
             return Ok(result);
