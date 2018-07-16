@@ -58,15 +58,19 @@ namespace TestApp
             var parser = new MethodChainParser();
             var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[]
 
-            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
+            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text), Status-eq({true}))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
 
                 } });
+
+            //:where(Sub.Text-eq(`SubText`))
+            //:where(`SubText`-eq(-it.Sub.Text)
 
 
             tree = new LambdaTerm
             {
                 Operation = new WhereOperation(),
                 Arguments = new List<ITerm> {
+                   
                     new PropertyTerm{
                         PropertyName = "Text",
                         Next = new MethodTerm{

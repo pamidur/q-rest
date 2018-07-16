@@ -11,7 +11,9 @@ namespace QRest.Core.Terms
             if (!Operation.SupportsQuery)
                 throw new ExpressionCreationException();
 
-            var argsroot = Expression.Parameter(prev.GetQueryElementType(), $"p_{GetHashCode()}");
+            var etype = prev.GetQueryElementType();
+
+            var argsroot = Expression.Parameter(etype, etype.Name.ToLowerInvariant());
 
             var args = Arguments.Select(a => a.CreateExpressionChain(argsroot, argsroot)).ToList();
             var exp = Operation.CreateQueryExpression(root, prev, argsroot, args);

@@ -29,7 +29,12 @@ namespace QRest.AspNetCore
 
             var result = _parser.Parse(queryFields);
 
-            bindingContext.Result = ModelBindingResult.Success(new Query { RootTerm = result });
+            var query = new Query();
+
+            if (result != null)
+                query.RootTerm = result;
+
+            bindingContext.Result = ModelBindingResult.Success(query);
 
             return Task.FromResult(true);
         }

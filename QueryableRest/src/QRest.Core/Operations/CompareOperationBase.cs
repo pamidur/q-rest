@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Operations
@@ -28,10 +27,7 @@ namespace QRest.Core.Operations
             return PickExpression(a, b);
         }
 
-        protected virtual Expression PickExpression(Expression a, Expression b)
-        {
-            throw new NotImplementedException();
-        }
+        protected abstract Expression PickExpression(Expression a, Expression b);
 
     }
 }
