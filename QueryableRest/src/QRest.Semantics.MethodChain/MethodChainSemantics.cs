@@ -41,6 +41,11 @@ namespace QRest.Semantics.MethodChain
         {
             AddOperation("ne", new NotEqualOperation());
             AddOperation("eq", new EqualOperation());
+            AddOperation("gt", new GreaterThanOperation());
+            AddOperation("gte", new GreaterThanOrEqualOperation());
+            AddOperation("lt", new LessThanOperation());
+            AddOperation("lte", new LessThanOrEqualOperation());
+
             AddOperation("not", new NotOperation());
             AddOperation("where", new WhereOperation());
             AddOperation("get", new SelectOperation { UseStaticTerminatingQuery = UseStaticQueryTerminator });
@@ -63,9 +68,9 @@ namespace QRest.Semantics.MethodChain
 
         protected void AddOperation(string name, IOperation operation)
         {
-            if (operation is CompareOperationBase && UseDefferedConstantParsing >= DefferedConstantParsing.Strings)
+            if (operation is OperationBase && UseDefferedConstantParsing >= DefferedConstantParsing.Strings)
             {
-                var compareOp = (CompareOperationBase)operation;
+                var compareOp = (OperationBase)operation;
 
                 compareOp.TryParseFromStrings = true;
 

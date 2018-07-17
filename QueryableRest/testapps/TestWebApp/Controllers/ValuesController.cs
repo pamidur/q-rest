@@ -20,6 +20,8 @@ namespace TestWebApp.Controllers
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonConverter(typeof(ObjectIdConverter))]
         public ObjectId Id { get; set; }
+
+
         public string Text { get; set; }
         public int Number { get; set; }
 
@@ -56,6 +58,8 @@ namespace TestWebApp.Controllers
                 new Entity { Number = 2, Text = "AAA", Sub = new SubEntity { Text = "SubText2" } },
             }.AsQueryable();
 
+
+
         public ValuesController()
         {
             var client = new MongoClient(new MongoClientSettings() { Server = new MongoServerAddress("localhost", 27017) });
@@ -67,14 +71,7 @@ namespace TestWebApp.Controllers
         [HttpGet("{query?}")]
         public ActionResult Get(Query query)
         {
-            var cr = Expression.Call(typeof(Int32), "Parse", new Type[] { }, Expression.Constant("1"));
-
             var data = collection.AsQueryable();
-
-            var r = data.Where(e => e.Number == int.Parse("1"));
-            
-            var rr = r.ToArray();
-
             var result = query.Apply(data);          
 
             return Ok(result);

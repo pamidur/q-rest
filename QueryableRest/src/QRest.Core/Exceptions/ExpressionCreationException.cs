@@ -6,5 +6,13 @@ namespace QRest.Core
 {
     public class ExpressionCreationException : Exception
     {
+        public ExpressionCreationException()
+        {
+
+        }
+
+        public ExpressionCreationException(string message) : base(message)
+        {
+        }
     }
 }

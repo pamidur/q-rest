@@ -15,10 +15,10 @@ namespace QRest.Core.Operations.Query
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            if (arguments[0].Type != typeof(int))
-                throw new ExpressionCreationException();
+            if(!TryCast(arguments[0],typeof(Int32),out var argument))
+                throw new ExpressionCreationException($"Cannot cast {arguments[0].Type} to Int32");
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Take), new Type[] { argumentsRoot.Type }, context, arguments[0]);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Take), new Type[] { argumentsRoot.Type }, context, argument);
 
             return new NamedExpression(exp, NamedExpression.DefaultQueryResultName);
         }
