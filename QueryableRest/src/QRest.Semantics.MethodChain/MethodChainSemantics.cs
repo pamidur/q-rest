@@ -33,7 +33,7 @@ namespace QRest.Semantics.MethodChain
             foreach (var customOp in CustomOperations)
                 AddOperation(customOp.Key, customOp.Value);
 
-            return CallChain(this).End();
+            return CallChain().End();
         }
 
         protected internal void AddDefaultOperations()
