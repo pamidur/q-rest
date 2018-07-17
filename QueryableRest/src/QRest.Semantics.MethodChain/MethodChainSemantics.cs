@@ -8,10 +8,7 @@ using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
 using QRest.Core.Operations.Aggregations;
 using QRest.Core.Operations.Query.OrderDirectionOperations;
-using QRest.Core;
 using System;
-using System.Globalization;
-using QRest.Core.Exceptions;
 
 namespace QRest.Semantics.MethodChain
 {
@@ -33,7 +30,11 @@ namespace QRest.Semantics.MethodChain
             foreach (var customOp in CustomOperations)
                 AddOperation(customOp.Key, customOp.Value);
 
-            return CallChain().End();
+            //var a = new MethodChainParserBuilder(UseDefferedConstantParsing, _operationMap);
+            //a.Build();
+            //var m = a.CallChain.Parse("-");
+
+            return new MethodChainParserBuilder(UseDefferedConstantParsing, _operationMap).Build();
         }
 
         protected internal void AddDefaultOperations()
@@ -90,39 +91,6 @@ namespace QRest.Semantics.MethodChain
         public string[] QuerySelector(string modelname)
         {
             return new[] { modelname };
-        }
-
-        protected object ParseConstant<T>(string source)
-        {
-            var type = typeof(T);
-
-            if (UseDefferedConstantParsing == DefferedConstantParsing.All || type == typeof(string))
-                return source;
-
-            if (type == typeof(bool))
-                return bool.Parse(source);
-
-            if (UseDefferedConstantParsing == DefferedConstantParsing.StringsAndNumbers)
-                return source;
-
-            if (type == typeof(int))
-                return int.Parse(source, CultureInfo.InvariantCulture);
-
-            if (type == typeof(float))
-                return float.Parse(source, CultureInfo.InvariantCulture);
-
-            if (UseDefferedConstantParsing == DefferedConstantParsing.Strings)
-                return source;
-
-            throw new NotSupportedException($"Cannot parse type of {type.ToString()}");
-        }
-
-        protected IOperation SelectOperation(string opName)
-        {
-            if (!_operationMap.TryGetValue(opName, out var op))
-                throw new UnknownOperationException(opName);
-
-            return op;
         }
     }
 }
