@@ -1,24 +1,35 @@
-﻿using Sprache;
+﻿using Moq;
+using QRest.Core.Operations;
+using Sprache;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace QRest.Semantics.MethodChain.Tests
 {
     public class ParserTests
     {
-        private readonly MethodChainSemantics _parser;
+        private readonly Mock<IOperation> _opration;
+        private readonly MethodChainParserBuilder _parser;
+
+        private static readonly string _testUniversalOperationName = "test";
 
         public ParserTests()
         {
-            _parser = new MethodChainSemantics() { UseDefferedConstantParsing = DefferedConstantParsing.Disabled };
-            _parser.AddDefaultOperations();
+            _opration = new Mock<IOperation>();
+            _opration.Setup(m => m.SupportsCall).Returns(true);
+            _opration.Setup(m => m.SupportsQuery).Returns(true);
+            _opration.Setup(m => m.ToString()).Returns(_testUniversalOperationName);
+
+            _parser = new MethodChainParserBuilder(DefferedConstantParsing.Disabled, new Dictionary<string, IOperation> { { _testUniversalOperationName, _opration.Object } });
+            _parser.Build();
         }
 
         [Fact(DisplayName = "Correct String Constant Is Parsed")]
         public void ValidStringConstant()
         {
             var expected = "Test123-:=/\\+()!@#$%$String\r\n\t!";
-            var actual = MethodChainSemantics.StringConstant(_parser).TryParse($"`{expected}`");
+            var actual = _parser.StringConstant.TryParse($"`{expected}`");
 
             Assert.True(actual.Remainder.AtEnd);
             Assert.Empty(actual.Remainder.Memos);
@@ -33,7 +44,7 @@ namespace QRest.Semantics.MethodChain.Tests
         public void ValidEmptyStringConstant()
         {
             var expected = "";
-            var actual = MethodChainSemantics.StringConstant(_parser).TryParse($"`{expected}`");
+            var actual = _parser.StringConstant.TryParse($"`{expected}`");
 
             Assert.True(actual.WasSuccessful);
             Assert.Empty(actual.Expectations);
@@ -44,7 +55,7 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Incorrect String Constant Shows Error")]
         public void InValidStringConstant1()
         {
-            var actual = MethodChainSemantics.StringConstant(_parser).TryParse($"`text");
+            var actual = _parser.StringConstant.TryParse($"`text");
 
             Assert.NotEmpty(actual.Expectations);
             Assert.False(actual.WasSuccessful);
@@ -53,7 +64,7 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Correct Float Constant Is Parsed")]
         public void FloatParseTest()
         {
-            var actual = MethodChainSemantics.NumberConstant(_parser).TryParse($"1.12");
+            var actual = _parser.NumberConstant.TryParse($"1.12");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
@@ -63,7 +74,7 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Correct Int Constant Is Parsed")]
         public void IntParseTest()
         {
-            var actual = MethodChainSemantics.NumberConstant(_parser).TryParse($"567");
+            var actual = _parser.NumberConstant.TryParse($"567");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
@@ -73,22 +84,22 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Parsed Method Without Params and Brakets")]
         public void MethodWithoutParamsAndBrakets()
         {
-            var actual = MethodChainSemantics.Method(_parser).TryParse($"-where");
+            var actual = _parser.Method.TryParse($"-{_testUniversalOperationName}");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
-            Assert.Equal("where", actual.Value.Operation.ToString());
+            Assert.Equal(_testUniversalOperationName, actual.Value.Operation.ToString());
             Assert.Empty(actual.Value.Arguments);
         }
 
         [Fact(DisplayName = "Parsed Method Without Params")]
         public void MethodWithoutParams()
         {
-            var actual = MethodChainSemantics.Method(_parser).TryParse($"-where()");
+            var actual = _parser.Method.TryParse($"-{_testUniversalOperationName}()");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
-            Assert.Equal("where", actual.Value.Operation.ToString());
+            Assert.Equal(_testUniversalOperationName, actual.Value.Operation.ToString());
             Assert.Empty(actual.Value.Arguments);
         }
     }
