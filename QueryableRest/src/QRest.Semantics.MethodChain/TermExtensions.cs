@@ -1,7 +1,4 @@
-﻿using QRest.Core.Terms;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using QRest.Core.Contracts;
 
 namespace QRest.Semantics.MethodChain
 {

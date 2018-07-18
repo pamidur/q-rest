@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using QRest.Core.Contracts;
 
 namespace QRest.Core.Terms
 {
@@ -7,12 +8,12 @@ namespace QRest.Core.Terms
     {
         public object Value { get; set; }
 
-        protected override Expression CreateExpression(Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
         {
             return Expression.Constant(Value, Value.GetType());
         }
 
-        protected override string Debug
+        public override string DebugView
         {
             get
             {
@@ -35,5 +36,7 @@ namespace QRest.Core.Terms
                 return $"{del_l}{Value.ToString()}{del_r}";
             }
         }
+
+        public override ITerm Clone() => new ConstantTerm { Value = Value, Next = Next?.Clone() };
     }
 }

@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using QRest.Core;
+using QRest.Core.Compiler;
+using QRest.Core.Contracts;
 using QRest.Core.Operations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
@@ -98,16 +100,11 @@ namespace TestApp
 
             // :where(-gt(price,1))     
 
-            var dataParam = Expression.Parameter(data.GetType());
 
-            var registry = new Registry();
-            Registry.RegisterDefaultOperations(registry);
+            var e = new TermTreeCompiler().Compile<IQueryable<Entity>>(tree);
 
-            var e = tree.CreateExpressionChain(dataParam, dataParam);
 
-            var l = Expression.Lambda(e, dataParam);
-
-            var r = l.Compile().DynamicInvoke(data);            
+            var r = e.Compile()(data);            
         }
     }
 

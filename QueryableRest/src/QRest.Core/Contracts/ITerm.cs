@@ -1,10 +1,12 @@
 ﻿using System.Linq.Expressions;
 
-namespace QRest.Core.Terms
+namespace QRest.Core.Contracts
 {
     public interface ITerm
     {
         ITerm Next { get; set; }
-        Expression CreateExpressionChain(Expression prev, ParameterExpression root);        
+        Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root);
+        ITerm Clone();
+        string DebugView { get; }
     }
 }

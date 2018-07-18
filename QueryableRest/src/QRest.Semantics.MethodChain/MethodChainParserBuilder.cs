@@ -6,6 +6,7 @@ using Read = Sprache.Parse;
 using System.Linq;
 using System.Globalization;
 using QRest.Core.Operations;
+using QRest.Core.Contracts;
 
 namespace QRest.Semantics.MethodChain
 {
