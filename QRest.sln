@@ -15,20 +15,33 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain.Tests", "test\QRest.Semantics.MethodChain.Tests\QRest.Semantics.MethodChain.Tests.csproj", "{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testapps", "testapps", "{7D715283-67A8-43E2-938E-6CB12ACD30F8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{7D715283-67A8-43E2-938E-6CB12ACD30F8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "testapps\TestApp\TestApp.csproj", "{E8C52A35-B463-403E-BBCB-AF257E620FBB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "samples\TestApp\TestApp.csproj", "{E8C52A35-B463-403E-BBCB-AF257E620FBB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApp", "testapps\TestWebApp\TestWebApp.csproj", "{284FC041-7F0D-4F0C-8F49-71A52E92E46D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApp", "samples\TestWebApp\TestWebApp.csproj", "{284FC041-7F0D-4F0C-8F49-71A52E92E46D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{68EFFEF7-800B-4592-BE7B-9D9568083814}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solution", ".solution", "{68EFFEF7-800B-4592-BE7B-9D9568083814}"
 	ProjectSection(SolutionItems) = preProject
-		..\.travis.yml = ..\.travis.yml
+		.gitignore = .gitignore
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData.Tests", "test\QRest.OData.Tests\QRest.Semantics.OData.Tests.csproj", "{708FECC7-1CAF-4C06-8AAD-064D1918BCAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData", "src\QRest.Semantics.OData\QRest.Semantics.OData.csproj", "{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData", "src\QRest.OData\QRest.Semantics.OData.csproj", "{E5B852D3-1640-406C-8E74-1CE7C20CDE36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData.Tests", "test\QRest.Semantics.OData.Tests\QRest.Semantics.OData.Tests.csproj", "{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F592F579-DB0F-4E74-B79D-D921DEDBE4B2}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3D211EBB-5B03-4FDF-B7BA-E1B36958F523}"
+	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
+		after.QRest.sln.targets = after.QRest.sln.targets
+		Directory.build.targets = Directory.build.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -60,14 +73,14 @@ Global
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{708FECC7-1CAF-4C06-8AAD-064D1918BCAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{708FECC7-1CAF-4C06-8AAD-064D1918BCAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{708FECC7-1CAF-4C06-8AAD-064D1918BCAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{708FECC7-1CAF-4C06-8AAD-064D1918BCAD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5B852D3-1640-406C-8E74-1CE7C20CDE36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5B852D3-1640-406C-8E74-1CE7C20CDE36}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5B852D3-1640-406C-8E74-1CE7C20CDE36}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5B852D3-1640-406C-8E74-1CE7C20CDE36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,8 +92,10 @@ Global
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
 		{E8C52A35-B463-403E-BBCB-AF257E620FBB} = {7D715283-67A8-43E2-938E-6CB12ACD30F8}
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D} = {7D715283-67A8-43E2-938E-6CB12ACD30F8}
-		{708FECC7-1CAF-4C06-8AAD-064D1918BCAD} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
-		{E5B852D3-1640-406C-8E74-1CE7C20CDE36} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
+		{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
+		{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
+		{F592F579-DB0F-4E74-B79D-D921DEDBE4B2} = {68EFFEF7-800B-4592-BE7B-9D9568083814}
+		{3D211EBB-5B03-4FDF-B7BA-E1B36958F523} = {68EFFEF7-800B-4592-BE7B-9D9568083814}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {395047F8-3C58-47EF-81DB-C2ECE9E04D96}

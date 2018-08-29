@@ -10,12 +10,12 @@ env:
     - AUTHORS='QRest Contributors'
 script:
   - echo $VERSION
-  - dotnet restore ./QueryableRest/
-  - dotnet build ./QueryableRest/ -c $MODE -p:Version=$VERSION -p:InformationalVersion=$VERSION:$TRAVIS_COMMIT -p:Product="$PRODUCT" -p:Authors="$AUTHORS"
-  - dotnet test ./QueryableRest/test/QRest.Semantics.MethodChain.Tests -c $MODE --no-build
+  - dotnet restore ./
+  - dotnet build ./ -c $MODE -p:Version=$VERSION -p:InformationalVersion=$VERSION:$TRAVIS_COMMIT -p:Product="$PRODUCT" -p:Authors="$AUTHORS"
+  - dotnet test ./ -c $MODE --no-build
 deploy:
   skip_cleanup: true
   provider: script
-  script: dotnet pack ./QueryableRest/ -c $MODE --no-build -p:Version=$VERSION -p:Product="$PRODUCT" -p:Authors="$AUTHORS" && dotnet nuget push ./QueryableRest/src/**/*.nupkg -s $NUGETURL -k $NUGETKEY
+  script: dotnet pack ./ -c $MODE --no-build -p:Version=$VERSION -p:Product="$PRODUCT" -p:Authors="$AUTHORS" && dotnet nuget push ./src/**/*.nupkg -s $NUGETURL -k $NUGETKEY
   on:
     tags: true
