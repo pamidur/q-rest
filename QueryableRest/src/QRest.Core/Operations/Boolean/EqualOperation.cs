@@ -6,7 +6,5 @@ namespace QRest.Core.Operations.Boolean
     {
         protected override Expression PickExpression(Expression a, Expression b) =>
             Expression.Equal(a, b);
-
-
     }
 }

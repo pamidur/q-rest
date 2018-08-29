@@ -1,4 +1,5 @@
 using Antlr4.Runtime;
+using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using Xunit;
 

@@ -8,3 +8,4 @@ namespace QRest.Core.Operations.Boolean
             Expression.NotEqual(a, b);
     }
 }
+

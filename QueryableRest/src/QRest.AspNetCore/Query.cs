@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
 using QRest.Core;
 using QRest.Core.Contracts;
-using QRest.Semantics.MethodChain;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,9 +18,9 @@ namespace QRest.AspNetCore
     {
         private readonly IQuerySemanticsProvider _parser;
 
-        public QueryModelBinder(IQuerySemanticsProvider parser = null)
+        public QueryModelBinder(IOptions<QRestOptions> options)
         {
-            _parser = parser ?? new MethodChainParser();
+            _parser = options.Value.Semantics;
         }
 
         public Task BindModelAsync(ModelBindingContext bindingContext)
@@ -27,9 +28,21 @@ namespace QRest.AspNetCore
             var queryNames = _parser.QuerySelector(string.IsNullOrEmpty(bindingContext.ModelName) ? bindingContext.FieldName : bindingContext.ModelName);
             var queryFields = queryNames.ToDictionary(n => n, n => bindingContext.ValueProvider.GetValue(n).ToArray());
 
+            var a = new Stopwatch();
+            a.Start();
+
             var result = _parser.Parse(queryFields);
 
-            bindingContext.Result = ModelBindingResult.Success(new Query { RootTerm = result });
+            a.Stop();
+
+            var b = a.ElapsedTicks;
+
+            var query = new Query();
+
+            if (result != null)
+                query.RootTerm = result;
+            
+            bindingContext.Result = ModelBindingResult.Success(query);
 
             return Task.FromResult(true);
         }

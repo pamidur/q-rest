@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Method chain semantics for data queries over HTTP.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Sprache" Version="2.1.0" />
+    <PackageReference Include="Sprache" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -12,6 +12,7 @@ using QRest.Core.Operations.Aggregations;
 using QRest.Semantics.OData;
 using System.Collections.Generic;
 using QRest.Core.Operations.Query.OrderDirectionOperations;
+using QRest.Core.Contracts;
 
 namespace QRest.OData
 {

@@ -1,4 +1,5 @@
-﻿using QRest.Core.Operations;
+﻿using QRest.Core.Contracts;
+using QRest.Core.Operations;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,18 +11,18 @@ namespace QRest.Core.Terms
         public IOperation Operation { get; set; }
         public List<ITerm> Arguments { get; set; } = new List<ITerm>();
 
-        protected override Expression CreateExpression(Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
         {
             if (!Operation.SupportsCall)
                 throw new ExpressionCreationException();
 
-            var args = Arguments.Select(a => a.CreateExpressionChain(prev, root)).ToList();
+            var args = Arguments.Select(a => compiler.Compile(a, prev, root)).ToList();
             var exp = Operation.CreateCallExpression(root, prev, args);
 
             return exp;
         }
 
-        protected override string Debug
+        public override string DebugView
         {
             get
             {
@@ -30,5 +31,7 @@ namespace QRest.Core.Terms
                 return $"-{Operation.GetType().Name.ToLowerInvariant().Replace("operation", "")}{argsLiteral}";
             }
         }
+
+        public override ITerm Clone() => new MethodTerm { Operation = Operation, Next = Next?.Clone(), Arguments = Arguments.Select(a => a.Clone()).ToList() };
     }
 }

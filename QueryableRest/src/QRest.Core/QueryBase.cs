@@ -4,30 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using QRest.Core.Extensions;
+using QRest.Core.Operations;
+using QRest.Core.Contracts;
+using QRest.Core.Compiler;
 
 namespace QRest.Core
 {
     public abstract class QueryBase
     {
-        public ITerm RootTerm { get; set; }
+        public ITerm RootTerm { get; set; } = new MethodTerm { Operation = new ItOperation() };
 
-        public object Apply<T>(IQueryable<T> target)
+        private static readonly TermTreeCompiler _compiler = new TermTreeCompiler();
+
+        public object Apply<T>(IQueryable<T> target, bool finalize = true)
         {
-            if (RootTerm == null)
-                return target;
+            var lambda = _compiler.Compile<IQueryable<T>>(RootTerm);
 
-            var dataParam = Expression.Parameter(typeof(IQueryable<T>));
+            var result = lambda.Compile()(target);
 
-            var e = RootTerm.CreateExpressionChain(dataParam, dataParam);
+            //var debug = _compiler.CompileDebug<IQueryable<T>>(RootTerm);
+            //debug.Func.Compile()(target);
 
-            e = e.Reduce();
-
-            var l = Expression.Lambda(e, dataParam);            
-
-            var r = l.Compile().DynamicInvoke(target);
-
-            return r;
+            return result;
         }
-
     }
 }

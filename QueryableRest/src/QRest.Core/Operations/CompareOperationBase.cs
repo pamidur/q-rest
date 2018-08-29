@@ -1,37 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Operations
 {
     public abstract class CompareOperationBase : OperationBase
     {
-        public override bool SupportsCall => true;
+        public override bool SupportsCall => true;        
 
         public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            var a = context;
-            var b = arguments[0];
+            var compareArgs = Convert(context, arguments[0]);
 
-            if (a.Type != b.Type)
-            {
-                if (a.Type.IsAssignableFrom(b.Type))
-                    a = Expression.Convert(a, b.Type);
-                else if (b.Type.IsAssignableFrom(a.Type))
-                    b = Expression.Convert(b, a.Type);
-                else throw new ExpressionCreationException();
-            }
-
-            return PickExpression(a, b);
+            return PickExpression(compareArgs.Left, compareArgs.Right);
         }
 
-        protected virtual Expression PickExpression(Expression a, Expression b)
+        protected abstract Expression PickExpression(Expression a, Expression b);
+
+        protected virtual (Expression Left, Expression Right) Convert(Expression left, Expression right)
         {
-            throw new NotImplementedException();
-        }
-
+            if (TryCast(right, left.Type, out var newright))
+                return (left, newright);
+            else if (TryCast(left, right.Type, out var newleft))
+                return (newleft, right);
+            else
+                throw new ExpressionCreationException($"Cannot compare {left.Type.Name} and {right.Type.Name}");
+        }       
     }
 }

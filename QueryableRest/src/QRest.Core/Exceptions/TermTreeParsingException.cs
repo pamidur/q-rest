@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QRest.Core
 {
-    public class ExpressionCreationException : Exception
+    public class TermTreeParsingException : Exception
     {
     }
 }

@@ -1,4 +1,4 @@
-﻿using QRest.Core.Terms;
+﻿using QRest.Core.Contracts;
 
 namespace QRest.Core
 {

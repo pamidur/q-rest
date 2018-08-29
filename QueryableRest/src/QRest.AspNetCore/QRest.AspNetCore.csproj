@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Infrastructure for ASPNET Core that enables using quries.</Description>
   </PropertyGroup>
 
   <ItemGroup>

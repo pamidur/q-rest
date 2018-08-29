@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using QRest.Core;
+using QRest.Core.Compiler;
+using QRest.Core.Contracts;
 using QRest.Core.Operations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
@@ -55,16 +57,19 @@ namespace TestApp
                 new Entity { Number = 2, Text = "AAA", Sub = new SubEntity { Text = "SubText2" } },
             }.AsQueryable();
 
-            var parser = new MethodChainParser();
+            var parser = new MethodChainSemantics();
             var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[]
 
-            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
+            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text), Status-eq({true}))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
 
                 } });
 
             //:where()-select(:count,:select)
             //:where()-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))    
             //-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))
+            //:where(Sub.Text-eq(`SubText`))
+            //:where(`SubText`-eq(-it.Sub.Text)
+
 
             tree = new LambdaTerm
             {
@@ -116,16 +121,11 @@ namespace TestApp
 
             // :where(-gt(price,1))     
 
-            var dataParam = Expression.Parameter(data.GetType());
 
-            var registry = new Registry();
-            Registry.RegisterDefaultOperations(registry);
+            var e = new TermTreeCompiler().Compile<IQueryable<Entity>>(tree);
 
-            var e = tree.CreateExpressionChain(dataParam, dataParam);
 
-            var l = Expression.Lambda(e, dataParam);
-
-            var r = l.Compile().DynamicInvoke(data);
+            var r = e.Compile()(data);            
         }
     }
 

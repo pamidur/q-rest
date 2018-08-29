@@ -1,5 +1,5 @@
 ﻿using QRest.Core.Containers;
-using QRest.Core.Operations;
+using QRest.Core.Contracts;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
@@ -8,7 +8,7 @@ namespace QRest.Core.Terms
     {
         public string PropertyName { get; set; }
 
-        protected override Expression CreateExpression(Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
         {
             Expression exp;
 
@@ -25,6 +25,8 @@ namespace QRest.Core.Terms
             return exp;
         }
 
-        protected override string Debug => $".{PropertyName}";
+        public override string DebugView => $".{PropertyName}";
+
+        public override ITerm Clone() => new PropertyTerm { PropertyName = PropertyName, Next = Next?.Clone() };
     }
 }
