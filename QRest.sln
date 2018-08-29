@@ -40,6 +40,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3D211EBB
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
 		after.QRest.sln.targets = after.QRest.sln.targets
+		Directory.Build.props = Directory.Build.props
 		Directory.build.targets = Directory.build.targets
 	EndProjectSection
 EndProject
