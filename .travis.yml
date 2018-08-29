@@ -8,6 +8,7 @@ env:
     - MODE=Release
     - PRODUCT=QRest
     - AUTHORS='QRest Contributors'
+    - ICON=https://raw.githubusercontent.com/pamidur/q-rest/master/logo.png
 script:
   - echo $VERSION
   - dotnet restore ./
@@ -16,6 +17,6 @@ script:
 deploy:
   skip_cleanup: true
   provider: script
-  script: dotnet pack ./ -c $MODE --no-build -p:Version=$VERSION -p:Product="$PRODUCT" -p:Authors="$AUTHORS" && dotnet nuget push ./src/**/*.nupkg -s $NUGETURL -k $NUGETKEY
+  script: dotnet pack ./ -c $MODE --no-build -p:Version=$VERSION -p:Product="$PRODUCT" -p:Authors="$AUTHORS" -p:PackageIconUrl="$ICON" && dotnet nuget push ./src/**/*.nupkg -s $NUGETURL -k $NUGETKEY
   on:
     tags: true
