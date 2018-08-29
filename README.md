@@ -1,7 +1,7 @@
 # q-rest
 
 ## Project Status
-**Master** [![Build Status](https://travis-ci.org/pamidur/q-rest.svg?branch=master)](https://travis-ci.org/pamidur/q-rest)
+[![Build Status](https://travis-ci.org/pamidur/q-rest.svg?branch=master)](https://travis-ci.org/pamidur/q-rest)
 
 Package | Release | Pre-release
 --- | --- | ---
