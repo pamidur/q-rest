@@ -64,6 +64,9 @@ namespace TestApp
 
                 } });
 
+            //:where()-select(:count,:select)
+            //:where()-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))    
+            //-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))
             //:where(Sub.Text-eq(`SubText`))
             //:where(`SubText`-eq(-it.Sub.Text)
 
@@ -72,18 +75,36 @@ namespace TestApp
             {
                 Operation = new WhereOperation(),
                 Arguments = new List<ITerm> {
-                   
-                    new PropertyTerm{
-                        PropertyName = "Text",
-                        Next = new MethodTerm{
-                            Operation = new EqualOperation(),
-                            Arguments = new List<ITerm>{
-                                new ConstantTerm {
-                                    Value = "dadsa"
+                    new MethodTerm{
+                        Operation = new EveryOperation(),
+                        Arguments = new List<ITerm>{
+                            new PropertyTerm{
+                                PropertyName = "Text",
+                                Next = new MethodTerm{
+                                    Operation = new EqualOperation(),
+                                    Arguments = new List<ITerm>{
+                                        new ConstantTerm {
+                                            Value = "dadsa"
+                                        }
+                                    }
                                 }
-                            }
+                            },
+                             new PropertyTerm{
+                                PropertyName = "Number",
+                                Next = new MethodTerm{
+                                    Operation = new NotEqualOperation(),
+                                    Arguments = new List<ITerm>{
+                                        new ConstantTerm {
+                                            Value = 2
+                                        }
+                                    }
+                                }
+                            },
+
                         }
-                    }
+                    },
+
+
                 }
             };
 

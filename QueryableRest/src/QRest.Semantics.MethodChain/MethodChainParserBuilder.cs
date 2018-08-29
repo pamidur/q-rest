@@ -7,6 +7,7 @@ using System.Linq;
 using System.Globalization;
 using QRest.Core.Operations;
 using QRest.Core.Contracts;
+using QRest.Core;
 
 namespace QRest.Semantics.MethodChain
 {

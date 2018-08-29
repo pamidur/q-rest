@@ -1,10 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using QRest.Core.Contracts;
 
-namespace QRest.Core.Extensions
+namespace QRest.Core
 {
+
     public static class TermExtensions
     {
+        public static ITerm GetLatestCall(this ITerm root)
+        {
+            var res = root;
+            while (res.Next != null) res = res.Next;
+
+            return res;
+        }
     }
 }
