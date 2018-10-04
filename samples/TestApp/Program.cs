@@ -10,6 +10,7 @@ using QRest.Semantics.MethodChain;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -45,6 +46,22 @@ namespace TestApp
         }
     }
 
+    class FakeRequest : IRequestModel
+    {
+        public string ModelName { get; set; }
+        public string Query { get; set; }
+
+        public Stream GetBody()
+        {
+            throw new NotImplementedException();
+        }
+
+        public ReadOnlyMemory<string> GetNamedQueryPart(string name)
+        {
+            return new[] { Query }.AsMemory();
+        }
+    }
+
     //sort=-text@trim
 
     public class Program
@@ -58,12 +75,8 @@ namespace TestApp
             }.AsQueryable();
 
             var parser = new MethodChainSemantics();
-            var tree = parser.Parse(new Dictionary<string, string[]> { { "", new[]
-
-            { ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text), Status-eq({true}))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" }
-
-                } });
-
+            var tree = parser.Parse(new FakeRequest { Query = ":where(-every(Sub.Text-eq(`SubText`),Text-ne(-it.Sub.Text), Status-eq({true}))):select(Number@num,Sub.Text):where(Number-eq(1)):select(Text)" });
+                     
             //:where()-select(:count,:select)
             //:where()-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))    
             //-select(:count,:order(-it.f1-asc):top(1):skip(2):select(-it.f1,it.f2))

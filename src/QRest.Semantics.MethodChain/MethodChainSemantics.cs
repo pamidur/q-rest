@@ -81,21 +81,16 @@ namespace QRest.Semantics.MethodChain
             _operationMap.Add(name, operation);
         }
 
-        public ITerm Parse(IReadOnlyDictionary<string, string[]> queryParts)
+        public ITerm Parse(IRequestModel model)
         {
-            var query = queryParts.FirstOrDefault().Value.FirstOrDefault();
-
-            if (string.IsNullOrEmpty(query))
+            var queries = model.GetNamedQueryPart(model.ModelName).Span;
+            
+            if (queries.Length == 0)
                 return null;
 
-            var result = Parser.Value.TryParse(query);            
+            var result = Parser.Value.TryParse(queries[0]);            
 
             return result.Value;
-        }
-
-        public string[] QuerySelector(string modelname)
-        {
-            return new[] { modelname };
         }
     }
 }
