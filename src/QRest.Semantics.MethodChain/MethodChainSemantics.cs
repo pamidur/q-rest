@@ -15,6 +15,7 @@ namespace QRest.Semantics.MethodChain
     public partial class MethodChainSemantics : IQuerySemanticsProvider
     {
         private readonly Dictionary<string, IOperation> _operationMap = new Dictionary<string, IOperation>();
+        private static readonly ITerm _default = new MethodTerm { Operation = new ItOperation() };
 
         private Lazy<Parser<ITerm>> Parser { get; }
 
@@ -86,7 +87,7 @@ namespace QRest.Semantics.MethodChain
             var queries = model.GetNamedQueryPart(model.ModelName).Span;
             
             if (queries.Length == 0)
-                return null;
+                return _default;
 
             var result = Parser.Value.TryParse(queries[0]);            
 

@@ -1,6 +1,5 @@
 ﻿using QRest.Core.Containers;
 using QRest.Core.Expressions;
-using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -148,6 +147,11 @@ namespace QRest.Core.Operations.Query
             } while (initializers.ContainsKey(name));
 
             return name;
+        }
+
+        public override string ToString()
+        {
+            return nameof(SelectOperation).ToLowerInvariant().Replace("operation", "") + (UseStaticTerminatingQuery ? "!" : "");
         }
     }
 }
