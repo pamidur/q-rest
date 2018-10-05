@@ -8,14 +8,14 @@ namespace QRest.OData.Tests
     public class ODataParserTest
     {
         [Theory]
-        [InlineData(":where(-it.param1-equal(`L72`))-select(:select@value)", @"$filter =   param1 eq 'L72'")]
-        [InlineData(":where(`L72`-equal(-it.param1))-select(:select@value)", @"$filter =  'L72' eq param1 ")]
-        [InlineData(":where(-every(-it.param1-equal(`L72`),-oneof(-it.param2-equal(`qwerty`),-it.param3-equal(`asdf`))))-select(:select@value)",
+        [InlineData(":where(-it.param1-equal('L72'))-select(:select@value)", @"$filter =   param1 eq 'L72'")]
+        [InlineData(":where('L72'-equal(-it.param1))-select(:select@value)", @"$filter =  'L72' eq param1 ")]
+        [InlineData(":where(-every(-it.param1-equal('L72'),-oneof(-it.param2-equal('qwerty'),-it.param3-equal('asdf'))))-select(:select@value)",
             @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ")]
         public void ShouldParseFilterQueryOption(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.ToString()); // "Debug" property is protected
+            Assert.Equal(expected, exp.SharedView);
         }
 
         [Fact]
@@ -23,7 +23,7 @@ namespace QRest.OData.Tests
         {
             var input = @"$filter = not contains(param,'b')";
             ITerm exp = Parse(input);
-            Assert.Equal(":where(-it.param-contains(`b`)-not)-select(:select@value)", exp.ToString());
+            Assert.Equal(":where(-it.param-contains('b')-not)-select(:select@value)", exp.SharedView);
 
         }
 
@@ -33,7 +33,7 @@ namespace QRest.OData.Tests
         public void ShouldParseCount(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.ToString());
+            Assert.Equal(expected, exp.SharedView);
         }
 
 
@@ -41,7 +41,7 @@ namespace QRest.OData.Tests
         public void ShouldParseEmptyString()
         {
             ITerm exp = Parse(string.Empty);
-            Assert.Equal("-select(:select@value)", exp.ToString());
+            Assert.Equal("-select(:select@value)", exp.SharedView);
         }
 
         [Theory]
@@ -50,7 +50,7 @@ namespace QRest.OData.Tests
         public void ShouldParseSelect(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.ToString());
+            Assert.Equal(expected, exp.SharedView);
         }
 
 
@@ -61,7 +61,7 @@ namespace QRest.OData.Tests
         public void ShouldParseOrderBy(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.ToString());
+            Assert.Equal(expected, exp.SharedView);
         }
 
 

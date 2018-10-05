@@ -6,6 +6,9 @@ namespace QRest.Core.Contracts
     {
         Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root);
         ITerm Clone();
+
         string DebugView { get; }
+        string SharedView { get; }
+        string KeyView { get; }
     }
 }

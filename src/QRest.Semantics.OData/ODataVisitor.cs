@@ -20,7 +20,7 @@ namespace QRest.OData
     {
         public override ITerm VisitParse([NotNull] ParseContext context)
         {
-            return new TermSequence { Visit(context.queryOptions()) };
+            return Visit(context.queryOptions()).AsSequence();
         }
 
         public override ITerm VisitQueryOptions([NotNull] QueryOptionsContext context)

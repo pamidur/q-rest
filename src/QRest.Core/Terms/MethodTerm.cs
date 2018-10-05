@@ -22,7 +22,7 @@ namespace QRest.Core.Terms
             return exp;
         }
 
-        public override string DebugView
+        public override string SharedView
         {
             get
             {
