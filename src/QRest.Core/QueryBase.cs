@@ -6,13 +6,13 @@ namespace QRest.Core
 {
     public abstract class QueryBase
     {
-        public ITerm RootTerm { get; set; }
+        public ITermSequence Sequence { get; set; }
 
         private static readonly TermTreeCompiler _compiler = new TermTreeCompiler();
 
         public object Apply<T>(IQueryable<T> target, bool finalize = true)
         {
-            var lambda = _compiler.Compile<IQueryable<T>>(RootTerm);
+            var lambda = _compiler.Compile<IQueryable<T>>(Sequence);
 
             var result = lambda.Compile()(target);
 

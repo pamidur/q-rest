@@ -3,7 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>true</IsPackable>
-    <Description>Core library for QRest</Description>    
+    <Description>Core library for QRest</Description>
+    <LangVersion>7.3</LangVersion>    
   </PropertyGroup>
 
   <ItemGroup>

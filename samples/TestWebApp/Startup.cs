@@ -31,7 +31,7 @@ namespace TestWebApp
                 .AddQRestOptions(qrest => qrest.Semantics = new MethodChainSemantics
                 {
                     UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers,
-                    UseStaticQueryTerminator = true
+                    UseStaticQueryTerminator = false
                 })
             ;
         }

@@ -5,16 +5,14 @@ namespace QRest.Core.Terms
 {
     public abstract class TermBase : ITerm
     {    
-        public ITerm Next { get; set; }  
-
         public sealed override string ToString()
         {
-            return $"{DebugView}{Next?.ToString()}";
+            return $"{DebugView}";
         }
 
         public virtual string DebugView => $"#{GetType().Name.ToLowerInvariant().Replace("term", "")}";
 
-        public abstract Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root);
+        public abstract Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root);
         public abstract ITerm Clone();
     }
 }

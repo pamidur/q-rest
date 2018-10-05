@@ -7,7 +7,7 @@ namespace QRest.Core.Terms
 {
     public class LambdaTerm : MethodTerm
     {
-        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
         {
             if (!Operation.SupportsQuery)
                 throw new ExpressionCreationException();
@@ -16,7 +16,7 @@ namespace QRest.Core.Terms
 
             var argsroot = Expression.Parameter(etype, etype.Name.ToLowerInvariant());
 
-            var args = Arguments.Select(a => compiler.Compile(a,argsroot,argsroot)).ToList();
+            var args = Arguments.Select(a => compiler.Assemble(a,argsroot,argsroot)).ToList();
             var exp = Operation.CreateQueryExpression(root, prev, argsroot, args);
 
             return exp;
@@ -24,6 +24,6 @@ namespace QRest.Core.Terms
 
         public override string DebugView => $":{base.DebugView.Substring(1)}";
 
-        public override ITerm Clone() => new LambdaTerm { Operation = Operation, Next = Next?.Clone(), Arguments = Arguments.Select(a => a.Clone()).ToList() };
+        public override ITerm Clone() => new LambdaTerm { Operation = Operation, Arguments =  Arguments.Select(a => (ITermSequence) a.Clone()).ToList() };
     }
 }

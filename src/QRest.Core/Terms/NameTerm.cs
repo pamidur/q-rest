@@ -8,13 +8,13 @@ namespace QRest.Core.Terms
     {
         public string Name { get; set; }
 
-        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
         {
             return new NamedExpression(prev, Name);
         }
 
         public override string DebugView => $"@{Name}";
 
-        public override ITerm Clone() => new NameTerm { Name = Name, Next = Next?.Clone() };
+        public override ITerm Clone() => new NameTerm { Name = Name };
     }
 }

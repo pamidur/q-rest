@@ -84,42 +84,43 @@ namespace TestApp
             //:where(`SubText`-eq(-it.Sub.Text)
 
 
-            tree = new LambdaTerm
-            {
-                Operation = new WhereOperation(),
-                Arguments = new List<ITerm> {
-                    new MethodTerm{
-                        Operation = new EveryOperation(),
-                        Arguments = new List<ITerm>{
-                            new PropertyTerm{
-                                PropertyName = "Text",
-                                Next = new MethodTerm{
-                                    Operation = new EqualOperation(),
-                                    Arguments = new List<ITerm>{
-                                        new ConstantTerm {
-                                            Value = "dadsa"
-                                        }
-                                    }
-                                }
-                            },
-                             new PropertyTerm{
-                                PropertyName = "Number",
-                                Next = new MethodTerm{
-                                    Operation = new NotEqualOperation(),
-                                    Arguments = new List<ITerm>{
-                                        new ConstantTerm {
-                                            Value = 2
-                                        }
-                                    }
-                                }
-                            },
 
-                        }
-                    },
+            //tree = new LambdaTerm
+            //{
+            //    Operation = new WhereOperation(),
+            //    Arguments = new List<ITerm> {
+            //        new MethodTerm{
+            //            Operation = new EveryOperation(),
+            //            Arguments = new List<ITerm>{
+            //                new PropertyTerm{
+            //                    PropertyName = "Text",
+            //                    Next = new MethodTerm{
+            //                        Operation = new EqualOperation(),
+            //                        Arguments = new List<ITerm>{
+            //                            new ConstantTerm {
+            //                                Value = "dadsa"
+            //                            }
+            //                        }
+            //                    }
+            //                },
+            //                 new PropertyTerm{
+            //                    PropertyName = "Number",
+            //                    Next = new MethodTerm{
+            //                        Operation = new NotEqualOperation(),
+            //                        Arguments = new List<ITerm>{
+            //                            new ConstantTerm {
+            //                                Value = 2
+            //                            }
+            //                        }
+            //                    }
+            //                },
+
+            //            }
+            //        },
 
 
-                }
-            };
+            //    }
+            //};
 
 
             // :with(1@v):where(price-ne($v)):select(text,price@totalprice,$v)
