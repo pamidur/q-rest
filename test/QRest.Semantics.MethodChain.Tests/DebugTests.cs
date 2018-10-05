@@ -18,31 +18,31 @@ namespace QRest.Semantics.MethodChain.Tests
 
     public class DebugTests
     {
-        [Fact]
-        public void TestDebug()
-        {
-            var tree = new PropertyTerm
-            {
-                PropertyName = nameof(Data.Value),                
-                Next = new MethodTerm
-                {
-                    Operation = new EqualOperation(),
-                    Arguments = new List<ITerm>
-                    {
-                        new ConstantTerm
-                        {
-                            Value = 14
-                        }
-                    }
-                }
-            };
+        //[Fact]
+        //public void TestDebug()
+        //{
+        //    var tree = new PropertyTerm
+        //    {
+        //        PropertyName = nameof(Data.Value),                
+        //        Next = new MethodTerm
+        //        {
+        //            Operation = new EqualOperation(),
+        //            Arguments = new List<ITerm>
+        //            {
+        //                new ConstantTerm
+        //                {
+        //                    Value = 14
+        //                }
+        //            }
+        //        }
+        //    };
 
-            var debug = new TermTreeCompiler().CompileDebug<Data>(tree);
+        //    var debug = new TermTreeCompiler().CompileDebug<Data>(tree);
 
-            var func = debug.Func.Compile();
+        //    var func = debug.Func.Compile();
 
-            var result = func(new Data());
-            var result2 = func(new Data() { Value = 14 });
-        }
+        //    var result = func(new Data());
+        //    var result2 = func(new Data() { Value = 14 });
+        //}
     }
 }

@@ -1,16 +1,13 @@
 ﻿using QRest.Core.Contracts;
+using QRest.Core.Terms;
 
 namespace QRest.Core
 {
-
     public static class TermExtensions
     {
-        public static ITerm GetLatestCall(this ITerm root)
+        public static ITermSequence AsSequence (this ITerm term)
         {
-            var res = root;
-            while (res.Next != null) res = res.Next;
-
-            return res;
+            return term as ITermSequence ?? new TermSequence { term };
         }
     }
 }

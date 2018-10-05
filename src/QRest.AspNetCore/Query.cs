@@ -25,11 +25,8 @@ namespace QRest.AspNetCore
         {
             var result = _parser.Parse(new RequestModel(bindingContext));
 
-            var query = new Query();
+            var query = new Query { Sequence = result };
 
-            if (result != null)
-                query.RootTerm = result;
-            
             bindingContext.Result = ModelBindingResult.Success(query);
 
             return Task.FromResult(true);

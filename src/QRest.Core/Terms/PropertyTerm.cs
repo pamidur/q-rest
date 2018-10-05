@@ -8,7 +8,7 @@ namespace QRest.Core.Terms
     {
         public string PropertyName { get; set; }
 
-        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
         {
             Expression exp;
 
@@ -27,6 +27,6 @@ namespace QRest.Core.Terms
 
         public override string DebugView => $".{PropertyName}";
 
-        public override ITerm Clone() => new PropertyTerm { PropertyName = PropertyName, Next = Next?.Clone() };
+        public override ITerm Clone() => new PropertyTerm { PropertyName = PropertyName};
     }
 }

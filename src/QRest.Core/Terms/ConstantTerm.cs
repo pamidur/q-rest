@@ -8,7 +8,7 @@ namespace QRest.Core.Terms
     {
         public object Value { get; set; }
 
-        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
         {
             return Expression.Constant(Value, Value.GetType());
         }
@@ -37,6 +37,6 @@ namespace QRest.Core.Terms
             }
         }
 
-        public override ITerm Clone() => new ConstantTerm { Value = Value, Next = Next?.Clone() };
+        public override ITerm Clone() => new ConstantTerm { Value = Value };
     }
 }

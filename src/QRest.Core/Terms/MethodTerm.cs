@@ -9,14 +9,14 @@ namespace QRest.Core.Terms
     public class MethodTerm : TermBase
     {
         public IOperation Operation { get; set; }
-        public List<ITerm> Arguments { get; set; } = new List<ITerm>();
+        public List<ITermSequence> Arguments { get; set; } = new List<ITermSequence>();
 
-        public override Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
         {
             if (!Operation.SupportsCall)
                 throw new ExpressionCreationException();
 
-            var args = Arguments.Select(a => compiler.Compile(a, prev, root)).ToList();
+            var args = Arguments.Select(a => compiler.Assemble(a, prev, root)).ToList();
             var exp = Operation.CreateCallExpression(root, prev, args);
 
             return exp;
@@ -32,6 +32,6 @@ namespace QRest.Core.Terms
             }
         }
 
-        public override ITerm Clone() => new MethodTerm { Operation = Operation, Next = Next?.Clone(), Arguments = Arguments.Select(a => a.Clone()).ToList() };
+        public override ITerm Clone() => new MethodTerm { Operation = Operation, Arguments = Arguments.Select(a => (ITermSequence) a.Clone()).ToList() };
     }
 }

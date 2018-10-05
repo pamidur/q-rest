@@ -2,6 +2,6 @@
 {
     public interface IQuerySemanticsProvider
     {
-        ITerm Parse(IRequestModel model);
+        ITermSequence Parse(IRequestModel model);
     }
 }

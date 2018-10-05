@@ -4,8 +4,7 @@ namespace QRest.Core.Contracts
 {
     public interface ITerm
     {
-        ITerm Next { get; set; }
-        Expression CreateExpression(ICompilerContext compiler, Expression prev, ParameterExpression root);
+        Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root);
         ITerm Clone();
         string DebugView { get; }
     }

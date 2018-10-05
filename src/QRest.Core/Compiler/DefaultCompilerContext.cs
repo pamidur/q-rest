@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Compiler
 {
-    internal class DefaultCompilerContext : ICompilerContext
+    internal class DefaultCompilerContext : ICompilationContext
     {
         private bool finalize;
 
@@ -15,15 +15,9 @@ namespace QRest.Core.Compiler
             this.finalize = finalize;
         }
 
-        public virtual Expression Compile(ITerm term, Expression context, ParameterExpression root)
+        public virtual Expression Assemble(ITermSequence sequence, Expression context, ParameterExpression root)
         {
-            var exp = CompileTerm(term, context, root);
-            return term.Next != null ? Compile(term.Next, exp, root) : Finalize(exp);
-        }
-
-        protected virtual Expression CompileTerm(ITerm term, Expression context, ParameterExpression root)
-        {
-            return term.CreateExpression(this, context, root);
+            return sequence.CreateExpression(this, context, root);
         }
 
         protected virtual Expression Finalize(Expression exp)

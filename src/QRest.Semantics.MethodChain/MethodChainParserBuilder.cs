@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using QRest.Core.Contracts;
+using QRest.Core.Operations;
 using QRest.Core.Terms;
 using Sprache;
-using Read = Sprache.Parse;
-using System.Linq;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
-using QRest.Core.Operations;
-using QRest.Core.Contracts;
-using QRest.Core;
+using System.Linq;
+using Read = Sprache.Parse;
 
 namespace QRest.Semantics.MethodChain
 {
@@ -35,9 +34,9 @@ namespace QRest.Semantics.MethodChain
         private readonly Dictionary<string, IOperation> _operationMap;
 
 
-        internal Parser<ITerm> CallChain;
+        internal Parser<ITermSequence> CallChain;
         internal Parser<ITerm> Call;
-        internal Parser<List<ITerm>> CallArguments;
+        internal Parser<List<ITermSequence>> CallArguments;
         internal Parser<LambdaTerm> Lambda;
         internal Parser<MethodTerm> Method;
         internal Parser<ITerm> SubProperty;
@@ -56,7 +55,7 @@ namespace QRest.Semantics.MethodChain
             _operationMap = operationMap;
         }
 
-        public Parser<ITerm> Build()
+        public Parser<ITermSequence> Build()
         {
             MemberName = BuildMemberNameParser().Named("Member Name");
 
@@ -81,27 +80,27 @@ namespace QRest.Semantics.MethodChain
             return CallChain.End();
         }
 
-        internal Parser<ITerm> BuildCallChainParser() =>
+        internal Parser<ITermSequence> BuildCallChainParser() =>
           from root in Call.Or(Property).Or(Constant)
           from chunks in SubProperty.Or(Call).Or(Name).Many()
-          select chunks.Aggregate(root, (c1, c2) => { c1.GetLatestCall().Next = c2; return c1; });
+          select chunks.Aggregate(new TermSequence() { root }, (c1, c2) => { c1.Add(c2); return c1; });
 
-        internal Parser<List<ITerm>> BuildCallArgumentsParser() => Read.Ref(() =>
+        internal Parser<List<ITermSequence>> BuildCallArgumentsParser() => Read.Ref(() =>
             from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
-            select parameters.Where(r => r != null)?.ToList() ?? new List<ITerm>()
+            select parameters.Where(r => r != null)?.ToList() ?? new List<ITermSequence>()
             );
 
         internal Parser<LambdaTerm> BuildLambdaParser(Parser<IOperation> operationParser) =>
              from semic in LambdaIndicator
              from operation in operationParser
              from arguments in CallArguments.Optional()
-             select new LambdaTerm { Operation = operation, Arguments = arguments.GetOrDefault() ?? new List<ITerm>() };
+             select new LambdaTerm { Operation = operation, Arguments = arguments.GetOrDefault() ?? new List<ITermSequence>() };
 
         internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationParser) =>
              from semic in MethodIndicator
              from operation in operationParser
              from arguments in CallArguments.Optional()
-             select new MethodTerm { Operation = operation, Arguments = arguments.GetOrDefault() ?? new List<ITerm>() };
+             select new MethodTerm { Operation = operation, Arguments = arguments.GetOrDefault() ?? new List<ITermSequence>() };
 
         internal Parser<IOperation> BuildOperationParsers(KeyValuePair<string, IOperation>[] operationMap)
         {
