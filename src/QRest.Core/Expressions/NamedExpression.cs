@@ -28,7 +28,7 @@ namespace QRest.Core.Expressions
 
         public override string ToString()
         {
-            return $"{Expression.ToString()}.NameAs(\"{Name}\")";
+            return $"@{Name} = {Expression.ToString()}";
         }
     }
 }
