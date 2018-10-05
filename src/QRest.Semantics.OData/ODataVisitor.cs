@@ -35,7 +35,7 @@ namespace QRest.OData
 
         private ITerm BuildTerms(List<LambdaTerm> sortedLambdas)
         {
-            var selectTerm = new MethodTerm { Operation = new SelectOperation(), Arguments = new List<ITerm>() };
+            var selectTerm = new MethodTerm { Operation = new SelectOperation { UseStaticTerminatingQuery = true }, Arguments = new List<ITerm>() };
 
             if (!sortedLambdas.Any()) return selectTerm;
 
@@ -51,9 +51,20 @@ namespace QRest.OData
                 firstTerm = selectTerm;
             }
             var countTerm = sortedLambdas.Where(c => c.Operation is CountOperation).FirstOrDefault();
-            if (countTerm != null) selectTerm.Arguments.Add(countTerm);
+            if (countTerm != null)
+            {
+                var name = new NameTerm { Name = "@odata.count", Next = countTerm.Next };
+                countTerm.Next = name;
+                selectTerm.Arguments.Add(countTerm);
+            }
 
             var selectArg = BuildSelectArgs(sortedLambdas);
+
+            var selectname = new NameTerm { Name = "value", Next = selectArg.GetLatestCall() };
+
+            var lastCall = selectArg.GetLatestCall();
+            lastCall = selectname;
+
             selectTerm.Arguments.Add(selectArg);
 
             return firstTerm;
@@ -61,7 +72,7 @@ namespace QRest.OData
 
         private ITerm BuildSelectArgs(List<LambdaTerm> sortedLambdas)
         {
-            var emptySelect= new LambdaTerm { Operation = new SelectOperation() }; ;
+            var emptySelect = new LambdaTerm { Operation = new SelectOperation { UseStaticTerminatingQuery = true } }; ;
             var selectArgTerms = sortedLambdas.Where(c => !(c.Operation is CountOperation)).ToList();
             if (!selectArgTerms.Any()) return emptySelect;
 
@@ -97,8 +108,12 @@ namespace QRest.OData
         public override ITerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var lambda =  new LambdaTerm { Operation = new SelectOperation { }, Arguments = selectArgs };
-            return lambda;
+            return new LambdaTerm
+            {
+                Operation = new SelectOperation { UseStaticTerminatingQuery = true },
+                Arguments = selectArgs
+            };
+          
         }
 
         public override ITerm VisitSelectItem([NotNull] SelectItemContext context)
@@ -261,7 +276,8 @@ namespace QRest.OData
                 Visit(context.children[1])
                 : new MethodTerm { Operation = new AscendingOperation() };
 
-            var prop = new PropertyTerm {
+            var prop = new PropertyTerm
+            {
                 PropertyName = context.children[0].GetText(),
                 Next = order
             };
@@ -289,6 +305,28 @@ namespace QRest.OData
 
             }
             return method;
+        }
+
+        public override ITerm VisitSkip([NotNull] SkipContext context)
+        {
+            if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
+                return new LambdaTerm
+                {
+                    Operation = new SkipOperation(),
+                    Arguments = new List<ITerm> { new ConstantTerm { Value = value } }
+                };
+            else return null;
+        }
+
+        public override ITerm VisitTop([NotNull] TopContext context)
+        {
+            if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
+                return new LambdaTerm
+                {
+                    Operation = new TakeOperation(),
+                    Arguments = new List<ITerm> { new ConstantTerm { Value = value } }
+                };
+            else return null;
         }
 
         private MethodTerm GetFuncTerm(string funcName)

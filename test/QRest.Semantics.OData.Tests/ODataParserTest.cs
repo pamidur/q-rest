@@ -53,6 +53,14 @@ namespace QRest.OData.Tests
             Assert.Equal(expected, exp.ToString());
         }
 
+        [Theory]
+        [InlineData("-select(:select(-it.f1,-it.f2))", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
+        public void ShouldParseTopSkip(string expected, string input)
+        {
+            ITerm exp = Parse(input);
+            Assert.Equal(expected, exp.ToString());
+        }
+
 
         [Theory]
         [InlineData("-select(:order(-it.f1-ascending,-it.f2-ascending):select)", @"$orderby=f1,f2")]
