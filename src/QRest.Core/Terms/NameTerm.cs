@@ -13,7 +13,7 @@ namespace QRest.Core.Terms
             return new NamedExpression(prev, Name);
         }
 
-        public override string DebugView => $"@{Name}";
+        public override string SharedView => $"@{Name}";
 
         public override ITerm Clone() => new NameTerm { Name = Name };
     }

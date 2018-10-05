@@ -25,7 +25,7 @@ namespace QRest.Core.Terms
             return exp;
         }
 
-        public override string DebugView => $".{PropertyName}";
+        public override string SharedView => $".{PropertyName}";
 
         public override ITerm Clone() => new PropertyTerm { PropertyName = PropertyName};
     }

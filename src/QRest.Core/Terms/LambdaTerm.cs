@@ -22,7 +22,7 @@ namespace QRest.Core.Terms
             return exp;
         }
 
-        public override string DebugView => $":{base.DebugView.Substring(1)}";
+        public override string SharedView => $":{base.SharedView.Substring(1)}";
 
         public override ITerm Clone() => new LambdaTerm { Operation = Operation, Arguments =  Arguments.Select(a => (ITermSequence) a.Clone()).ToList() };
     }

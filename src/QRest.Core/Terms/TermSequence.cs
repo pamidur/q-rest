@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class TermSequence : ITermSequence, IEnumerable<ITerm>
+    public class TermSequence : TermBase, ITermSequence
     {
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
@@ -14,17 +14,12 @@ namespace QRest.Core.Terms
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
 
-        public string DebugView => "";
+        public override string SharedView => string.Join("", _sequence.Select(t => t.SharedView));
+        public override string DebugView => $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
 
         public void Add(ITerm term)
         {
             _sequence.AddLast(term);
-        }
-
-        public ITermSequence Clone()
-        {
-            throw new System.NotImplementedException();
-            //return new TermSequence { Root = Root.Clone() };
         }
 
         public IEnumerator<ITerm> GetEnumerator()
@@ -37,16 +32,7 @@ namespace QRest.Core.Terms
             return _sequence.GetEnumerator();
         }
 
-        public override string ToString()
-        {
-            var result = "";
-            foreach (var term in _sequence)
-                result = $"{result}{term.ToString()}";
-
-            return result;
-        }
-
-        public Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
+        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
         {
             var result = prev;
 
@@ -56,9 +42,9 @@ namespace QRest.Core.Terms
             return result;
         }
 
-        ITerm ITerm.Clone()
+        public override ITerm Clone()
         {
-            throw new System.NotImplementedException();
+            return new TermSequence { Root.Clone() };
         }
     }
 }
