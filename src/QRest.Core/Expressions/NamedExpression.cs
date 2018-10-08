@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Expressions
 {
-    class NamedExpression : Expression
+    public class NamedExpression : Expression
     {
         public static readonly string DefaultQueryResultName = "Query";
         public static readonly string DefaultObjectResultName = "Object";

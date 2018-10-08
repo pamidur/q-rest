@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
+using QRest.Compiller.Standard;
 using QRest.Core;
-using QRest.Core.Compiler;
 using QRest.Core.Contracts;
 using QRest.Core.Operations;
 using QRest.Core.Operations.Boolean;
@@ -136,10 +136,10 @@ namespace TestApp
             // :where(-gt(price,1))     
 
 
-            var e = new TermTreeCompiler().Compile<IQueryable<Entity>>(tree);
+            var e = new StandardCompiler().Compile<IQueryable<Entity>>(tree);
 
 
-            var r = e.Compile()(data);            
+            var r = e(data);            
         }
     }
 
