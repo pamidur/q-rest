@@ -46,7 +46,7 @@ namespace QRest.OData
                 }
             }
 
-            var selectTerm = new MethodTerm { Operation = new SelectOperation (), Arguments = new List<ITermSequence>() };
+            var selectTerm = new MethodTerm { Operation = new SelectOperation(), Arguments = new List<ITermSequence>() };
             seq.Add(selectTerm);
 
             var countTerm = sortedLambdas.Where(c => c.Operation is CountOperation).FirstOrDefault();
@@ -82,11 +82,12 @@ namespace QRest.OData
         {
             var termFilter = new LambdaTerm
             {
-                Operation = new WhereOperation(),
+                Operation = new WhereOperation { TryParseFromStrings = true },
                 Arguments = new List<ITermSequence>()
             };
 
-            termFilter.Arguments.Add(Visit(context.filterexpr).AsSequence());
+            var filterExpression = Visit(context.filterexpr);
+            termFilter.Arguments.Add(filterExpression.AsSequence());
             return termFilter;
         }
 

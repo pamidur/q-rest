@@ -43,7 +43,6 @@ expression
  | IDENTIFIER                                     #identifierExpression
  | DECIMAL                                        #decimalExpression
  | INT                                            #intExpression
- | dateTimeOffset								  #dateTimeOffsetExpression
  | STRINGLITERAL                                  #stringExpression
  | func=IDENTIFIER LPAREN functionParams RPAREN   #funcCallExpression
  ;
@@ -60,47 +59,10 @@ bool
  : TRUE | FALSE
  ;
 
-dateTimeOffset : 
-	year MINUS month MINUS day 'T' hour COLON minute ( COLON second ( '.' fractionalSeconds )? )? ( 'Z' | SIGN hour COLON minute );
-
-year : (Digit) (Digit) (Digit) (Digit) ;
-
-month : '0' ONE_TO_NINE | '1' ZERO_TO_TWO;
-
-day   : ZERO_TO_TWO ONE_TO_NINE
-      | '3' ZERO_TO_ONE;
-
-hour   : ZERO_TO_ONE ( Digit )
-       | '2' ONE_TO_THREE; 
-
-minute : ZERO_TO_FIFTY_NINE;
-
-second : ZERO_TO_FIFTY_NINE;       
-
-fractionalSeconds : ( Digit )+;
-
 functionParams
  :   expression (COMMA expression)*
  ;
 
-Digit		: [0-9];
-Alpha		: [a-zA-Z];
-
-ONE_TO_TWO  : [1-2];
-ONE_TO_THREE: ONE_TO_TWO | [3];
-ONE_TO_FOUR : ONE_TO_THREE | [4]; 
-ONE_TO_NINE : ONE_TO_FOUR | [5-9]; 
-ZERO_TO_ONE : [0-1];
-ZERO_TO_TWO : ZERO_TO_ONE | [2];
-ZERO_TO_THREE: ZERO_TO_TWO | [3];
-ZERO_TO_FOUR: ZERO_TO_THREE | [4];
-ZERO_TO_FIVE: ZERO_TO_FOUR | [5];
-ZERO_TO_FIFTY_NINE: ZERO_TO_FIVE Digit;
-
-COLON	   : ':' ;
-SIGN	   : (PLUS | MINUS);
-MINUS	   : '-' ;
-PLUS	   : '+' ;
 EQPARAM	   : '=' ;
 DOLLAR     : '$' ;
 AMPERSAND  : '&' ;
