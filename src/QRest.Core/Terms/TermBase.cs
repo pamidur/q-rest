@@ -11,7 +11,7 @@ namespace QRest.Core.Terms
         private static readonly IOperation _default = new NopOperation();
 
         public virtual IOperation Operation { get; protected set; } = _default;
-        public virtual IReadOnlyList<ITermSequence> Arguments { get; protected set; }
+        public virtual IReadOnlyList<ITermSequence> Arguments { get; protected set; } = new List<ITermSequence>();
 
         public abstract string SharedView { get; }
         public virtual string DebugView => SharedView;

@@ -1,6 +1,7 @@
 ﻿using QRest.Core.Contracts;
 using QRest.Core.Expressions;
 using QRest.Core.Extensions;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -17,13 +18,23 @@ namespace QRest.Compiller.Standard
 
         public virtual Expression Assemble(ITermSequence sequence, Expression context, ParameterExpression root)
         {
-            var exp = sequence.CreateExpression(this, context, root);
+            var sqroot = (ParameterExpression) sequence.RootSelector.CreateCallExpression(root, context, new List<Expression>());
+
+            var exp = context;
+
+            foreach (var term in sequence)
+            {
+                var args = term.Arguments.Select(a => Assemble(a, exp, sqroot)).ToList();
+                exp = term.Operation.CreateCallExpression(sqroot, exp, args);
+            }
 
             if (_finalize)
                 exp = Finalize(exp);
 
             return exp;
         }
+
+       
 
         protected virtual Expression Finalize(Expression exp)
         {
@@ -40,18 +51,6 @@ namespace QRest.Compiller.Standard
             exp = new NamedExpression(Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { eType }, exp), name);
 
             return exp;
-        }
-
-
-
-        public Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
-        {
-            var result = prev;
-
-            foreach (var term in _sequence)
-                result = term.CreateExpression(compiler, result, root);
-
-            return result;
         }
     }
 }

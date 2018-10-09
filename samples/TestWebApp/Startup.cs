@@ -10,7 +10,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Serialization;
 using QRest.Semantics.MethodChain;
-using QRest.Semantics.OData;
 
 namespace TestWebApp
 {
@@ -29,7 +28,7 @@ namespace TestWebApp
             services
                 .AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
-                .AddQRestOptions(qrest => qrest.Semantics = new ODataSemantics())
+                //.AddQRestOptions(qrest => qrest.Semantics = new ODataSemantics())
                 
                 //.AddQRestOptions(qrest => qrest.Semantics = new MethodChainSemantics
                 //{

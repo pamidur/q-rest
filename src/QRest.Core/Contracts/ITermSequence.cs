@@ -4,6 +4,8 @@ namespace QRest.Core.Contracts
 {
     public interface ITermSequence : IEnumerable<ITerm>
     {
+        IOperation RootSelector { get; }
+
         ITerm Root { get; }
         ITerm Last { get; }
 

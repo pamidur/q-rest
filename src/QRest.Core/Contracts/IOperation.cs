@@ -10,5 +10,7 @@ namespace QRest.Core.Contracts
 
         Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments);
         Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments);
+
+        
     }
 }

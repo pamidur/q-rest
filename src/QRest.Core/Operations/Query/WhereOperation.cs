@@ -9,20 +9,21 @@ namespace QRest.Core.Operations.Query
     public class WhereOperation : OperationBase
     {
         public override bool SupportsQuery => true;
+        public override bool SupportsCall => true;
 
-        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            if (arguments[0].Type != typeof(bool))
+            if (arguments[0].NodeType != ExpressionType.Lambda)
                 throw new ExpressionCreationException();
 
-            var lambda = Expression.Lambda(arguments[0], argumentsRoot);
+            var lambda = (LambdaExpression)arguments[0];
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Where), new Type[] { argumentsRoot.Type }, context, lambda);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Where), new Type[] { lambda.Parameters[0].Type }, context, lambda);
 
             return new NamedExpression(exp, NamedExpression.DefaultQueryResultName);
-        }       
+        }      
     }
 }

@@ -15,7 +15,7 @@ namespace QRest.Semantics.MethodChain
     public partial class MethodChainSemantics : IQuerySemanticsProvider
     {
         private readonly Dictionary<string, IOperation> _operationMap = new Dictionary<string, IOperation>();
-        private static readonly ITermSequence _default = new TermSequence { new MethodTerm { Operation = new ItOperation() } };
+        private static readonly ITermSequence _default = new TermSequence { new MethodTerm (new ItOperation() ) };
 
         private Lazy<Parser<ITermSequence>> Parser { get; }
 

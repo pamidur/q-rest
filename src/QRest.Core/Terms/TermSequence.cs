@@ -1,4 +1,6 @@
 ﻿using QRest.Core.Contracts;
+using QRest.Core.Extensions;
+using QRest.Core.Operations;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,25 +9,28 @@ namespace QRest.Core.Terms
 {
     public class TermSequence : ITermSequence
     {
-        private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
+        private static readonly IOperation _transientRoot = new ItOperation();
+        private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();       
 
+        public virtual IOperation RootSelector => _transientRoot;
         public ITerm Root => _sequence.First.Value;
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
 
-        public string SharedView => string.Join("", _sequence.Select(t => t?.SharedView ?? "Shit happend"));
-        public string KeyView => string.Join("", _sequence.Select(t => t.KeyView));
-        public string DebugView => $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
+        public virtual string SharedView => $"{string.Join("", _sequence.Select(t => t.SharedView))}";
+        public virtual string KeyView => string.Join("", _sequence.Select(t => t.KeyView));
+        public virtual string DebugView => $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
 
         public void Add(ITerm term)
         {
-            _sequence.AddLast(term);
+            if (term != null)
+                _sequence.AddLast(term);
         }
 
         public void Add(ITermSequence terms)
         {
             foreach (var term in terms)
-                _sequence.AddLast(term);
+                Add(term);
         }
 
         public IEnumerator<ITerm> GetEnumerator()
@@ -42,5 +47,7 @@ namespace QRest.Core.Terms
         {
             return new TermSequence { Root.Clone() };
         }
+
+        public override string ToString() => SharedView;
     }
 }
