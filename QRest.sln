@@ -44,9 +44,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3D211EBB
 		Directory.build.targets = Directory.build.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRest.Compiller.Standard", "src\QRest.Compiller.Standard\QRest.Compiller.Standard.csproj", "{36AA7CCA-06C6-4B79-802C-3645FC618974}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Compiler.Standard", "src\QRest.Compiler.Standard\QRest.Compiler.Standard.csproj", "{36AA7CCA-06C6-4B79-802C-3645FC618974}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRest.Compiller.Fast", "src\QRest.Compiller.Fast\QRest.Compiller.Fast.csproj", "{84C9CBAD-BF81-4E57-A67F-B3442D4A506C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Compiler.Fast", "src\QRest.Compiler.Fast\QRest.Compiler.Fast.csproj", "{84C9CBAD-BF81-4E57-A67F-B3442D4A506C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

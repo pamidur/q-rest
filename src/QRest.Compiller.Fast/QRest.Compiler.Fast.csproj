@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QRest.Compiller.Standard\QRest.Compiller.Standard.csproj" />
+    <ProjectReference Include="..\QRest.Compiller.Standard\QRest.Compiler.Standard.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace QRest.Core.Expressions
 {
-    class CreateContainerExpression : Expression
+    public class NewContainerExpression : Expression
     {
         
     }
