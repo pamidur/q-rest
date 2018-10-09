@@ -92,6 +92,18 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitOrder([NotNull] ODataGrammarParser.OrderContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.top"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitTop([NotNull] ODataGrammarParser.TopContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.skip"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSkip([NotNull] ODataGrammarParser.SkipContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>binaryExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
 	/// </summary>

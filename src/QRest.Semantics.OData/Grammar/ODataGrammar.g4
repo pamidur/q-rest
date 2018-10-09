@@ -12,6 +12,8 @@ queryOption :
   | select
   | count
   | orderby
+  | top
+  | skip
 ;
 
 filter : DOLLAR 'filter' EQPARAM filterexpr=expression ;
@@ -27,6 +29,10 @@ orderby : DOLLAR 'orderby' EQPARAM orderbyItem ( COMMA orderbyItem) ;
 orderbyItem : IDENTIFIER order? ;
 
 order : 'asc' | 'desc' ;
+
+top : DOLLAR 'top' EQPARAM INT ;
+
+skip : DOLLAR 'skip' EQPARAM INT ;
 
 expression
  : LPAREN expression RPAREN                       #parenExpression
@@ -78,5 +84,5 @@ RPAREN     : ')' ;
 DECIMAL    : INT '.' [0-9]+  ;
 INT        : '-'? [0-9]+ ;
 IDENTIFIER : [a-zA-Z_] [a-zA-Z_0-9]* ;
-STRINGLITERAL : SQ [a-zA-Z_0-9]* SQ ;
+STRINGLITERAL : SQ [a-zA-Z_0-9\-:.+]* SQ ;
 WS         : [ \r\t\u000C\n]+ -> skip;

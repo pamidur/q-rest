@@ -50,7 +50,7 @@ namespace QRest.OData
             seq.Add(selectTerm);
 
             var countTerm = sortedLambdas.Where(c => c.Operation is CountOperation).FirstOrDefault();
-            if (countTerm != null) selectTerm.Arguments.Add(new TermSequence { countTerm , new NameTerm { Name = "@odata.count"} });
+            if (countTerm != null) selectTerm.Arguments.Add(new TermSequence { countTerm, new NameTerm { Name = "@odata.count" } });
 
             selectTerm.Arguments.Add(BuildSelectArgs(sortedLambdas));
 
@@ -82,18 +82,19 @@ namespace QRest.OData
         {
             var termFilter = new LambdaTerm
             {
-                Operation = new WhereOperation(),
+                Operation = new WhereOperation { TryParseFromStrings = true },
                 Arguments = new List<ITermSequence>()
             };
 
-            termFilter.Arguments.Add(Visit(context.filterexpr).AsSequence());
+            var filterExpression = Visit(context.filterexpr);
+            termFilter.Arguments.Add(filterExpression.AsSequence());
             return termFilter;
         }
 
         public override ITerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var lambda = new LambdaTerm { Operation = new SelectOperation { }, Arguments = selectArgs.Select(p=>p.AsSequence()).ToList() };
+            var lambda = new LambdaTerm { Operation = new SelectOperation { }, Arguments = selectArgs.Select(p => p.AsSequence()).ToList() };
             return lambda;
         }
 
@@ -218,7 +219,7 @@ namespace QRest.OData
             if (!parameters.Any()) throw new ArgumentException("Need more arguments!");
             var funcRoot = parameters.First().AsSequence();
             var func = GetFuncTerm(context.func.Text);
-            func.Arguments = parameters.Skip(1).Select(p=>p.AsSequence()).ToList();
+            func.Arguments = parameters.Skip(1).Select(p => p.AsSequence()).ToList();
             funcRoot.Add(func);
 
             return funcRoot;
@@ -243,7 +244,7 @@ namespace QRest.OData
 
         public override ITerm VisitOrderby([NotNull] OrderbyContext context)
         {
-            var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).Select(p=>p.AsSequence()).ToList();
+            var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).Select(p => p.AsSequence()).ToList();
 
             return new LambdaTerm { Operation = new OrderOperation(), Arguments = args };
         }
@@ -279,6 +280,28 @@ namespace QRest.OData
 
             }
             return method;
+        }
+
+        public override ITerm VisitSkip([NotNull] SkipContext context)
+        {
+            if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
+                return new LambdaTerm
+                {
+                    Operation = new SkipOperation(),
+                    Arguments = new List<ITermSequence> { new ConstantTerm { Value = value }.AsSequence() }
+                };
+            else return null;
+        }
+
+        public override ITerm VisitTop([NotNull] TopContext context)
+        {
+            if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
+                return new LambdaTerm
+                {
+                    Operation = new TakeOperation(),
+                    Arguments = new List<ITermSequence> { new ConstantTerm { Value = value }.AsSequence() }
+                };
+            else return null;
         }
 
         private MethodTerm GetFuncTerm(string funcName)

@@ -24,6 +24,8 @@ namespace TestWebApp.Controllers
 
         public string Text { get; set; }
         public int Number { get; set; }
+        public DateTime Datetime { get; set; }
+        public DateTimeOffset Datetimeoffset { get; set; }
 
         public SubEntity Sub { get; set; }
 
@@ -64,7 +66,7 @@ namespace TestWebApp.Controllers
         {
             var client = new MongoClient(new MongoClientSettings() { Server = new MongoServerAddress("localhost", 27017) });
             collection = client.GetDatabase("test").GetCollection<Entity>("entities");
-            //collection.InsertOne(new Entity { Number = 3, Text = "Olo" });
+            //collection.InsertOne(new Entity { Number = 1, Text = "dateTime tests", Datetime=DateTime.Now, Datetimeoffset = DateTime.Now });
         }
 
         // GET api/values
