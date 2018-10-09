@@ -15,6 +15,7 @@ namespace QRest.Core.Terms
         public bool IsEmpty => !_sequence.Any();
 
         public override string SharedView => string.Join("", _sequence.Select(t => t.SharedView));
+        public override string KeyView => string.Join("", _sequence.Select(t => t.KeyView));
         public override string DebugView => $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
 
         public void Add(ITerm term)

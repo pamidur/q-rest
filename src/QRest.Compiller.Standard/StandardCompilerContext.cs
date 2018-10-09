@@ -4,20 +4,25 @@ using QRest.Core.Extensions;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Compiler
+namespace QRest.Compiller.Standard
 {
-    internal class DefaultCompilerContext : ICompilationContext
+    internal class StandardCompilerContext : ICompilationContext
     {
-        private bool finalize;
+        private readonly bool _finalize;
 
-        public DefaultCompilerContext(bool finalize)
+        public StandardCompilerContext(bool finalize)
         {
-            this.finalize = finalize;
+            _finalize = finalize;
         }
 
         public virtual Expression Assemble(ITermSequence sequence, Expression context, ParameterExpression root)
         {
-            return sequence.CreateExpression(this, context, root);
+            var exp = sequence.CreateExpression(this, context, root);
+
+            if (_finalize)
+                exp = Finalize(exp);
+
+            return exp;
         }
 
         protected virtual Expression Finalize(Expression exp)

@@ -1,5 +1,4 @@
 ﻿using QRest.Core;
-using QRest.Core.Compiler;
 using QRest.Core.Contracts;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Terms;

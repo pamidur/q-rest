@@ -1,5 +1,6 @@
 ﻿using QRest.Core.Contracts;
 using QRest.Core.Operations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -22,16 +23,17 @@ namespace QRest.Core.Terms
             return exp;
         }
 
-        public override string SharedView
+        protected virtual string GetView(Func<ITerm, string> viewSelector)
         {
-            get
-            {
-                var args = string.Join(",", Arguments.Select(a => a.ToString()));
-                var argsLiteral = args.Length > 0 ? $"({args})" : "";
-                return $"-{Operation.GetType().Name.ToLowerInvariant().Replace("operation", "")}{argsLiteral}";
-            }
+            var args = string.Join(",", Arguments.Select(viewSelector));
+            var argsLiteral = args.Length > 0 ? $"({args})" : "";
+            return $"-{Operation.GetType().Name.ToLowerInvariant().Replace("operation", "")}{argsLiteral}";
         }
 
-        public override ITerm Clone() => new MethodTerm { Operation = Operation, Arguments = Arguments.Select(a => (ITermSequence) a.Clone()).ToList() };
+        public override string SharedView => GetView(t => t.SharedView);
+        public override string DebugView => GetView(t => t.DebugView);
+        public override string KeyView => GetView(t => t.KeyView);
+
+        public override ITerm Clone() => new MethodTerm { Operation = Operation, Arguments = Arguments.Select(a => (ITermSequence)a.Clone()).ToList() };
     }
 }

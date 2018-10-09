@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace QRest.Core.Extensions
 {
-    internal static class ExpressionExtensions
+    public static class ExpressionExtensions
     {
         private static readonly Type _queryableIface = typeof(IQueryable<>);
         private static readonly string _queryableIfaceName = $"{_queryableIface.Namespace}.{_queryableIface.Name}";

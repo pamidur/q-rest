@@ -10,22 +10,25 @@ namespace QRest.AspNetCore
     [ModelBinder(typeof(QueryModelBinder))]
     public class Query : QueryBase
     {
+        public Query(ITermSequence sequence, ICompiler compiller) : base(sequence, compiller)
+        {
+        }
     }
 
     public class QueryModelBinder : IModelBinder
     {
-        private readonly IQuerySemanticsProvider _parser;
+        private readonly QRestOptions _options;
 
         public QueryModelBinder(IOptions<QRestOptions> options)
         {
-            _parser = options.Value.Semantics;
+            _options = options.Value;
         }
 
         public Task BindModelAsync(ModelBindingContext bindingContext)
         {
-            var result = _parser.Parse(new RequestModel(bindingContext));
+            var sequence = _options.Semantics.Parse(new RequestModel(bindingContext));
 
-            var query = new Query { Sequence = result };
+            var query = new Query(sequence, _options.Compiler);
 
             bindingContext.Result = ModelBindingResult.Success(query);
 
