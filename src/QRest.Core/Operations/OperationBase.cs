@@ -11,7 +11,7 @@ namespace QRest.Core.Operations
         private static readonly Type[] _parseWithFormatSignature = new[] { typeof(string), typeof(IFormatProvider) };
         private static readonly Type[] _parseSignature = new[] { typeof(string) };
 
-        public bool TryParseFromStrings { get; set; }
+        public bool TryParseFromStrings { get; set; } = true;
 
         public Dictionary<Type, Func<string, object>> Parsers { get; set; } = new Dictionary<Type, Func<string, object>>();
 
