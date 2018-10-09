@@ -1,29 +1,21 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Operations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
     public class MethodTerm : TermBase
     {
-        public IOperation Operation { get; set; }
-        public List<ITermSequence> Arguments { get; set; } = new List<ITermSequence>();
-
-        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
+        public MethodTerm()
         {
-            if (!Operation.SupportsCall)
-                throw new ExpressionCreationException();
-
-            var args = Arguments.Select(a => compiler.Assemble(a, prev, root)).ToList();
-            var exp = Operation.CreateCallExpression(root, prev, args);
-
-            return exp;
+            Arguments = new List<ITermSequence>();
         }
 
-        protected virtual string GetView(Func<ITerm, string> viewSelector)
+        public new IOperation Operation { get => base.Operation; set => base.Operation = value; }
+        public new List<ITermSequence> Arguments { get => (List<ITermSequence>) base.Arguments; set => base.Arguments = value; }
+
+        protected virtual string GetView(Func<ITermSequence, string> viewSelector)
         {
             var args = string.Join(",", Arguments.Select(viewSelector));
             var argsLiteral = args.Length > 0 ? $"({args})" : "";

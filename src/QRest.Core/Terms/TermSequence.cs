@@ -2,11 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class TermSequence : TermBase, ITermSequence
+    public class TermSequence : ITermSequence
     {
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
@@ -14,13 +13,19 @@ namespace QRest.Core.Terms
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
 
-        public override string SharedView => string.Join("", _sequence.Select(t => t?.SharedView ?? "Shit happend"));
-        public override string KeyView => string.Join("", _sequence.Select(t => t.KeyView));
-        public override string DebugView => $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
+        public string SharedView => string.Join("", _sequence.Select(t => t?.SharedView ?? "Shit happend"));
+        public string KeyView => string.Join("", _sequence.Select(t => t.KeyView));
+        public string DebugView => $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
 
         public void Add(ITerm term)
         {
             _sequence.AddLast(term);
+        }
+
+        public void Add(ITermSequence terms)
+        {
+            foreach (var term in terms)
+                _sequence.AddLast(term);
         }
 
         public IEnumerator<ITerm> GetEnumerator()
@@ -33,17 +38,7 @@ namespace QRest.Core.Terms
             return _sequence.GetEnumerator();
         }
 
-        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
-        {
-            var result = prev;
-
-            foreach (var term in _sequence)
-                result = term.CreateExpression(compiler, result, root);
-
-            return result;
-        }
-
-        public override ITerm Clone()
+        public ITermSequence Clone()
         {
             return new TermSequence { Root.Clone() };
         }

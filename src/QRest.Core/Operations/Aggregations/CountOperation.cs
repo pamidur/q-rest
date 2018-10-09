@@ -10,7 +10,7 @@ namespace QRest.Core.Operations.Aggregations
     {
         public override bool SupportsQuery => true;
 
-        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 0)
                 throw new ExpressionCreationException();            

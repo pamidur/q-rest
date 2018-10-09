@@ -1,32 +1,16 @@
-﻿using QRest.Core.Containers;
-using QRest.Core.Contracts;
-using System.Linq.Expressions;
+﻿using QRest.Core.Contracts;
+using QRest.Core.Operations.Basic;
 
 namespace QRest.Core.Terms
 {
     public class PropertyTerm : TermBase
     {
-        public string PropertyName { get; set; }
+        private readonly string _name;
+        public PropertyTerm(string name) => _name = name;
 
-        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
-        {
-            Expression exp;
+        public override IOperation Operation => new GetPropertyOperation(_name);        
 
-            if (DynamicContainer.IsContainerType(prev.Type))
-            {
-                exp = DynamicContainer.CreateReadProperty(prev, PropertyName);
-            }
-            else
-            {
-                exp = Expression.PropertyOrField(prev, PropertyName);
-            }
-
-
-            return exp;
-        }
-
-        public override string SharedView => $".{PropertyName}";
-
-        public override ITerm Clone() => new PropertyTerm { PropertyName = PropertyName};
+        public override string SharedView => $".{_name}";
+        public override ITerm Clone() => new PropertyTerm (_name);
     }
 }

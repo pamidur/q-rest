@@ -41,5 +41,17 @@ namespace QRest.Compiller.Standard
 
             return exp;
         }
+
+
+
+        public Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
+        {
+            var result = prev;
+
+            foreach (var term in _sequence)
+                result = term.CreateExpression(compiler, result, root);
+
+            return result;
+        }
     }
 }

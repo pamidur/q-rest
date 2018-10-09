@@ -83,7 +83,7 @@ namespace TestApp
             //:where(Sub.Text-eq(`SubText`))
             //:where(`SubText`-eq(-it.Sub.Text)
 
-
+            
 
             //tree = new LambdaTerm
             //{

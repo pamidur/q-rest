@@ -2,7 +2,7 @@
 
 namespace QRest.Core.Contracts
 {
-    public interface ITermSequence : IEnumerable<ITerm>, ITerm
+    public interface ITermSequence : IEnumerable<ITerm>
     {
         ITerm Root { get; }
         ITerm Last { get; }
@@ -10,5 +10,12 @@ namespace QRest.Core.Contracts
         bool IsEmpty { get; }
 
         void Add(ITerm term);
+        void Add(ITermSequence terms);
+
+        string DebugView { get; }
+        string SharedView { get; }
+        string KeyView { get; }
+
+        ITermSequence Clone();
     }
 }

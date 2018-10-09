@@ -16,14 +16,14 @@ using static ODataGrammarParser;
 
 namespace QRest.OData
 {
-    public class ODataVisitor : ODataGrammarBaseVisitor<ITerm>
+    public class ODataVisitor : ODataGrammarBaseVisitor<ITermSequence>
     {
-        public override ITerm VisitParse([NotNull] ParseContext context)
+        public override ITermSequence VisitParse([NotNull] ParseContext context)
         {
-            return Visit(context.queryOptions()).AsSequence();
+            return Visit(context.queryOptions());
         }
 
-        public override ITerm VisitQueryOptions([NotNull] QueryOptionsContext context)
+        public override ITermSequence VisitQueryOptions([NotNull] QueryOptionsContext context)
         {
             var operationLambdas = context.children.OfType<QueryOptionContext>().Select(c => Visit(c)).Cast<LambdaTerm>();
 
@@ -33,7 +33,7 @@ namespace QRest.OData
             return BuildTerms(sortedLambdas);
         }
 
-        private ITerm BuildTerms(List<LambdaTerm> sortedLambdas)
+        private ITermSequence BuildTerms(List<LambdaTerm> sortedLambdas)
         {
             var seq = new TermSequence();
 
@@ -50,7 +50,7 @@ namespace QRest.OData
             seq.Add(selectTerm);
 
             var countTerm = sortedLambdas.Where(c => c.Operation is CountOperation).FirstOrDefault();
-            if (countTerm != null) selectTerm.Arguments.Add(new TermSequence { countTerm, new NameTerm { Name = "@odata.count" } });
+            if (countTerm != null) selectTerm.Arguments.Add(new TermSequence { countTerm, new NameTerm("@odata.count") });
 
             selectTerm.Arguments.Add(BuildSelectArgs(sortedLambdas));
 
@@ -67,7 +67,7 @@ namespace QRest.OData
             if (seq.IsEmpty)
                 seq.Add(new LambdaTerm { Operation = new SelectOperation() });
 
-            seq.Add(new NameTerm { Name = "value" });
+            seq.Add(new NameTerm("value"));
 
             return seq;
         }
@@ -78,36 +78,32 @@ namespace QRest.OData
         }
 
 
-        public override ITerm VisitFilter([NotNull] ODataGrammarParser.FilterContext context)
+        public override ITermSequence VisitFilter([NotNull] ODataGrammarParser.FilterContext context)
         {
-            var termFilter = new LambdaTerm
-            {
-                Operation = new WhereOperation { TryParseFromStrings = true },
-                Arguments = new List<ITermSequence>()
-            };
+            var termFilter = new LambdaTerm( new WhereOperation (), new List<ITermSequence>()            );
 
             var filterExpression = Visit(context.filterexpr);
-            termFilter.Arguments.Add(filterExpression.AsSequence());
-            return termFilter;
+            termFilter.Arguments.Add(filterExpression);
+            return new TermSequence { termFilter };
         }
 
-        public override ITerm VisitSelect([NotNull] SelectContext context)
+        public override ITermSequence VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var lambda = new LambdaTerm { Operation = new SelectOperation { }, Arguments = selectArgs.Select(p => p.AsSequence()).ToList() };
-            return lambda;
+            var lambda = new LambdaTerm(new SelectOperation { }, selectArgs.ToList());
+            return new TermSequence { lambda };
         }
 
-        public override ITerm VisitSelectItem([NotNull] SelectItemContext context)
+        public override ITermSequence VisitSelectItem([NotNull] SelectItemContext context)
         {
             return new TermSequence {
                 new MethodTerm { Operation = new ItOperation() },
-                new PropertyTerm { PropertyName = context.GetText() }
+                new PropertyTerm(context.GetText())
             };
         }
 
 
-        public override ITerm VisitNotExpression([NotNull] NotExpressionContext context)
+        public override ITermSequence VisitNotExpression([NotNull] NotExpressionContext context)
         {
             return new TermSequence {
                 Visit(context.expression()),
@@ -115,25 +111,25 @@ namespace QRest.OData
             };
         }
 
-        public override ITerm VisitStringExpression([NotNull] ODataGrammarParser.StringExpressionContext context)
+        public override ITermSequence VisitStringExpression([NotNull] ODataGrammarParser.StringExpressionContext context)
         {
-            return new ConstantTerm { Value = context.GetText().Trim('\'') };
+            return new TermSequence { new ConstantTerm { Value = context.GetText().Trim('\'') } };
         }
 
-        public override ITerm VisitDecimalExpression([NotNull] ODataGrammarParser.DecimalExpressionContext context)
+        public override ITermSequence VisitDecimalExpression([NotNull] ODataGrammarParser.DecimalExpressionContext context)
         {
-            return new ConstantTerm { Value = decimal.Parse(context.GetText()) };
+            return new TermSequence { new ConstantTerm { Value = decimal.Parse(context.GetText()) } };
         }
 
-        public override ITerm VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context)
+        public override ITermSequence VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context)
         {
-            return new ConstantTerm { Value = int.Parse(context.GetText()) };
+            return new TermSequence { new ConstantTerm { Value = int.Parse(context.GetText()) } };
         }
 
-        public override ITerm VisitComparatorExpression([NotNull] ODataGrammarParser.ComparatorExpressionContext context)
+        public override ITermSequence VisitComparatorExpression([NotNull] ODataGrammarParser.ComparatorExpressionContext context)
         {
-            var left = Visit(context.left).AsSequence();
-            var right = Visit(context.right).AsSequence();
+            var left = Visit(context.left);
+            var right = Visit(context.right);
 
             var op = Visit(context.op);
             (op as MethodTerm).Arguments = new List<ITermSequence> { right };
@@ -143,29 +139,29 @@ namespace QRest.OData
             return left;
         }
 
-        public override ITerm VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context)
+        public override ITermSequence VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context)
         {
             return new TermSequence
             {
                 new MethodTerm{ Operation = new ItOperation() },
-                new PropertyTerm { PropertyName = context.GetText() }
+                new PropertyTerm (context.GetText() )
             };
         }
 
-        public override ITerm VisitParenExpression([NotNull] ODataGrammarParser.ParenExpressionContext context)
+        public override ITermSequence VisitParenExpression([NotNull] ODataGrammarParser.ParenExpressionContext context)
         {
             return Visit(context.children[1]);
         }
 
-        public override ITerm VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context)
+        public override ITermSequence VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context)
         {
-            return new ConstantTerm { Value = bool.Parse(context.GetText()) };
+            return new TermSequence { new ConstantTerm { Value = bool.Parse(context.GetText()) } };
         }
 
-        public override ITerm VisitBinaryExpression([NotNull] ODataGrammarParser.BinaryExpressionContext context)
+        public override ITermSequence VisitBinaryExpression([NotNull] ODataGrammarParser.BinaryExpressionContext context)
         {
-            var left = Visit(context.left).AsSequence();
-            var right = Visit(context.right).AsSequence();
+            var left = Visit(context.left);
+            var right = Visit(context.right);
 
             var op = VisitBinary(context.op);
             ((MethodTerm)op).Arguments = new List<ITermSequence> { left, right };
@@ -173,7 +169,7 @@ namespace QRest.OData
             return new TermSequence { op };
         }
 
-        public override ITerm VisitTerminal(ITerminalNode node)
+        public override ITermSequence VisitTerminal(ITerminalNode node)
         {
             OperationBase operation;
             switch (node.Symbol.Type)
@@ -210,61 +206,61 @@ namespace QRest.OData
                 default:
                     throw new Exception("Operation not supported");
             }
-            return new MethodTerm { Operation = operation };
+            return new TermSequence { new MethodTerm { Operation = operation } };
         }
 
-        public override ITerm VisitFuncCallExpression([NotNull] FuncCallExpressionContext context)
+        public override ITermSequence VisitFuncCallExpression([NotNull] FuncCallExpressionContext context)
         {
             var parameters = context.functionParams().children.Where((c, i) => i % 2 == 0).Select(c => Visit(c));
             if (!parameters.Any()) throw new ArgumentException("Need more arguments!");
-            var funcRoot = parameters.First().AsSequence();
+            var funcRoot = parameters.First();
             var func = GetFuncTerm(context.func.Text);
-            func.Arguments = parameters.Skip(1).Select(p => p.AsSequence()).ToList();
+            func.Arguments = parameters.Skip(1).ToList();
             funcRoot.Add(func);
 
             return funcRoot;
         }
 
-        public override ITerm VisitFunctionParams([NotNull] FunctionParamsContext context)
+        public override ITermSequence VisitFunctionParams([NotNull] FunctionParamsContext context)
         {
             return base.VisitFunctionParams(context);
         }
 
 
-        public override ITerm VisitCount([NotNull] CountContext context)
+        public override ITermSequence VisitCount([NotNull] CountContext context)
         {
 
             if (context.decexpr.GetText().Equals("true", StringComparison.OrdinalIgnoreCase))
-                return new LambdaTerm
+                return new TermSequence{ new LambdaTerm
                 {
                     Operation = new CountOperation()
-                };
-            else return null;
+                } };
+            else return new TermSequence();
         }
 
-        public override ITerm VisitOrderby([NotNull] OrderbyContext context)
+        public override ITermSequence VisitOrderby([NotNull] OrderbyContext context)
         {
-            var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).Select(p => p.AsSequence()).ToList();
+            var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).ToList();
 
-            return new LambdaTerm { Operation = new OrderOperation(), Arguments = args };
+            return new TermSequence { new LambdaTerm { Operation = new OrderOperation(), Arguments = args } };
         }
 
-        public override ITerm VisitOrderbyItem([NotNull] OrderbyItemContext context)
+        public override ITermSequence VisitOrderbyItem([NotNull] OrderbyItemContext context)
         {
-            ITerm order = context.ChildCount > 1 ?
+            ITermSequence order = context.ChildCount > 1 ?
                 Visit(context.children[1])
-                : new MethodTerm { Operation = new AscendingOperation() };
+                : new TermSequence { new MethodTerm { Operation = new AscendingOperation() } };
 
 
             return new TermSequence {
                 new MethodTerm  {   Operation = new ItOperation() },
-                new PropertyTerm    {   PropertyName = context.children[0].GetText() },
+                new PropertyTerm   ( context.children[0].GetText() ),
                 order
             };
 
         }
 
-        public override ITerm VisitOrder([NotNull] OrderContext context)
+        public override ITermSequence VisitOrder([NotNull] OrderContext context)
         {
             var method = new MethodTerm();
             switch (context.GetText())
@@ -279,29 +275,29 @@ namespace QRest.OData
                     throw new Exception($"Order direction {context.GetText()} is unknown");
 
             }
-            return method;
+            return new TermSequence { method };
         }
 
-        public override ITerm VisitSkip([NotNull] SkipContext context)
+        public override ITermSequence VisitSkip([NotNull] SkipContext context)
         {
             if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
-                return new LambdaTerm
+                return new TermSequence {new LambdaTerm
                 {
                     Operation = new SkipOperation(),
                     Arguments = new List<ITermSequence> { new ConstantTerm { Value = value }.AsSequence() }
-                };
-            else return null;
+                } };
+            else return new TermSequence();
         }
 
-        public override ITerm VisitTop([NotNull] TopContext context)
+        public override ITermSequence VisitTop([NotNull] TopContext context)
         {
             if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
-                return new LambdaTerm
+                return new TermSequence{new LambdaTerm
                 {
                     Operation = new TakeOperation(),
                     Arguments = new List<ITermSequence> { new ConstantTerm { Value = value }.AsSequence() }
-                };
-            else return null;
+                } };
+            else return new TermSequence();
         }
 
         private MethodTerm GetFuncTerm(string funcName)

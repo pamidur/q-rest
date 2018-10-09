@@ -25,7 +25,7 @@ namespace QRest.Core.Operations.Query
             return new NamedExpression(expression, expName);
         }
 
-        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
             var queryElement = argumentsRoot.Type;
 

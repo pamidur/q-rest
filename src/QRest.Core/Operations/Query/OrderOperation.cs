@@ -11,7 +11,7 @@ namespace QRest.Core.Operations.Query
     {
         public override bool SupportsQuery => true;
 
-        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
             var exp = context;
 

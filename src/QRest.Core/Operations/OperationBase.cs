@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QRest.Core.Contracts;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -23,7 +24,7 @@ namespace QRest.Core.Operations
             throw new NotSupportedException();
         }
 
-        public virtual Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public virtual Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
         {
             throw new NotSupportedException();
         }

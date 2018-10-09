@@ -1,10 +1,12 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 
 namespace QRest.Core.Contracts
 {
     public interface ITerm
     {
-        Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root);
+        IOperation Operation { get; }
+        IReadOnlyList<ITermSequence> Arguments { get; }
+
         ITerm Clone();
 
         string DebugView { get; }

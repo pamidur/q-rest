@@ -1,5 +1,4 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Operations;
 using QRest.Core.Terms;
 using Sprache;
 using System;
@@ -130,7 +129,7 @@ namespace QRest.Semantics.MethodChain
 
         internal Parser<ITerm> BuildPropertyParser() =>
              from name in MemberName
-             select new PropertyTerm { PropertyName = name };
+             select new PropertyTerm(name);
 
         internal Parser<ConstantTerm> BuildConstantParser() =>
             new Parser<ConstantTerm>[] {
@@ -161,7 +160,7 @@ namespace QRest.Semantics.MethodChain
         protected Parser<NameTerm> BuildNameTermParser() =>
             from at in Read.Char('@')
             from name in MemberName
-            select new NameTerm { Name = name };
+            select new NameTerm(name);
 
         protected Parser<string> BuildMemberNameParser() =>
             from str1 in Read.Letter.Once().Text()

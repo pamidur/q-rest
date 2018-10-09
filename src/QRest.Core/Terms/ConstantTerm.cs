@@ -1,4 +1,5 @@
 ﻿using QRest.Core.Contracts;
+using QRest.Core.Operations.Basic;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
@@ -7,10 +8,7 @@ namespace QRest.Core.Terms
     {
         public object Value { get; set; }
 
-        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
-        {
-            return Expression.Constant(Value, Value.GetType());
-        }
+        public override IOperation Operation => new CreateConstantOperation(Value, Value.GetType());
 
         public override string SharedView => $"'{Value.ToString()}'";
         public override string KeyView => $"[{Value.GetType()}]";
