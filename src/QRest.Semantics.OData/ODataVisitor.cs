@@ -46,11 +46,11 @@ namespace QRest.OData
                 }
             }
 
-            var selectTerm = new MethodTerm { Operation = new SelectOperation(), Arguments = new List<ITermSequence>() };
+            var selectTerm = new MethodTerm { Operation = new SelectOperation (), Arguments = new List<ITermSequence>() };
             seq.Add(selectTerm);
 
             var countTerm = sortedLambdas.Where(c => c.Operation is CountOperation).FirstOrDefault();
-            if (countTerm != null) selectTerm.Arguments.Add(new TermSequence { countTerm , new NameTerm { Name = "@odata.count"} });
+            if (countTerm != null) selectTerm.Arguments.Add(new TermSequence { countTerm, new NameTerm { Name = "@odata.count" } });
 
             selectTerm.Arguments.Add(BuildSelectArgs(sortedLambdas));
 
@@ -93,7 +93,7 @@ namespace QRest.OData
         public override ITerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var lambda = new LambdaTerm { Operation = new SelectOperation { }, Arguments = selectArgs.Select(p=>p.AsSequence()).ToList() };
+            var lambda = new LambdaTerm { Operation = new SelectOperation { }, Arguments = selectArgs.Select(p => p.AsSequence()).ToList() };
             return lambda;
         }
 
@@ -218,7 +218,7 @@ namespace QRest.OData
             if (!parameters.Any()) throw new ArgumentException("Need more arguments!");
             var funcRoot = parameters.First().AsSequence();
             var func = GetFuncTerm(context.func.Text);
-            func.Arguments = parameters.Skip(1).Select(p=>p.AsSequence()).ToList();
+            func.Arguments = parameters.Skip(1).Select(p => p.AsSequence()).ToList();
             funcRoot.Add(func);
 
             return funcRoot;
@@ -243,7 +243,7 @@ namespace QRest.OData
 
         public override ITerm VisitOrderby([NotNull] OrderbyContext context)
         {
-            var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).Select(p=>p.AsSequence()).ToList();
+            var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).Select(p => p.AsSequence()).ToList();
 
             return new LambdaTerm { Operation = new OrderOperation(), Arguments = args };
         }

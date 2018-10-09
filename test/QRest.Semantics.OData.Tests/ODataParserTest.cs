@@ -54,7 +54,7 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("-select(:skip(1):take(1):select(-it.f1,-it.f2)@value)", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
+        [InlineData("-select(:skip('1'):take('1'):select(-it.f1,-it.f2)@value)", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
         public void ShouldParseTopSkip(string expected, string input)
         {
             ITerm exp = Parse(input);

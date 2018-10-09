@@ -14,7 +14,7 @@ namespace QRest.Core.Operations.Query
         public override bool SupportsQuery => true;
 
 
-        public bool UseStaticTerminatingQuery { get; set; } = false;
+        public bool UseStaticTerminatingQuery { get; set; } = true;
 
 
         public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)

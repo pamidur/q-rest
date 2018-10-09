@@ -118,6 +118,13 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitDecimalExpression([NotNull] ODataGrammarParser.DecimalExpressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>dateTimeOffsetExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDateTimeOffsetExpression([NotNull] ODataGrammarParser.DateTimeOffsetExpressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>stringExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
 	/// </summary>
@@ -191,6 +198,54 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitBool([NotNull] ODataGrammarParser.BoolContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.dateTimeOffset"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDateTimeOffset([NotNull] ODataGrammarParser.DateTimeOffsetContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.year"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitYear([NotNull] ODataGrammarParser.YearContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.month"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMonth([NotNull] ODataGrammarParser.MonthContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.day"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitDay([NotNull] ODataGrammarParser.DayContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.hour"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitHour([NotNull] ODataGrammarParser.HourContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.minute"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitMinute([NotNull] ODataGrammarParser.MinuteContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.second"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitSecond([NotNull] ODataGrammarParser.SecondContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.fractionalSeconds"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFractionalSeconds([NotNull] ODataGrammarParser.FractionalSecondsContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="ODataGrammarParser.functionParams"/>.
 	/// </summary>
