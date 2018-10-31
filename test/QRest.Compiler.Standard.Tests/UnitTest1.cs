@@ -24,31 +24,31 @@ namespace QRest.Compiler.Standard.Tests
         [Fact]
         public void Can_Compile_Simple_Method()
         {
-            var seq = new TermSequence {
+            var seq = new SequenceTerm {
                 new MethodTerm(
                     new EqualOperation(),
                     new[] {
-                        new TermSequence { new ConstantTerm("Ololo") }
+                        new SequenceTerm { new ConstantTerm("Ololo") }
                     })
             };
 
-            var result = _compiler.Assemble<string, string>(seq, false);
+            var result = _compiler.Assemble<string>(seq, false);
             var compiled = result.Compile();
 
-            Assert.True((bool)compiled("Ololo", "Ololo"));
+            Assert.True((bool)compiled("Ololo"));
         }
 
         [Fact]
         public void Can_Compile_Lambda()
         {
-            var seq = new TermSequence {
+            var seq = new SequenceTerm {
                 new MethodTerm(
                     new WhereOperation(),
                     new[] {
-                        new LambdaSequence {
+                        new LambdaTerm {
                             new MethodTerm(new ItOperation()),
                             new PropertyTerm(nameof(TestEntity.IntProperty)),
-                            new MethodTerm(new EqualOperation(), new[]{ new TermSequence { new ConstantTerm(1) } })
+                            new MethodTerm(new EqualOperation(), new[]{ new SequenceTerm { new ConstantTerm(1) } })
                         }
                     })
             };

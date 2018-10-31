@@ -35,7 +35,7 @@ namespace QRest.OData
 
         private ITermSequence BuildTerms(List<LambdaTerm> sortedLambdas)
         {
-            var seq = new TermSequence();
+            var seq = new SequenceTerm();
 
             if (sortedLambdas.Any())
             {
@@ -50,7 +50,7 @@ namespace QRest.OData
             seq.Add(selectTerm);
 
             var countTerm = sortedLambdas.Where(c => c.Operation is CountOperation).FirstOrDefault();
-            if (countTerm != null) selectTerm.Arguments.Add(new TermSequence { countTerm, new NameTerm("@odata.count") });
+            if (countTerm != null) selectTerm.Arguments.Add(new SequenceTerm { countTerm, new NameTerm("@odata.count") });
 
             selectTerm.Arguments.Add(BuildSelectArgs(sortedLambdas));
 
@@ -59,7 +59,7 @@ namespace QRest.OData
 
         private ITermSequence BuildSelectArgs(List<LambdaTerm> sortedLambdas)
         {
-            var seq = new TermSequence();
+            var seq = new SequenceTerm();
 
             foreach (var lambda in sortedLambdas.Where(c => !(c.Operation is CountOperation)))
                 seq.Add(lambda);
@@ -84,19 +84,19 @@ namespace QRest.OData
 
             var filterExpression = Visit(context.filterexpr);
             termFilter.Arguments.Add(filterExpression);
-            return new TermSequence { termFilter };
+            return new SequenceTerm { termFilter };
         }
 
         public override ITermSequence VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
             var lambda = new LambdaTerm(new SelectOperation { }, selectArgs.ToList());
-            return new TermSequence { lambda };
+            return new SequenceTerm { lambda };
         }
 
         public override ITermSequence VisitSelectItem([NotNull] SelectItemContext context)
         {
-            return new TermSequence {
+            return new SequenceTerm {
                 new MethodTerm { Operation = new ItOperation() },
                 new PropertyTerm(context.GetText())
             };
@@ -105,7 +105,7 @@ namespace QRest.OData
 
         public override ITermSequence VisitNotExpression([NotNull] NotExpressionContext context)
         {
-            return new TermSequence {
+            return new SequenceTerm {
                 Visit(context.expression()),
                 new MethodTerm{ Operation = new NotOperation() }
             };
@@ -113,17 +113,17 @@ namespace QRest.OData
 
         public override ITermSequence VisitStringExpression([NotNull] ODataGrammarParser.StringExpressionContext context)
         {
-            return new TermSequence { new ConstantTerm { Value = context.GetText().Trim('\'') } };
+            return new SequenceTerm { new ConstantTerm { Value = context.GetText().Trim('\'') } };
         }
 
         public override ITermSequence VisitDecimalExpression([NotNull] ODataGrammarParser.DecimalExpressionContext context)
         {
-            return new TermSequence { new ConstantTerm { Value = decimal.Parse(context.GetText()) } };
+            return new SequenceTerm { new ConstantTerm { Value = decimal.Parse(context.GetText()) } };
         }
 
         public override ITermSequence VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context)
         {
-            return new TermSequence { new ConstantTerm { Value = int.Parse(context.GetText()) } };
+            return new SequenceTerm { new ConstantTerm { Value = int.Parse(context.GetText()) } };
         }
 
         public override ITermSequence VisitComparatorExpression([NotNull] ODataGrammarParser.ComparatorExpressionContext context)
@@ -141,7 +141,7 @@ namespace QRest.OData
 
         public override ITermSequence VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context)
         {
-            return new TermSequence
+            return new SequenceTerm
             {
                 new MethodTerm{ Operation = new ItOperation() },
                 new PropertyTerm (context.GetText() )
@@ -155,7 +155,7 @@ namespace QRest.OData
 
         public override ITermSequence VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context)
         {
-            return new TermSequence { new ConstantTerm { Value = bool.Parse(context.GetText()) } };
+            return new SequenceTerm { new ConstantTerm { Value = bool.Parse(context.GetText()) } };
         }
 
         public override ITermSequence VisitBinaryExpression([NotNull] ODataGrammarParser.BinaryExpressionContext context)
@@ -166,7 +166,7 @@ namespace QRest.OData
             var op = VisitBinary(context.op);
             ((MethodTerm)op).Arguments = new List<ITermSequence> { left, right };
 
-            return new TermSequence { op };
+            return new SequenceTerm { op };
         }
 
         public override ITermSequence VisitTerminal(ITerminalNode node)
@@ -206,7 +206,7 @@ namespace QRest.OData
                 default:
                     throw new Exception("Operation not supported");
             }
-            return new TermSequence { new MethodTerm { Operation = operation } };
+            return new SequenceTerm { new MethodTerm { Operation = operation } };
         }
 
         public override ITermSequence VisitFuncCallExpression([NotNull] FuncCallExpressionContext context)
@@ -231,28 +231,28 @@ namespace QRest.OData
         {
 
             if (context.decexpr.GetText().Equals("true", StringComparison.OrdinalIgnoreCase))
-                return new TermSequence{ new LambdaTerm
+                return new SequenceTerm{ new LambdaTerm
                 {
                     Operation = new CountOperation()
                 } };
-            else return new TermSequence();
+            else return new SequenceTerm();
         }
 
         public override ITermSequence VisitOrderby([NotNull] OrderbyContext context)
         {
             var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).ToList();
 
-            return new TermSequence { new LambdaTerm { Operation = new OrderOperation(), Arguments = args } };
+            return new SequenceTerm { new LambdaTerm { Operation = new OrderOperation(), Arguments = args } };
         }
 
         public override ITermSequence VisitOrderbyItem([NotNull] OrderbyItemContext context)
         {
             ITermSequence order = context.ChildCount > 1 ?
                 Visit(context.children[1])
-                : new TermSequence { new MethodTerm { Operation = new AscendingOperation() } };
+                : new SequenceTerm { new MethodTerm { Operation = new AscendingOperation() } };
 
 
-            return new TermSequence {
+            return new SequenceTerm {
                 new MethodTerm  {   Operation = new ItOperation() },
                 new PropertyTerm   ( context.children[0].GetText() ),
                 order
@@ -275,29 +275,29 @@ namespace QRest.OData
                     throw new Exception($"Order direction {context.GetText()} is unknown");
 
             }
-            return new TermSequence { method };
+            return new SequenceTerm { method };
         }
 
         public override ITermSequence VisitSkip([NotNull] SkipContext context)
         {
             if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
-                return new TermSequence {new LambdaTerm
+                return new SequenceTerm {new LambdaTerm
                 {
                     Operation = new SkipOperation(),
                     Arguments = new List<ITermSequence> { new ConstantTerm { Value = value }.AsSequence() }
                 } };
-            else return new TermSequence();
+            else return new SequenceTerm();
         }
 
         public override ITermSequence VisitTop([NotNull] TopContext context)
         {
             if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
-                return new TermSequence{new LambdaTerm
+                return new SequenceTerm{new LambdaTerm
                 {
                     Operation = new TakeOperation(),
                     Arguments = new List<ITermSequence> { new ConstantTerm { Value = value }.AsSequence() }
                 } };
-            else return new TermSequence();
+            else return new SequenceTerm();
         }
 
         private MethodTerm GetFuncTerm(string funcName)

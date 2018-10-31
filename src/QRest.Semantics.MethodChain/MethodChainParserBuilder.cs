@@ -34,15 +34,15 @@ namespace QRest.Semantics.MethodChain
         private readonly Dictionary<string, IOperation> _operationMap;
 
 
-        internal Parser<TermSequence> CallChain;
+        internal Parser<SequenceTerm> CallChain;
         internal Parser<ITerm> Call;
-        internal Parser<List<TermSequence>> CallArguments;
+        internal Parser<List<SequenceTerm>> CallArguments;
         internal Parser<MethodTerm> Lambda;
         internal Parser<MethodTerm> Method;
         internal Parser<ITerm> SubProperty;
         internal Parser<ITerm> Property;
-        internal Parser<TermSequence> RootProperty;
-        internal Parser<TermSequence> ChainRoot;
+        internal Parser<SequenceTerm> RootProperty;
+        internal Parser<SequenceTerm> ChainRoot;
         internal Parser<ConstantTerm> Constant;
         internal Parser<ConstantTerm> ArrayConstant;
         internal Parser<ConstantTerm> NumberConstant;
@@ -57,7 +57,7 @@ namespace QRest.Semantics.MethodChain
             _operationMap = operationMap;
         }
 
-        public Parser<TermSequence> Build()
+        public Parser<SequenceTerm> Build()
         {
             MemberName = BuildMemberNameParser().Named("Member Name");
 
@@ -85,32 +85,32 @@ namespace QRest.Semantics.MethodChain
             return CallChain.End();
         }
 
-        internal Parser<TermSequence> BuildChainRootParser() =>
+        internal Parser<SequenceTerm> BuildChainRootParser() =>
           from root in Call.Or(Constant)
-          select new TermSequence() { root };
+          select new SequenceTerm() { root };
 
-        internal Parser<TermSequence> BuildCallChainParser() =>
+        internal Parser<SequenceTerm> BuildCallChainParser() =>
           from root in ChainRoot.Or(RootProperty)
           from chunks in SubProperty.Or(Call).Or(Name).Many()
           select chunks.Aggregate(root, (c1, c2) => { c1.Add(c2); return c1; });
 
-        internal Parser<List<TermSequence>> BuildCallArgumentsParser() => Read.Ref(() =>
+        internal Parser<List<SequenceTerm>> BuildCallArgumentsParser() => Read.Ref(() =>
             from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
-            select parameters.Where(r => r != null)?.ToList() ?? new List<TermSequence>()
+            select parameters.Where(r => r != null)?.ToList() ?? new List<SequenceTerm>()
             );
 
         internal Parser<MethodTerm> BuildLambdaParser(Parser<IOperation> operationParser) =>
             from semic in LambdaIndicator
             from operation in operationParser
             from arguments in CallArguments.Optional()
-            select new MethodTerm(operation, (arguments.GetOrDefault() ?? new List<TermSequence>()).Select(s => new LambdaSequence { s }).ToList());
+            select new MethodTerm(operation, (arguments.GetOrDefault() ?? new List<SequenceTerm>()).Select(s => new LambdaTerm { s }).ToList());
 
 
         internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationParser) =>
              from semic in MethodIndicator
              from operation in operationParser
              from arguments in CallArguments.Optional()
-             select new MethodTerm(operation, arguments.GetOrDefault() ?? new List<TermSequence>());
+             select new MethodTerm(operation, arguments.GetOrDefault() ?? new List<SequenceTerm>());
 
         internal Parser<IOperation> BuildOperationParsers(KeyValuePair<string, IOperation>[] operationMap)
         {
@@ -138,9 +138,9 @@ namespace QRest.Semantics.MethodChain
              from prop in Property
              select prop;
 
-        internal Parser<TermSequence> BuildRootPropertyParser() =>
+        internal Parser<SequenceTerm> BuildRootPropertyParser() =>
              from prop in Property
-             select new TermSequence { new MethodTerm(new ItOperation()), prop };
+             select new SequenceTerm { new MethodTerm(new ItOperation()), prop };
 
         internal Parser<ITerm> BuildPropertyParser() =>
              from name in MemberName

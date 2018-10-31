@@ -8,9 +8,9 @@ namespace QRest.Core
     {
         private readonly ICompiler _compiller;
 
-        public TermSequence Sequence { get; }
+        public SequenceTerm Sequence { get; }
 
-        protected QueryBase(TermSequence sequence, ICompiler compiller)
+        protected QueryBase(SequenceTerm sequence, ICompiler compiller)
         {
             Sequence = sequence;
             _compiller = compiller;

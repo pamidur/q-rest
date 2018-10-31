@@ -19,16 +19,21 @@ namespace QRest.Compiler.Standard
             _finalize = finalize;
         }
 
-        public virtual LambdaExpression Assemble(TermSequence sequence, Type root, Type context)
+        public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants) Assemble(SequenceTerm sequence, ParameterExpression root, ParameterExpression ctx = null, bool finalize = true)
         {
-            var rootparam = Expression.Parameter(root, "r");
-            var ctxparam = Expression.Parameter(context, "c");
+            var args = new[] { root };
+            var ctxarg = root;
+            if (ctx != null && ctx != root)
+            {
+                ctxarg = ctx;
+                args = new[] { root, ctx };
+            }
 
-            var result = AssembleSequence(sequence, rootparam, ctxparam);
+            var assembled = AssembleSequence(sequence, root, ctxarg);
 
-            var lambda = Expression.Lambda(Expression.Invoke(result.Lambda, new[] { rootparam, ctxparam }.Concat<Expression>(result.Constants)), rootparam, ctxparam);
 
-            return lambda;
+            var resultLambda = Expression.Lambda(assembled.Expression, args.Concat(assembled.Parameters));
+            return (resultLambda, assembled.Constants);
         }
 
         protected virtual Expression Finalize(Expression exp)
@@ -74,20 +79,23 @@ namespace QRest.Compiler.Standard
 
         protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleMethod(MethodTerm m, Expression root, Expression ctx)
         {
-            var args = m.Arguments.Select(a => AssembleSequence(a, root, ctx)).ToArray();
+            var args = m.Arguments.Select(a => AssembleTerm(a, root, ctx)).ToArray();
 
             var constants = args.SelectMany(a => a.Constants).ToArray();
-            var parameters = args.SelectMany(a => a.Lambda.Parameters.Skip(2)).ToArray();
+            var parameters = args.SelectMany(a => a.Parameters).ToArray();
+            var argValues = args.Select(a => a.Expression).ToArray();
 
-            var argValues = args.Select(a => Expression.Invoke(a.Lambda, new[] { root, ctx }.Concat(a.Lambda.Parameters.Skip(2)))).ToArray();           
-
-
-            return ( m.Operation.CreateCallExpression(root, ctx, argValues),constants,parameters);
+            return (m.Operation.CreateCallExpression(root, ctx, argValues), constants, parameters);
         }
 
         protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleName(NameTerm n, Expression root, Expression ctx)
         {
             return (new NamedExpression(ctx, n.Name), null, null);
+        }
+
+        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleLambda(LambdaTerm l, Expression root, Expression ctx)
+        {
+            throw new NotImplementedException();
         }
     }
 }

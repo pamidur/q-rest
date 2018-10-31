@@ -9,15 +9,15 @@ namespace QRest.Core.Terms
     public class MethodTerm : ITerm
     {
         public IOperation Operation { get; }
-        public IReadOnlyList<TermSequence> Arguments { get; }
+        public IReadOnlyList<SequenceTerm> Arguments { get; }
 
-        public MethodTerm(IOperation operation, IReadOnlyList<TermSequence> terms = null)
+        public MethodTerm(IOperation operation, IReadOnlyList<SequenceTerm> terms = null)
         {
             Operation = operation;
-            Arguments = terms ?? new List<TermSequence>();
+            Arguments = terms ?? new List<SequenceTerm>();
         }
 
-        protected virtual string GetView(Func<TermSequence, string> viewSelector)
+        protected virtual string GetView(Func<SequenceTerm, string> viewSelector)
         {
             var args = string.Join(",", Arguments.Select(viewSelector));
             var argsLiteral = args.Length > 0 ? $"({args})" : "";
@@ -28,6 +28,6 @@ namespace QRest.Core.Terms
         public string DebugView => GetView(t => t.DebugView);
         public string KeyView => GetView(t => t.KeyView);
 
-        public ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => (TermSequence) a.Clone()).ToList());
+        public ITerm Clone => new MethodTerm(Operation, Arguments.Select(a => (SequenceTerm)a.Clone).ToList());
     }
 }

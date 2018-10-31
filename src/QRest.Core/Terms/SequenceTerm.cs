@@ -6,12 +6,10 @@ using System.Linq;
 
 namespace QRest.Core.Terms
 {
-    public class TermSequence : IEnumerable<ITerm>, ITerm
+    public class SequenceTerm : IEnumerable<ITerm>, ITerm
     {
-        private static readonly IOperation _transientRoot = new ItOperation();
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
-        public virtual IOperation RootSelector => _transientRoot;
         public ITerm Root => _sequence.First.Value;
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
@@ -22,13 +20,13 @@ namespace QRest.Core.Terms
 
         public void Add(ITerm term)
         {
-            if (term is TermSequence s)
+            if (term is SequenceTerm s)
                 Add(s);
             else if (term != null)
                 _sequence.AddLast(term);
         }
 
-        public void Add(TermSequence terms)
+        public void Add(SequenceTerm terms)
         {
             foreach (var term in terms)
                 Add(term);
@@ -44,10 +42,7 @@ namespace QRest.Core.Terms
             return _sequence.GetEnumerator();
         }
 
-        public ITerm Clone()
-        {
-            return new TermSequence { Root.Clone() };
-        }
+        public virtual ITerm Clone => new SequenceTerm { Root.Clone };
 
         public override string ToString() => SharedView;
     }

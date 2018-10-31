@@ -5,6 +5,6 @@ namespace QRest.Core.Contracts
 {
     public interface ICompiler
     {
-        Func<TRoot, object> Compile<TRoot>(TermSequence sequence, bool finalize = true);
+        Func<TRoot, object> Compile<TRoot>(SequenceTerm sequence, bool finalize = true);
     }
 }

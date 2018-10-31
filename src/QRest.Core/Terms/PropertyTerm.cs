@@ -12,6 +12,6 @@ namespace QRest.Core.Terms
         public string DebugView => SharedView;
         public string KeyView => SharedView;
 
-        public ITerm Clone() => new PropertyTerm(Name);
+        public ITerm Clone => new PropertyTerm(Name);
     }
 }
