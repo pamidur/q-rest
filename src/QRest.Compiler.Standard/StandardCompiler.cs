@@ -1,30 +1,36 @@
 ﻿using QRest.Core.Contracts;
+using QRest.Core.Terms;
 using System;
 using System.Linq.Expressions;
 
-namespace QRest.Compiller.Standard
+namespace QRest.Compiler.Standard
 {
     public class StandardCompiler : ICompiler
     {
-        public Expression<Func<TRoot, object>> CompileRaw<TRoot>(ITermSequence sequence, bool finalize = true)
+        public Func<TRoot, object> Compile<TRoot>(TermSequence sequence, bool finalize = true)
         {
-            var dataParam = Expression.Parameter(typeof(TRoot));
-            var expression = Compile(sequence, dataParam, dataParam, finalize);
-
-            var lambda = Expression.Lambda<Func<TRoot, object>>(Expression.Convert(expression, typeof(object)), dataParam);
-            return lambda;
+            var exp = Assemble<TRoot, TRoot>(sequence, finalize);
+            var compiled = exp.Compile();
+            return (TRoot root) => compiled(root, root);
         }
 
-        public Func<TRoot, object> Compile<TRoot>(ITermSequence sequence, bool finalize = true)
+        public Expression<Func<TRoot, object>> Assemble<TRoot>(TermSequence sequence, bool finalize = true)
         {
-            var exp = CompileRaw<TRoot>(sequence, finalize);
-            return exp.Compile();
+            var rootParam = Expression.Parameter(typeof(TRoot), "root");
+            return Expression.Lambda<Func<TRoot, object>>(Expression.Invoke(Assemble<TRoot, TRoot>(sequence, finalize), rootParam, rootParam), rootParam);
         }
 
-        public Expression Compile(ITermSequence sequence, Expression context, ParameterExpression root, bool finalize = true)
+        public Expression<Func<TRoot, TContext, object>> Assemble<TRoot, TContext>(TermSequence sequence, bool finalize = true)
+        {
+            var expression = Assemble(sequence, typeof(TRoot), typeof(TContext), finalize);
+
+            return Expression.Lambda<Func<TRoot, TContext, object>>(Expression.Convert(expression.Body, typeof(object)), expression.Parameters);
+        }
+
+        public LambdaExpression Assemble(TermSequence sequence, Type root, Type context, bool finalize = true)
         {
             var ctx = new StandardCompilerContext(finalize);
-            var expression = ctx.Assemble(sequence, context, root);
+            var expression = ctx.Assemble(sequence, root, context);
             return expression;
         }
     }

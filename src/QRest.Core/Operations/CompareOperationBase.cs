@@ -7,7 +7,7 @@ namespace QRest.Core.Operations
     {
         public override bool SupportsCall => true;        
 
-        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        public override Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
@@ -21,12 +21,15 @@ namespace QRest.Core.Operations
 
         protected virtual (Expression Left, Expression Right) Convert(Expression left, Expression right)
         {
-            if (TryCast(right, left.Type, out var newright))
+            var leftType = /*left.NodeType == ExpressionType.Lambda ? ((LambdaExpression)left).ReturnType : */left.Type;
+            var rightType = /*right.NodeType == ExpressionType.Lambda ? ((LambdaExpression)right).ReturnType :*/ right.Type;
+
+            if (TryCast(right, leftType, out var newright))
                 return (left, newright);
-            else if (TryCast(left, right.Type, out var newleft))
+            else if (TryCast(left, rightType, out var newleft))
                 return (newleft, right);
             else
-                throw new ExpressionCreationException($"Cannot compare {left.Type.Name} and {right.Type.Name}");
+                throw new ExpressionCreationException($"Cannot compare {leftType.Name} and {rightType.Name}");
         }       
     }
 }

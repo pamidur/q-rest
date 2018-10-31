@@ -15,16 +15,16 @@ namespace QRest.Semantics.MethodChain
     public partial class MethodChainSemantics : IQuerySemanticsProvider
     {
         private readonly Dictionary<string, IOperation> _operationMap = new Dictionary<string, IOperation>();
-        private static readonly ITermSequence _default = new TermSequence { new MethodTerm (new ItOperation() ) };
+        private static readonly TermSequence _default = new TermSequence { new MethodTerm (new ItOperation() ) };
 
-        private Lazy<Parser<ITermSequence>> Parser { get; }
+        private Lazy<Parser<TermSequence>> Parser { get; }
 
         public MethodChainSemantics()
         {
-            Parser = new Lazy<Parser<ITermSequence>>(() => PrepareParser());
+            Parser = new Lazy<Parser<TermSequence>>(() => PrepareParser());
         }
 
-        private Parser<ITermSequence> PrepareParser()
+        private Parser<TermSequence> PrepareParser()
         {
             AddDefaultOperations();
 
@@ -82,7 +82,7 @@ namespace QRest.Semantics.MethodChain
             _operationMap.Add(name, operation);
         }
 
-        public ITermSequence Parse(IRequestModel model)
+        public TermSequence Parse(IRequestModel model)
         {
             var queries = model.GetNamedQueryPart(model.ModelName).Span;
             

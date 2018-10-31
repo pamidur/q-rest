@@ -19,7 +19,7 @@ namespace QRest.Core.Operations
         public virtual bool SupportsQuery => false;
         public virtual bool SupportsCall => false;
 
-        public virtual Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        public virtual Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             throw new NotSupportedException();
         }

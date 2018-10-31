@@ -1,9 +1,11 @@
-﻿using System.Linq.Expressions;
+﻿using QRest.Core.Terms;
+using System;
+using System.Linq.Expressions;
 
 namespace QRest.Core.Contracts
 {
     public interface ICompilationContext
     {
-        Expression Assemble(ITermSequence term, Expression context, ParameterExpression root);
+        LambdaExpression Assemble(TermSequence term, Type root, Type context);
     }
 }

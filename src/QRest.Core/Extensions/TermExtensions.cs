@@ -5,9 +5,9 @@ namespace QRest.Core
 {
     public static class TermExtensions
     {
-        public static ITermSequence AsSequence (this ITerm term)
+        public static TermSequence AsSequence (this ITerm term)
         {
-            return term as ITermSequence ?? new TermSequence { term };
+            return term as TermSequence ?? new TermSequence { term };
         }
     }
 }

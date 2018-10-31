@@ -6,7 +6,7 @@ namespace QRest.Core.Operations.Selectors
 {
     public class ElementOperation : OperationBase
     {
-        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        public override Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             var etype = context.GetQueryElementType();
             var arg = Expression.Parameter(etype, etype.Name.ToLowerInvariant());

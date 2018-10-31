@@ -20,8 +20,6 @@ namespace TestWebApp.Controllers
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonConverter(typeof(ObjectIdConverter))]
         public ObjectId Id { get; set; }
-
-
         public string Text { get; set; }
         public int Number { get; set; }
         public DateTime Datetime { get; set; }

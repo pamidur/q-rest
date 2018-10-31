@@ -6,25 +6,28 @@ using System.Linq;
 
 namespace QRest.Core.Terms
 {
-    public class MethodTerm : TermBase
+    public class MethodTerm : ITerm
     {
-        public MethodTerm(IOperation operation, IReadOnlyList<ITermSequence> terms = null)
+        public IOperation Operation { get; }
+        public IReadOnlyList<TermSequence> Arguments { get; }
+
+        public MethodTerm(IOperation operation, IReadOnlyList<TermSequence> terms = null)
         {
             Operation = operation;
-            Arguments = terms ?? new List<ITermSequence>();
+            Arguments = terms ?? new List<TermSequence>();
         }
 
-        protected virtual string GetView(Func<ITermSequence, string> viewSelector)
+        protected virtual string GetView(Func<TermSequence, string> viewSelector)
         {
             var args = string.Join(",", Arguments.Select(viewSelector));
             var argsLiteral = args.Length > 0 ? $"({args})" : "";
             return $"-{Operation.GetName()}{argsLiteral}";
         }
 
-        public override string SharedView => GetView(t => t.SharedView);
-        public override string DebugView => GetView(t => t.DebugView);
-        public override string KeyView => GetView(t => t.KeyView);
+        public string SharedView => GetView(t => t.SharedView);
+        public string DebugView => GetView(t => t.DebugView);
+        public string KeyView => GetView(t => t.KeyView);
 
-        public override ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => a.Clone()).ToList());
+        public ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => (TermSequence) a.Clone()).ToList());
     }
 }

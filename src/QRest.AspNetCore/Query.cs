@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 using QRest.Core;
 using QRest.Core.Contracts;
+using QRest.Core.Terms;
 using System.Threading.Tasks;
 
 namespace QRest.AspNetCore
@@ -10,7 +11,7 @@ namespace QRest.AspNetCore
     [ModelBinder(typeof(QueryModelBinder))]
     public class Query : QueryBase
     {
-        public Query(ITermSequence sequence, ICompiler compiller) : base(sequence, compiller)
+        public Query(TermSequence sequence, ICompiler compiller) : base(sequence, compiller)
         {
         }
     }

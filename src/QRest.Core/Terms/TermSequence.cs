@@ -1,5 +1,4 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Extensions;
 using QRest.Core.Operations;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,10 +6,10 @@ using System.Linq;
 
 namespace QRest.Core.Terms
 {
-    public class TermSequence : ITermSequence
+    public class TermSequence : IEnumerable<ITerm>, ITerm
     {
         private static readonly IOperation _transientRoot = new ItOperation();
-        private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();       
+        private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
         public virtual IOperation RootSelector => _transientRoot;
         public ITerm Root => _sequence.First.Value;
@@ -23,11 +22,13 @@ namespace QRest.Core.Terms
 
         public void Add(ITerm term)
         {
-            if (term != null)
+            if (term is TermSequence s)
+                Add(s);
+            else if (term != null)
                 _sequence.AddLast(term);
         }
 
-        public void Add(ITermSequence terms)
+        public void Add(TermSequence terms)
         {
             foreach (var term in terms)
                 Add(term);
@@ -43,7 +44,7 @@ namespace QRest.Core.Terms
             return _sequence.GetEnumerator();
         }
 
-        public ITermSequence Clone()
+        public ITerm Clone()
         {
             return new TermSequence { Root.Clone() };
         }

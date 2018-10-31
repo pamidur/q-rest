@@ -1,6 +1,5 @@
 ﻿using QRest.Core.Contracts;
 using QRest.Core.Operations;
-using QRest.Core.Operations.Basic;
 using QRest.Core.Terms;
 using Sprache;
 using System;
@@ -35,15 +34,15 @@ namespace QRest.Semantics.MethodChain
         private readonly Dictionary<string, IOperation> _operationMap;
 
 
-        internal Parser<ITermSequence> CallChain;
+        internal Parser<TermSequence> CallChain;
         internal Parser<ITerm> Call;
-        internal Parser<List<ITermSequence>> CallArguments;
+        internal Parser<List<TermSequence>> CallArguments;
         internal Parser<MethodTerm> Lambda;
         internal Parser<MethodTerm> Method;
         internal Parser<ITerm> SubProperty;
         internal Parser<ITerm> Property;
-        internal Parser<ITermSequence> RootProperty;
-        internal Parser<ITermSequence> ChainRoot;
+        internal Parser<TermSequence> RootProperty;
+        internal Parser<TermSequence> ChainRoot;
         internal Parser<ConstantTerm> Constant;
         internal Parser<ConstantTerm> ArrayConstant;
         internal Parser<ConstantTerm> NumberConstant;
@@ -58,7 +57,7 @@ namespace QRest.Semantics.MethodChain
             _operationMap = operationMap;
         }
 
-        public Parser<ITermSequence> Build()
+        public Parser<TermSequence> Build()
         {
             MemberName = BuildMemberNameParser().Named("Member Name");
 
@@ -68,7 +67,7 @@ namespace QRest.Semantics.MethodChain
             ArrayConstant = BuildArrayConstantParser().Named("Array Constant");
             Constant = BuildConstantParser().Named("Constant");
 
-            
+
             Property = BuildPropertyParser().Named("Property");
             SubProperty = BuildSubPropertyParser().Named("SubProperty");
             RootProperty = BuildRootPropertyParser().Named("Property");
@@ -86,32 +85,32 @@ namespace QRest.Semantics.MethodChain
             return CallChain.End();
         }
 
-        internal Parser<ITermSequence> BuildChainRootParser() =>
+        internal Parser<TermSequence> BuildChainRootParser() =>
           from root in Call.Or(Constant)
           select new TermSequence() { root };
 
-        internal Parser<ITermSequence> BuildCallChainParser() =>
+        internal Parser<TermSequence> BuildCallChainParser() =>
           from root in ChainRoot.Or(RootProperty)
           from chunks in SubProperty.Or(Call).Or(Name).Many()
           select chunks.Aggregate(root, (c1, c2) => { c1.Add(c2); return c1; });
 
-        internal Parser<List<ITermSequence>> BuildCallArgumentsParser() => Read.Ref(() =>
+        internal Parser<List<TermSequence>> BuildCallArgumentsParser() => Read.Ref(() =>
             from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
-            select parameters.Where(r => r != null)?.ToList() ?? new List<ITermSequence>()
+            select parameters.Where(r => r != null)?.ToList() ?? new List<TermSequence>()
             );
 
         internal Parser<MethodTerm> BuildLambdaParser(Parser<IOperation> operationParser) =>
             from semic in LambdaIndicator
             from operation in operationParser
             from arguments in CallArguments.Optional()
-            select new MethodTerm(operation, new List<ITermSequence> { new LambdaSequence { new MethodTerm(new LambdaOperation(), arguments.GetOrDefault() ?? new List<ITermSequence>()) } });
-            
+            select new MethodTerm(operation, (arguments.GetOrDefault() ?? new List<TermSequence>()).Select(s => new LambdaSequence { s }).ToList());
+
 
         internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationParser) =>
              from semic in MethodIndicator
              from operation in operationParser
              from arguments in CallArguments.Optional()
-             select new MethodTerm(operation, arguments.GetOrDefault() ?? new List<ITermSequence>());
+             select new MethodTerm(operation, arguments.GetOrDefault() ?? new List<TermSequence>());
 
         internal Parser<IOperation> BuildOperationParsers(KeyValuePair<string, IOperation>[] operationMap)
         {
@@ -139,7 +138,7 @@ namespace QRest.Semantics.MethodChain
              from prop in Property
              select prop;
 
-        internal Parser<ITermSequence> BuildRootPropertyParser() =>
+        internal Parser<TermSequence> BuildRootPropertyParser() =>
              from prop in Property
              select new TermSequence { new MethodTerm(new ItOperation()), prop };
 
@@ -157,21 +156,21 @@ namespace QRest.Semantics.MethodChain
 
         internal Parser<ConstantTerm> BuildArrayConstantParser() => Read.Ref(() =>
             from constants in Read.Contained(Read.DelimitedBy(Constant, ArgumentDelimiter), ArrayOpenBracket, ArrayCloseBracket)
-            select new ConstantTerm { Value = constants.Where(r => r != null).Select(c => c.Value).ToArray().AsQueryable() }
+            select new ConstantTerm(constants.Where(r => r != null).Select(c => c.Value).ToArray().AsQueryable())
             );
 
         internal Parser<ConstantTerm> BuildNumberConstantParser() =>
             from strInt in Read.Digit.XAtLeastOnce().Text()
             from srtDecim in Read.Char('.').Then(c => Read.Digit.XAtLeastOnce().Text()).Optional()
-            select new ConstantTerm { Value = srtDecim.IsDefined ? ParseConstant<float>($"{strInt}.{srtDecim.GetOrDefault()}") : ParseConstant<Int32>(strInt) };
+            select new ConstantTerm(srtDecim.IsDefined ? ParseConstant<float>($"{strInt}.{srtDecim.GetOrDefault()}") : ParseConstant<Int32>(strInt));
 
         internal Parser<ConstantTerm> BuildStringConstantParser() =>
             from str in Read.Contained(Read.AnyChar.Except(StringDelimiter).Many().Text().Optional(), StringDelimiter, StringDelimiter)
-            select new ConstantTerm { Value = ParseConstant<string>(str.GetOrDefault() ?? "") };
+            select new ConstantTerm(ParseConstant<string>(str.GetOrDefault() ?? ""));
 
         internal Parser<ConstantTerm> BuildBoolConstantParser() =>
             from str in TrueConstantString.XOr(FalseConstantString).Text()
-            select new ConstantTerm { Value = ParseConstant<bool>(str) };
+            select new ConstantTerm(ParseConstant<bool>(str));
 
         protected Parser<NameTerm> BuildNameTermParser() =>
             from at in Read.Char('@')

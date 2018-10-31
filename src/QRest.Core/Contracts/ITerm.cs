@@ -4,9 +4,6 @@ namespace QRest.Core.Contracts
 {
     public interface ITerm
     {
-        IOperation Operation { get; }
-        IReadOnlyList<ITermSequence> Arguments { get; }
-
         ITerm Clone();
 
         string DebugView { get; }

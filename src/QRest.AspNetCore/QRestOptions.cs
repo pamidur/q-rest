@@ -1,4 +1,4 @@
-﻿using QRest.Compiller.Standard;
+﻿using QRest.Compiler.Standard;
 using QRest.Core.Contracts;
 using QRest.Semantics.MethodChain;
 

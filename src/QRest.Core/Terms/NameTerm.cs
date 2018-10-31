@@ -1,16 +1,17 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Operations.Basic;
 
 namespace QRest.Core.Terms
 {
-    public class NameTerm : TermBase
+    public class NameTerm : ITerm
     {
-        private readonly string _name;
-        public NameTerm(string name) => _name = name;
+        public string Name { get; }
 
-        public override IOperation Operation => new SetNameOperation(_name);
+        public NameTerm(string name) => Name = name;
 
-        public override string SharedView => $"@{_name}";
-        public override ITerm Clone() => new NameTerm(_name);
+        public string SharedView => $"@{Name}";
+        public string DebugView => SharedView;
+        public string KeyView => SharedView;
+
+        public ITerm Clone() => new NameTerm(Name);
     }
 }

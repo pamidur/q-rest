@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace QRest.Core.Containers
 {
-    internal class DynamicContainer : DynamicObject
+    public class DynamicContainer : DynamicObject
     {
         public static readonly MethodInfo ArgAddMethod = ((Action<string, object>)new Dictionary<string, object>().Add).Method;
         public static readonly Type Type = typeof(DynamicContainer);

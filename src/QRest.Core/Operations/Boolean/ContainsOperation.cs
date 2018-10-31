@@ -8,7 +8,7 @@ namespace QRest.Core.Operations.Boolean
     {
         public override bool SupportsCall => true;
 
-        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        public override Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();

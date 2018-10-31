@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using QRest.Core.Contracts;
+using QRest.Core.Terms;
 
 namespace QRest.Core
 {
@@ -7,9 +8,9 @@ namespace QRest.Core
     {
         private readonly ICompiler _compiller;
 
-        public ITermSequence Sequence { get; }
+        public TermSequence Sequence { get; }
 
-        protected QueryBase(ITermSequence sequence, ICompiler compiller)
+        protected QueryBase(TermSequence sequence, ICompiler compiller)
         {
             Sequence = sequence;
             _compiller = compiller;

@@ -17,7 +17,7 @@ namespace QRest.Core.Operations.Query
         public bool UseStaticTerminatingQuery { get; set; } = true;
 
 
-        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        public override Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             var expression = arguments.Any() ? DynamicContainer.CreateContainer(GetInitializers(arguments)) : root;
 
