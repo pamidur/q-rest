@@ -17,7 +17,7 @@ namespace QRest.Compiler.Standard
 
         public Expression<Func<TRoot, object>> Assemble<TRoot>(LambdaTerm lambda, bool finalize = true)
         {
-            var ctx = new StandardCompilerContext(finalize);
+            var ctx = new StandardAssembler(finalize);
 
             var result = ctx.Assemble(lambda, Expression.Parameter(typeof(TRoot), "r"), finalize: finalize);
             var root = result.Lambda.Parameters[0];

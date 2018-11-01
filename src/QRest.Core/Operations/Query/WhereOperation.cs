@@ -1,4 +1,5 @@
-﻿using QRest.Core.Expressions;
+﻿using QRest.Core.Contracts;
+using QRest.Core.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace QRest.Core.Operations.Query
 {
     public class WhereOperation : OperationBase
     {
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();

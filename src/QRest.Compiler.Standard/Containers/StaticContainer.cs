@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Containers
+namespace QRest.Compiler.Standard.Containers
 {
     public class StaticContainer
     {
@@ -46,10 +45,5 @@ namespace QRest.Core.Containers
             var getExp = Expression.Property(Expression.ArrayIndex(context,Expression.Constant(index)), nameof(Value.V));
             return getExp;
         }
-
-        //public static bool IsContainerType(Type type)
-        //{
-        //    return type == Type;
-        //}
     }
 }

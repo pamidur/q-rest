@@ -1,21 +1,27 @@
-﻿using QRest.Core.Containers;
+﻿using QRest.Compiler.Standard.Containers;
+using QRest.Core;
 using QRest.Core.Contracts;
 using QRest.Core.Expressions;
 using QRest.Core.Extensions;
 using QRest.Core.Terms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace QRest.Compiler.Standard
 {
-    internal class StandardCompilerContext : TermVisitor, ICompilationContext
+    public partial class StandardAssembler : TermVisitor, IAssemblerContext
     {
         private readonly bool _finalize;
+        private readonly bool _parseStrings;
+        private readonly DataStringParser _parser;
 
-        public StandardCompilerContext(bool finalize)
+        public StandardAssembler(bool finalize, bool parseStrings, DataStringParser parser)
         {
             _finalize = finalize;
+            _parseStrings = parseStrings;
+            _parser = parser;
         }
 
         public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
@@ -82,7 +88,7 @@ namespace QRest.Compiler.Standard
             var parameters = args.SelectMany(a => a.Parameters).ToArray();
             var argValues = args.Select(a => a.Expression).ToArray();
 
-            return (m.Operation.CreateExpression(root, ctx, argValues), constants, parameters);
+            return (m.Operation.CreateExpression(root, ctx, argValues, this), constants, parameters);
         }
 
         protected override
@@ -103,5 +109,55 @@ namespace QRest.Compiler.Standard
             var resultLambda = Expression.Lambda(sequence.Expression, rootarg);
             return (resultLambda, sequence.Constants, sequence.Parameters);
         }
+
+        public virtual (Expression Left, Expression Right) Convert(Expression left, Expression right)
+        {
+            var leftType = /*left.NodeType == ExpressionType.Lambda ? ((LambdaExpression)left).ReturnType : */left.Type;
+            var rightType = /*right.NodeType == ExpressionType.Lambda ? ((LambdaExpression)right).ReturnType :*/ right.Type;
+
+            if (TryConvert(right, leftType, out var newright))
+                return (left, newright);
+            else if (TryConvert(left, rightType, out var newleft))
+                return (newleft, right);
+            else
+                throw new ExpressionCreationException($"Cannot cast {leftType.Name} and {rightType.Name} either way.");
+        }
+
+        public virtual bool TryConvert(Expression expression, Type target, out Expression result)
+        {
+            if (expression.Type == target)
+            {
+                result = expression;
+                return true;
+            }
+            else if (target.IsAssignableFrom(expression.Type))
+            {
+                result = Expression.Convert(expression, target);
+                return true;
+            }
+            else if (_parseStrings && expression.Type == typeof(string))
+            {
+                var parser = _parser.GetParser(target);
+                if (parser != null)
+                {
+                    var value = (string)((ConstantExpression)expression).Value;
+
+                    try
+                    {
+                        result = Expression.Call(parser.Method, expression);
+                        return true;
+                    }
+                    catch (FormatException)
+                    {
+                        result = null;
+                        return false;
+                        //throw new ExpressionCreationException($"Cannot parse '{value}' to {target.Name}");
+                    }
+                }
+            }
+
+            result = null;
+            return false;
+        }       
     }
 }
