@@ -64,24 +64,16 @@ namespace QRest.Core.Operations.Query
 
         private Expression QueryNonDynamic(Expression last, ParameterExpression root, IReadOnlyDictionary<string, Expression> fields)
         {
-            var valuesList = fields.Select(e => e.Value).ToList();
-            var staticExpression = fields.Any() ? StaticContainer.CreateContainer(valuesList) : root;
+            var expression = fields.Any() ? DynamicContainer.CreateContainer(fields) : root;
+            var lambda = Expression.Lambda(expression, root);
 
-            var staticLambda = Expression.Lambda(staticExpression, root);
-
-            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { staticExpression.Type },
-                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { staticExpression.Type },
-                        Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, staticExpression.Type }, last, staticLambda)
+            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { expression.Type },
+                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { expression.Type },
+                        Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, expression.Type }, last, lambda)
                     )
                 );
 
-            if (!fields.Any())
-                return resultExpression;
-
-            var dynParam = Expression.Parameter(StaticContainer.ContainerType);
-            var dynamicFields = fields.ToDictionary(f => f.Key, f => StaticContainer.CreateReadProperty(dynParam, valuesList.IndexOf(f.Value)));
-
-            return QueryDynamic(resultExpression, dynParam, dynamicFields);
+            return resultExpression;
         }
 
         private string GetName(Expression arg)

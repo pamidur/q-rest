@@ -4,23 +4,42 @@ using System.Dynamic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace QRest.Core.Containers
 {
     internal class DynamicContainer : DynamicObject
     {
-        public static readonly MethodInfo ArgAddMethod = ((Action<string, object>)new Dictionary<string, object>().Add).Method;
         public static readonly Type Type = typeof(DynamicContainer);
-        public static readonly Type ArgType = typeof(Dictionary<string, object>);
 
-        public static readonly ConstructorInfo TypeCtor = typeof(DynamicContainer).GetConstructor(new[] { ArgType });
+        private readonly static Type _valueContainerType = typeof(PropertyContainer);
 
         private IDictionary<string, object> _props = new Dictionary<string, object>();
 
-        public DynamicContainer(IDictionary<string, object> initial)
+        private static readonly MethodInfo _sourceSetter = Type.GetProperty(nameof(Source), typeof(PropertyContainer[])).SetMethod;
+        private static readonly MethodInfo _nameSetter = _valueContainerType.GetProperty(nameof(PropertyContainer.N)).SetMethod;
+        private static readonly MethodInfo _valueSetter = _valueContainerType.GetProperty(nameof(PropertyContainer.V)).SetMethod;
+               
+
+        public class PropertyContainer
         {
-            _props = initial;
+            public string N { get; set; }
+            public object V { get; set; }
+        }
+
+        public DynamicContainer()
+        {
+
+        }
+
+        public PropertyContainer[] Source
+        {
+            set
+            {
+                foreach (var prop in value)
+                {
+                    _props.Add(prop.N, prop.V);
+                }
+            }
         }
 
         public override IEnumerable<string> GetDynamicMemberNames()
@@ -48,11 +67,16 @@ namespace QRest.Core.Containers
             return base.TrySetMember(binder, value);
         }
 
-
         public static Expression CreateContainer(IReadOnlyDictionary<string, Expression> properties)
         {
-            var initializers = properties.Select(p => Expression.ElementInit(ArgAddMethod, Expression.Constant(p.Key), Expression.Convert(p.Value, typeof(object))));
-            var createContainer = Expression.New(TypeCtor, Expression.ListInit(Expression.New(ArgType), initializers));
+            var initializers = new List<Expression>();
+
+            foreach (var property in properties)
+            {
+                initializers.Add(Expression.MemberInit(Expression.New(typeof(PropertyContainer)), Expression.Bind(_valueSetter, Expression.Convert(property.Value,typeof(object))), Expression.Bind(_nameSetter, Expression.Constant(property.Key))));
+            }
+
+            var createContainer = Expression.MemberInit(Expression.New(Type),Expression.Bind(_sourceSetter, Expression.NewArrayInit(_valueContainerType, initializers)));
             return createContainer;
         }
 
