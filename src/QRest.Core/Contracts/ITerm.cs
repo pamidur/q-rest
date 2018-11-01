@@ -4,7 +4,7 @@ namespace QRest.Core.Contracts
 {
     public interface ITerm
     {
-        ITerm Clone { get; }
+        ITerm Clone();
         string DebugView { get; }
         string SharedView { get; }
         string KeyView { get; }

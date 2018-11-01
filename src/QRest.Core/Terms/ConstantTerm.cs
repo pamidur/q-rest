@@ -11,6 +11,6 @@ namespace QRest.Core.Terms
         public string DebugView => SharedView;
         public string SharedView => $"'{Value.ToString()}'";
         public string KeyView => $"[{Value.GetType()}]";
-        public ITerm Clone => new ConstantTerm(Value);
+        public ITerm Clone() => new ConstantTerm(Value);
     }
 }

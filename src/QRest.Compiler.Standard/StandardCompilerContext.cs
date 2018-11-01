@@ -3,7 +3,6 @@ using QRest.Core.Contracts;
 using QRest.Core.Expressions;
 using QRest.Core.Extensions;
 using QRest.Core.Terms;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,20 +18,12 @@ namespace QRest.Compiler.Standard
             _finalize = finalize;
         }
 
-        public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants) Assemble(SequenceTerm sequence, ParameterExpression root, ParameterExpression ctx = null, bool finalize = true)
+        public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
+            Assemble(LambdaTerm sequence, ParameterExpression root, bool finalize = true)
         {
-            var args = new[] { root };
-            var ctxarg = root;
-            if (ctx != null && ctx != root)
-            {
-                ctxarg = ctx;
-                args = new[] { root, ctx };
-            }
+            var assembled = AssembleSequence(sequence, root, root);
 
-            var assembled = AssembleSequence(sequence, root, ctxarg);
-
-
-            var resultLambda = Expression.Lambda(assembled.Expression, args.Concat(assembled.Parameters));
+            var resultLambda = Expression.Lambda(assembled.Expression, new[] { root }.Concat(assembled.Parameters));
             return (resultLambda, assembled.Constants);
         }
 
@@ -53,7 +44,9 @@ namespace QRest.Compiler.Standard
             return exp;
         }
 
-        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleConstant(ConstantTerm c, Expression root, Expression ctx)
+        protected override
+            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
+            AssembleConstant(ConstantTerm c, ParameterExpression root, Expression ctx)
         {
             var constant = Expression.Constant(c.Value);
             var param = Expression.Parameter(constant.Type, "v");
@@ -61,7 +54,9 @@ namespace QRest.Compiler.Standard
             return (param, new[] { constant }, new[] { param });
         }
 
-        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleProperty(PropertyTerm p, Expression root, Expression ctx)
+        protected override
+            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
+            AssembleProperty(PropertyTerm p, ParameterExpression root, Expression ctx)
         {
             Expression exp;
 
@@ -77,7 +72,9 @@ namespace QRest.Compiler.Standard
             return (exp, null, null);
         }
 
-        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleMethod(MethodTerm m, Expression root, Expression ctx)
+        protected override
+            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
+            AssembleMethod(MethodTerm m, ParameterExpression root, Expression ctx)
         {
             var args = m.Arguments.Select(a => AssembleTerm(a, root, ctx)).ToArray();
 
@@ -85,17 +82,26 @@ namespace QRest.Compiler.Standard
             var parameters = args.SelectMany(a => a.Parameters).ToArray();
             var argValues = args.Select(a => a.Expression).ToArray();
 
-            return (m.Operation.CreateCallExpression(root, ctx, argValues), constants, parameters);
+            return (m.Operation.CreateExpression(root, ctx, argValues), constants, parameters);
         }
 
-        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleName(NameTerm n, Expression root, Expression ctx)
+        protected override
+            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
+            AssembleName(NameTerm n, ParameterExpression root, Expression ctx)
         {
             return (new NamedExpression(ctx, n.Name), null, null);
         }
 
-        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleLambda(LambdaTerm l, Expression root, Expression ctx)
+        protected override
+            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
+            AssembleLambda(LambdaTerm l, ParameterExpression root, Expression ctx)
         {
-            throw new NotImplementedException();
+            var rootarg = l.RootProvider.GetRoot(root, ctx);
+
+            var sequence = base.AssembleSequence(l, rootarg, rootarg);
+
+            var resultLambda = Expression.Lambda(sequence.Expression, rootarg);
+            return (resultLambda, sequence.Constants, sequence.Parameters);
         }
     }
 }

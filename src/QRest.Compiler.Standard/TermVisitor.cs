@@ -8,7 +8,7 @@ namespace QRest.Compiler.Standard
 {
     public abstract class TermVisitor
     {
-        protected virtual (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleTerm(ITerm term, Expression root, Expression ctx)
+        protected virtual (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleTerm(ITerm term, ParameterExpression root, Expression ctx)
         {
             var constants = new List<ConstantExpression>();
             var parameters = new List<ParameterExpression>();
@@ -35,7 +35,9 @@ namespace QRest.Compiler.Standard
                 case SequenceTerm s:
                     result = AssembleSequence(s, root, ctx);
                     break;
-                default: throw new TermTreeCompilationException($"Unknown Term type '{term.GetType().Name}'");
+                default:
+                    result = ProcessCustomTerm(term, root, ctx);
+                    break;
             }
 
             ctx = result.Expression;
@@ -47,7 +49,14 @@ namespace QRest.Compiler.Standard
             return (ctx, constants, parameters);
         }
 
-        protected virtual (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleSequence(SequenceTerm s, Expression root, Expression ctx)
+        protected virtual
+            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
+            ProcessCustomTerm(ITerm term, ParameterExpression root, Expression context)
+        {
+            throw new TermTreeCompilationException($"Unknown Term type '{term.GetType().Name}'");
+        }
+
+        protected virtual (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleSequence(SequenceTerm s, ParameterExpression root, Expression ctx)
         {
             var constants = new List<ConstantExpression>();
             var parameters = new List<ParameterExpression>();
@@ -64,10 +73,10 @@ namespace QRest.Compiler.Standard
             return (ctx, constants, parameters);
         }
 
-        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleName(NameTerm n, Expression root, Expression ctx);
-        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleLambda(LambdaTerm l, Expression root, Expression ctx);
-        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleMethod(MethodTerm m, Expression root, Expression ctx);
-        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleProperty(PropertyTerm p, Expression root, Expression ctx);
-        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleConstant(ConstantTerm c, Expression root, Expression ctx);
+        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleName(NameTerm n, ParameterExpression root, Expression ctx);
+        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleLambda(LambdaTerm l, ParameterExpression root, Expression ctx);
+        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleMethod(MethodTerm m, ParameterExpression root, Expression ctx);
+        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleProperty(PropertyTerm p, ParameterExpression root, Expression ctx);
+        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleConstant(ConstantTerm c, ParameterExpression root, Expression ctx);
     }
 }

@@ -8,17 +8,17 @@ namespace QRest.Core
     {
         private readonly ICompiler _compiller;
 
-        public SequenceTerm Sequence { get; }
+        public LambdaTerm Lambda { get; }
 
-        protected QueryBase(SequenceTerm sequence, ICompiler compiller)
+        protected QueryBase(LambdaTerm lambda, ICompiler compiller)
         {
-            Sequence = sequence;
+            Lambda = lambda;
             _compiller = compiller;
         }
 
         public object Apply<T>(IQueryable<T> target, bool finalize = true)
         {
-            var lambda = _compiller.Compile<IQueryable<T>>(Sequence);
+            var lambda = _compiller.Compile<IQueryable<T>>(Lambda);
             var result = lambda(target);
             return result;
         }

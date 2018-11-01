@@ -11,7 +11,7 @@ namespace QRest.AspNetCore
     [ModelBinder(typeof(QueryModelBinder))]
     public class Query : QueryBase
     {
-        public Query(SequenceTerm sequence, ICompiler compiller) : base(sequence, compiller)
+        public Query(LambdaTerm lambda, ICompiler compiller) : base(lambda, compiller)
         {
         }
     }

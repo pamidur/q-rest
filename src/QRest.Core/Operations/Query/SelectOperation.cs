@@ -10,35 +10,37 @@ namespace QRest.Core.Operations.Query
 {
     public class SelectOperation : OperationBase
     {
-        public override bool SupportsCall => true;
-        public override bool SupportsQuery => true;
 
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        {
+            return base.CreateExpression(root, context, arguments);
+        }
 
         public bool UseStaticTerminatingQuery { get; set; } = true;
 
 
-        public override Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
-        {
-            var expression = arguments.Any() ? DynamicContainer.CreateContainer(GetInitializers(arguments)) : root;
+        //public override Expression CreateExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
+        //{
+        //    var expression = arguments.Any() ? DynamicContainer.CreateContainer(GetInitializers(arguments)) : root;
 
-            var expName = GetName(context) ?? NamedExpression.DefaultObjectResultName;
-            return new NamedExpression(expression, expName);
-        }
+        //    var expName = GetName(context) ?? NamedExpression.DefaultObjectResultName;
+        //    return new NamedExpression(expression, expName);
+        //}
 
-        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
-        {
-            var queryElement = argumentsRoot.Type;
+        //public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        //{
+        //    var queryElement = argumentsRoot.Type;
 
-            var fields = GetInitializers(arguments);
+        //    var fields = GetInitializers(arguments);
 
-            var expression = DynamicContainer.IsContainerType(queryElement) || !UseStaticTerminatingQuery ?
-                QueryDynamic(context, argumentsRoot, fields) :
-                QueryNonDynamic(context, argumentsRoot, fields);
+        //    var expression = DynamicContainer.IsContainerType(queryElement) || !UseStaticTerminatingQuery ?
+        //        QueryDynamic(context, argumentsRoot, fields) :
+        //        QueryNonDynamic(context, argumentsRoot, fields);
 
-            var expName = GetName(context) ?? NamedExpression.DefaultQueryResultName;
-            return new NamedExpression(expression, expName);
+        //    var expName = GetName(context) ?? NamedExpression.DefaultQueryResultName;
+        //    return new NamedExpression(expression, expName);
 
-        }
+        //}
 
         public IReadOnlyDictionary<string, Expression> GetInitializers(IReadOnlyList<Expression> arguments)
         {

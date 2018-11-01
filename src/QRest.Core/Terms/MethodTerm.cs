@@ -28,6 +28,6 @@ namespace QRest.Core.Terms
         public string DebugView => GetView(t => t.DebugView);
         public string KeyView => GetView(t => t.KeyView);
 
-        public ITerm Clone => new MethodTerm(Operation, Arguments.Select(a => (SequenceTerm)a.Clone).ToList());
+        public ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => (SequenceTerm)a.Clone()).ToList());
     }
 }

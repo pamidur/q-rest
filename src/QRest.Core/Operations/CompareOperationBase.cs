@@ -4,10 +4,8 @@ using System.Linq.Expressions;
 namespace QRest.Core.Operations
 {
     public abstract class CompareOperationBase : OperationBase
-    {
-        public override bool SupportsCall => true;        
-
-        public override Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
+    {    
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();

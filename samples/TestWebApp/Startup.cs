@@ -28,6 +28,7 @@ namespace TestWebApp
             services
                 .AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
+                ;
                 //.AddQRestOptions(qrest => qrest.Semantics = new ODataSemantics())
                 
                 //.AddQRestOptions(qrest => qrest.Semantics = new MethodChainSemantics

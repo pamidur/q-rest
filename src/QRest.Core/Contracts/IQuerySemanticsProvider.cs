@@ -4,6 +4,6 @@ namespace QRest.Core.Contracts
 {
     public interface IQuerySemanticsProvider
     {
-        SequenceTerm Parse(IRequestModel model);
+        LambdaTerm Parse(IRequestModel model);
     }
 }

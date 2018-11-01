@@ -1,5 +1,6 @@
 ﻿using QRest.Core.Contracts;
 using QRest.Core.Operations;
+using QRest.Core.RootProviders;
 using QRest.Core.Terms;
 using Sprache;
 using System;
@@ -31,10 +32,10 @@ namespace QRest.Semantics.MethodChain
 
 
         private readonly DefferedConstantParsing _defferedParsing;
-        private readonly Dictionary<string, IOperation> _operationMap;
-
-
+        private readonly Dictionary<string, IOperation> _callMap;
+        private readonly Dictionary<string, IOperation> _queryMap;
         internal Parser<SequenceTerm> CallChain;
+        internal Parser<LambdaTerm> TopLambda;
         internal Parser<ITerm> Call;
         internal Parser<List<SequenceTerm>> CallArguments;
         internal Parser<MethodTerm> Lambda;
@@ -51,13 +52,14 @@ namespace QRest.Semantics.MethodChain
         internal Parser<NameTerm> Name;
         internal Parser<string> MemberName;
 
-        public MethodChainParserBuilder(DefferedConstantParsing defferedParsing, Dictionary<string, IOperation> operationMap)
+        public MethodChainParserBuilder(DefferedConstantParsing defferedParsing, Dictionary<string, IOperation> callMap, Dictionary<string, IOperation> queryMap)
         {
             _defferedParsing = defferedParsing;
-            _operationMap = operationMap;
+            _callMap = callMap;
+            _queryMap = queryMap;
         }
 
-        public Parser<SequenceTerm> Build()
+        public Parser<LambdaTerm> Build()
         {
             MemberName = BuildMemberNameParser().Named("Member Name");
 
@@ -72,8 +74,8 @@ namespace QRest.Semantics.MethodChain
             SubProperty = BuildSubPropertyParser().Named("SubProperty");
             RootProperty = BuildRootPropertyParser().Named("Property");
 
-            Method = BuildMethodParser(BuildOperationParsers(_operationMap.Where(m => m.Value.SupportsCall).ToArray())).Named("Method Call");
-            Lambda = BuildLambdaParser(BuildOperationParsers(_operationMap.Where(m => m.Value.SupportsQuery).ToArray())).Named("Query Call");
+            Method = BuildMethodParser(BuildOperationParsers(_callMap.ToArray())).Named("Method Call");
+            Lambda = BuildLambdaParser(BuildOperationParsers(_queryMap.ToArray())).Named("Query Call");
             Call = Lambda.XOr(Method).Named("Call");
 
             Name = BuildNameTermParser().Named("Name");
@@ -82,8 +84,14 @@ namespace QRest.Semantics.MethodChain
             CallArguments = BuildCallArgumentsParser().Named("Call Arguments");
             CallChain = BuildCallChainParser().Named("Expression");
 
-            return CallChain.End();
+            TopLambda = BuildTopLambdaParser().Named("Lambda");
+
+            return TopLambda.End();
         }
+
+        internal Parser<LambdaTerm> BuildTopLambdaParser() =>
+          from seq in CallChain
+          select new LambdaTerm(BuiltInRootProviders.Root) { seq };
 
         internal Parser<SequenceTerm> BuildChainRootParser() =>
           from root in Call.Or(Constant)
@@ -103,7 +111,7 @@ namespace QRest.Semantics.MethodChain
             from semic in LambdaIndicator
             from operation in operationParser
             from arguments in CallArguments.Optional()
-            select new MethodTerm(operation, (arguments.GetOrDefault() ?? new List<SequenceTerm>()).Select(s => new LambdaTerm { s }).ToList());
+            select new MethodTerm(operation, (arguments.GetOrDefault() ?? new List<SequenceTerm>()).Select(s => new LambdaTerm (BuiltInRootProviders.ContextElement) { s }).ToList());
 
 
         internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationParser) =>

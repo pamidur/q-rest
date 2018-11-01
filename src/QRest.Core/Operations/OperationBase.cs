@@ -16,15 +16,14 @@ namespace QRest.Core.Operations
 
         public Dictionary<Type, Func<string, object>> Parsers { get; set; } = new Dictionary<Type, Func<string, object>>();
 
-        public virtual bool SupportsQuery => false;
-        public virtual bool SupportsCall => false;
-
-        public virtual Expression CreateCallExpression(Expression root, Expression context, IReadOnlyList<Expression> arguments)
+        public OperationBase()
         {
-            throw new NotSupportedException();
+            Key = GetType().Name.ToLowerInvariant().Replace("operation", "");
         }
 
-        public virtual Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public virtual string Key { get; } 
+
+        public virtual Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             throw new NotSupportedException();
         }

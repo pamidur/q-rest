@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using QRest.Core.Extensions;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Selectors
 {
-    public class ItOperation : OperationBase
+    public class ContextOperation : OperationBase
     {
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
-            return root;
+            return context;
         }
     }
 }

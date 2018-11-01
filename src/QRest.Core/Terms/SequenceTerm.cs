@@ -42,7 +42,7 @@ namespace QRest.Core.Terms
             return _sequence.GetEnumerator();
         }
 
-        public virtual ITerm Clone => new SequenceTerm { Root.Clone };
+        public virtual ITerm Clone() => new SequenceTerm { Root.Clone() };
 
         public override string ToString() => SharedView;
     }

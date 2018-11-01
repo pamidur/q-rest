@@ -9,15 +9,13 @@ namespace QRest.Core.Operations.Query
 {
     public class OrderOperation : OperationBase
     {
-        public override bool SupportsQuery => true;
-
-        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             var exp = context;
 
             foreach (var arg in arguments)
             {
-                var lambda = Expression.Lambda(arg, argumentsRoot);
+                var lambda = (LambdaExpression)arg;
 
                 var reduced = arg.ReduceTo(new[] { AscendingExpression.AscendingExpressionType, DescendingExpression.DescendingExpressionType });
 
@@ -25,7 +23,7 @@ namespace QRest.Core.Operations.Query
                 if (reduced.NodeType == DescendingExpression.DescendingExpressionType)
                     method = nameof(Queryable.OrderByDescending);
 
-                exp = Expression.Call(typeof(Queryable), method, new Type[] { argumentsRoot.Type, reduced.Type }, exp, lambda);
+                exp = Expression.Call(typeof(Queryable), method, new Type[] { lambda.Parameters[0].Type, reduced.Type }, exp, lambda);
             }
 
             return new NamedExpression(exp, NamedExpression.DefaultQueryResultName);

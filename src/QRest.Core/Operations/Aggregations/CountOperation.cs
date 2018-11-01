@@ -1,4 +1,5 @@
 ﻿using QRest.Core.Expressions;
+using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,12 @@ namespace QRest.Core.Operations.Aggregations
 {
     public class CountOperation : OperationBase
     {
-        public override bool SupportsQuery => true;
-
-        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 0)
-                throw new ExpressionCreationException();            
+                throw new ExpressionCreationException();
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Count), new Type[] { argumentsRoot.Type }, context);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Count), new Type[] { context.GetQueryElementType() }, context);
 
             return new NamedExpression(exp, nameof(Queryable.Count));
         }

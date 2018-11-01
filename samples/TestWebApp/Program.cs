@@ -19,6 +19,10 @@ namespace TestWebApp
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+            .ConfigureLogging(logBuilder =>
+            {
+
+            })
                 .UseStartup<Startup>()
                 .Build();
     }

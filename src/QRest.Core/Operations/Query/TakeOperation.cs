@@ -1,4 +1,5 @@
 ﻿using QRest.Core.Expressions;
+using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,7 @@ namespace QRest.Core.Operations.Query
 {
     public class TakeOperation : OperationBase
     {
-        public override bool SupportsQuery => true;
-
-        public override Expression CreateQueryExpression(Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
@@ -18,7 +17,7 @@ namespace QRest.Core.Operations.Query
             if(!TryCast(arguments[0],typeof(Int32),out var argument))
                 throw new ExpressionCreationException($"Cannot cast {arguments[0].Type} to Int32");
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Take), new Type[] { argumentsRoot.Type }, context, argument);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Take), new Type[] { context.GetQueryElementType() }, context, argument);
 
             return new NamedExpression(exp, NamedExpression.DefaultQueryResultName);
         }
