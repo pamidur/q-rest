@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Contracts
@@ -7,5 +8,6 @@ namespace QRest.Core.Contracts
     {
         (Expression Left, Expression Right) Convert(Expression left, Expression right);
         bool TryConvert(Expression expression, Type target, out Expression result);
+        LambdaExpression CreateContainer(ParameterExpression root, IReadOnlyDictionary<string, Expression> fields);
     }
 }

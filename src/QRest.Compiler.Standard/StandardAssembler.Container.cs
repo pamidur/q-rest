@@ -1,7 +1,5 @@
-﻿using QRest.Compiler.Standard.Containers;
-using QRest.Core;
+﻿using QRest.Core;
 using QRest.Core.Expressions;
-using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
@@ -25,34 +23,10 @@ namespace QRest.Compiler.Standard
             return fields;
         }
 
-        private Expression QueryDynamic(Expression last, ParameterExpression root, IReadOnlyDictionary<string, Expression> fields)
+        public LambdaExpression CreateContainer(ParameterExpression root, IReadOnlyDictionary<string, Expression> fields)
         {
-            var expression = fields.Any() ? DynamicContainer.CreateContainer(fields) : root;
-            var lambda = Expression.Lambda(expression, root);
-
-            return Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, expression.Type }, last, lambda);
-        }
-
-        private Expression QueryNonDynamic(Expression last, ParameterExpression root, IReadOnlyDictionary<string, Expression> fields)
-        {
-            var valuesList = fields.Select(e => e.Value).ToList();
-            var staticExpression = fields.Any() ? StaticContainer.CreateContainer(valuesList) : root;
-
-            var staticLambda = Expression.Lambda(staticExpression, root);
-
-            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { staticExpression.Type },
-                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { staticExpression.Type },
-                        Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, staticExpression.Type }, last, staticLambda)
-                    )
-                );
-
-            if (!fields.Any())
-                return resultExpression;
-
-            var dynParam = Expression.Parameter(StaticContainer.ContainerType);
-            var dynamicFields = fields.ToDictionary(f => f.Key, f => StaticContainer.CreateReadProperty(dynParam, valuesList.IndexOf(f.Value)));
-
-            return QueryDynamic(resultExpression, dynParam, dynamicFields);
+            var lambda = Expression.Lambda(DynamicContainer.CreateContainer(fields), root);
+            return lambda;
         }
 
         private string GetName(Expression arg)
