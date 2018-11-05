@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace QRest.Compiler.Standard
 {
-    public class DataStringParser
+    public class ParseStringsToClrTypes : IStringParsingBehavior
     {
         private static readonly string _parseMethodName = "Parse";
         private static readonly Type[] _parseWithFormatSignature = new[] { typeof(string), typeof(IFormatProvider) };
@@ -38,6 +38,14 @@ namespace QRest.Compiler.Standard
             }
 
             return _parsers[type];
+        }
+
+        public Expression Parse(Expression expression, Type target)
+        {
+            var parser = GetParser(target);
+            if (parser != null)
+                return Expression.Call(parser.Method, expression);
+            return null;
         }
     }
 }

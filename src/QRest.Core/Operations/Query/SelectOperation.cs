@@ -17,14 +17,11 @@ namespace QRest.Core.Operations.Query
             var lambda = (LambdaExpression)arguments[0];
             var param = lambda.Parameters[0];
 
-            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { lambda.ReturnType },
-                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { lambda.ReturnType },
-                        Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { queryElement, lambda.ReturnType }, context, lambda)
-                    )
-                );
+            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.Select)
+                , new Type[] { queryElement, lambda.ReturnType }, context, lambda);
             
             var expName = assembler.GetName(context) ?? NamedExpression.DefaultQueryResultName;
-            return new NamedExpression(resultExpression, expName);
+            return NamedExpression.Create(resultExpression, expName);
         }
     }
 }

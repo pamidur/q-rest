@@ -11,7 +11,7 @@ namespace QRest.Core.Expressions
 
         public static readonly ExpressionType NamedExpressionType = (ExpressionType)1010;
 
-        public NamedExpression(Expression expression, string name)
+        private NamedExpression(Expression expression, string name)
         {
             Expression = expression;
             Name = name;
@@ -29,6 +29,16 @@ namespace QRest.Core.Expressions
         public override string ToString()
         {
             return $"@{Name} = {Expression.ToString()}";
+        }
+
+        public static NamedExpression Create(Expression expression, string name)
+        {
+            if(expression is NamedExpression named)
+            {
+                expression = named.Expression;
+            }
+
+            return new NamedExpression(expression, name);
         }
     }
 }

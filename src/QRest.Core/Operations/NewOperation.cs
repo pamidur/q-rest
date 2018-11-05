@@ -13,7 +13,7 @@ namespace QRest.Core.Operations
             var expression = arguments.Any() ? assembler.CreateContainer(arguments) : context;
 
             var expName = assembler.GetName(context) ?? NamedExpression.DefaultObjectResultName;
-            return new NamedExpression(expression, expName);
+            return NamedExpression.Create(expression, expName);
         }
     }
 }

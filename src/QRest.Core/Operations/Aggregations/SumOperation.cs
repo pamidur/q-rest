@@ -18,7 +18,7 @@ namespace QRest.Core.Operations.Aggregations
 
             var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Sum), new Type[] { lambda.Parameters[0].Type }, context, lambda);
 
-            return new NamedExpression(exp, nameof(Queryable.Sum));
+            return NamedExpression.Create(exp, nameof(Queryable.Sum));
         }        
     }
 }

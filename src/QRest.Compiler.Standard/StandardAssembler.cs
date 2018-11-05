@@ -12,15 +12,11 @@ namespace QRest.Compiler.Standard
 {
     public partial class StandardAssembler : TermVisitor, IAssemblerContext
     {
-        private readonly bool _finalize;
-        private readonly bool _parseStrings;
-        private readonly DataStringParser _parser;
+        private readonly StandardCompillerOptions _options;
 
-        public StandardAssembler(bool finalize, bool parseStrings, DataStringParser parser)
+        public StandardAssembler(StandardCompillerOptions options)
         {
-            _finalize = finalize;
-            _parseStrings = parseStrings;
-            _parser = parser;
+            _options = options;
         }
 
         public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
@@ -44,7 +40,7 @@ namespace QRest.Compiler.Standard
             if (exp.NodeType == NamedExpression.NamedExpressionType)
                 name = ((NamedExpression)exp).Name;
 
-            exp = new NamedExpression(Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { eType }, exp), name);
+            exp = NamedExpression.Create(Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { eType }, exp), name);
 
             return exp;
         }
@@ -87,14 +83,42 @@ namespace QRest.Compiler.Standard
             var parameters = args.SelectMany(a => a.Parameters).ToArray();
             var argValues = args.Select(a => a.Expression).ToArray();
 
-            return (m.Operation.CreateExpression(root, ctx, argValues, this), constants, parameters);
+            var exp = m.Operation.CreateExpression(root, ctx, argValues, this);
+
+            if (_options.TerminateAfterSelect)
+            {
+                if (exp is MethodCallExpression call && call.Method.Name == "Select" && call.Method.DeclaringType == typeof(Queryable))
+                {
+                    var element = call.Arguments[0].GetQueryElementType();
+                    exp = Terminate(exp, element);
+                }
+            }
+
+            return (exp, constants, parameters);
         }
 
         protected override
             (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
             AssembleName(NameTerm n, ParameterExpression root, Expression ctx)
         {
-            return (new NamedExpression(ctx, n.Name), null, null);
+            return (NamedExpression.Create(ctx, n.Name), null, null);
+        }
+
+        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleSequence(SequenceTerm s, ParameterExpression root, Expression ctx)
+        {
+            var result = base.AssembleSequence(s, root, ctx);
+
+            var exp = result.Expression;
+
+            if (_options.TerminateSequence)
+            {
+                var element = exp.GetQueryElementType();                
+
+                if (element != null)                
+                    exp = Terminate(exp, element);                
+            }
+
+            return (exp, result.Constants, result.Parameters);
         }
 
         protected override
@@ -107,6 +131,16 @@ namespace QRest.Compiler.Standard
 
             var resultLambda = Expression.Lambda(sequence.Expression, rootarg);
             return (resultLambda, sequence.Constants, sequence.Parameters);
+        }
+
+        protected Expression Terminate(Expression exp, Type element)
+        {
+            var name = GetName(exp) ?? NamedExpression.DefaultQueryResultName;
+
+            exp = NamedExpression.Create(Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { element }
+            , Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray)
+            , new[] { element }, exp)), name);
+            return exp;
         }
 
         public virtual (Expression Left, Expression Right) Convert(Expression left, Expression right)
@@ -134,29 +168,14 @@ namespace QRest.Compiler.Standard
                 result = Expression.Convert(expression, target);
                 return true;
             }
-            else if (_parseStrings && expression.Type == typeof(string))
+            else if (expression.Type == typeof(string))
             {
-                var parser = _parser.GetParser(target);
-                if (parser != null)
-                {
-                    var value = (string)((ConstantExpression)expression).Value;
-
-                    try
-                    {
-                        result = Expression.Call(parser.Method, expression);
-                        return true;
-                    }
-                    catch (FormatException)
-                    {
-                        result = null;
-                        return false;
-                        //throw new ExpressionCreationException($"Cannot parse '{value}' to {target.Name}");
-                    }
-                }
+                result = _options.StringParsing.Parse(expression, target);
+                return result != null;
             }
 
             result = null;
             return false;
-        }       
+        }
     }
 }

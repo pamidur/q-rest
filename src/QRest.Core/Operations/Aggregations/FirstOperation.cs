@@ -17,7 +17,7 @@ namespace QRest.Core.Operations.Aggregations
 
             var exp = Expression.Call(typeof(Queryable), nameof(Queryable.FirstOrDefault), new Type[] { context.GetQueryElementType() }, context);
 
-            return new NamedExpression(exp, NamedExpression.DefaultObjectResultName);
+            return NamedExpression.Create(exp, NamedExpression.DefaultObjectResultName);
         }
     }
 }

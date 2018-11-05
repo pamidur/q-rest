@@ -20,7 +20,7 @@ namespace QRest.Core.Operations.Query
 
             var exp =  Expression.Call(typeof(Queryable), nameof(Queryable.Skip), new Type[] { context.GetQueryElementType() }, context, argument);
 
-            return new NamedExpression(exp, NamedExpression.DefaultQueryResultName);
+            return NamedExpression.Create(exp, NamedExpression.DefaultQueryResultName);
         }       
     }
 }
