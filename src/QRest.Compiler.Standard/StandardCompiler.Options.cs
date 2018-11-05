@@ -1,6 +1,9 @@
-﻿namespace QRest.Compiler.Standard
+﻿using QRest.Compiler.Standard.Assembler;
+using QRest.Compiler.Standard.StringParsing;
+
+namespace QRest.Compiler.Standard
 {
-    public class StandardCompillerOptions
+    public partial class StandardCompiler : IAssemblerOptions
     {
         public bool TerminateAfterSelect { get; set; } = true;
         public bool TerminateSequence { get; set; } = true;

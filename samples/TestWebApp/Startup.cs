@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Serialization;
+using QRest.Compiler.Standard;
 using QRest.Semantics.MethodChain;
 
 namespace TestWebApp
@@ -28,14 +23,15 @@ namespace TestWebApp
             services
                 .AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
-                ;
+
                 //.AddQRestOptions(qrest => qrest.Semantics = new ODataSemantics())
-                
-                //.AddQRestOptions(qrest => qrest.Semantics = new MethodChainSemantics
-                //{
-                //    UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers,
-                //    UseStaticQueryTerminator = true
-                //})
+
+                .AddQRestOptions(qrest =>
+                {
+                    qrest.Semantics = new MethodChainSemantics { UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers };
+                    qrest.Compiler = new StandardCompiler { };
+                })
+                ;
             ;
         }
 

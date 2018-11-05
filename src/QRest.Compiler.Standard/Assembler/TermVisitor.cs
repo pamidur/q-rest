@@ -4,7 +4,7 @@ using QRest.Core.Terms;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace QRest.Compiler.Standard
+namespace QRest.Compiler.Standard.Assembler
 {
     public abstract class TermVisitor
     {

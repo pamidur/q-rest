@@ -1,4 +1,5 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Compiler.Standard.Assembler;
+using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using System;
 using System.Linq;
@@ -6,15 +7,8 @@ using System.Linq.Expressions;
 
 namespace QRest.Compiler.Standard
 {
-    public class StandardCompiler : ICompiler
+    public partial class StandardCompiler : ICompiler
     {
-        private readonly StandardCompillerOptions _options;
-
-        public StandardCompiler(StandardCompillerOptions options = null)
-        {
-            _options = options ?? new StandardCompillerOptions();
-        }
-
         public Func<TRoot, object> Compile<TRoot>(LambdaTerm sequence, bool finalize = true)
         {
             var exp = Assemble<TRoot>(sequence, finalize);
@@ -24,7 +18,7 @@ namespace QRest.Compiler.Standard
 
         public Expression<Func<TRoot, object>> Assemble<TRoot>(LambdaTerm lambda, bool finalize = true)
         {
-            var ctx = new StandardAssembler(_options);
+            var ctx = new StandardAssembler(this);
 
             var result = ctx.Assemble(lambda, Expression.Parameter(typeof(TRoot), "r"), finalize: finalize);
             var root = result.Lambda.Parameters[0];
