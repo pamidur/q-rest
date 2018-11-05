@@ -8,6 +8,8 @@ namespace QRest.Core.Contracts
     {
         (Expression Left, Expression Right) Convert(Expression left, Expression right);
         bool TryConvert(Expression expression, Type target, out Expression result);
-        LambdaExpression CreateContainer(ParameterExpression root, IReadOnlyDictionary<string, Expression> fields);
+        Expression CreateContainer(IReadOnlyList<Expression> arguments);
+        Expression CreateContainer(IReadOnlyDictionary<string, Expression> properties);
+        string GetName(Expression arg);
     }
 }

@@ -1,3 +1,4 @@
+using QRest.Core;
 using QRest.Core.Operations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
@@ -14,11 +15,11 @@ namespace QRest.Compiler.Standard.Tests
         public int IntProperty { get; set; }
     }
 
-    public class CompilationTests
+    public class BasicCompilationTests
     {
         private readonly StandardCompiler _compiler;
 
-        public CompilationTests()
+        public BasicCompilationTests()
         {
             _compiler = new StandardCompiler();
         }
@@ -26,7 +27,7 @@ namespace QRest.Compiler.Standard.Tests
         [Fact]
         public void Can_Compile_Simple_Method()
         {
-            var seq = new LambdaTerm(BuiltInRootProviders.Root) {
+            var seq = new LambdaTerm(BuiltIn.Roots.OriginalRoot) {
                 new MethodTerm(
                     new EqualOperation(),
                     new[] {
@@ -43,11 +44,11 @@ namespace QRest.Compiler.Standard.Tests
         [Fact]
         public void Can_Compile_Lambda()
         {
-            var seq = new LambdaTerm(BuiltInRootProviders.Root) {
+            var seq = new LambdaTerm(BuiltIn.Roots.OriginalRoot) {
                 new MethodTerm(
                     new WhereOperation(),
                     new[] {
-                        new LambdaTerm(BuiltInRootProviders.ContextElement) {
+                        new LambdaTerm(BuiltIn.Roots.ContextElement) {
                             new MethodTerm(new ItOperation()),
                             new PropertyTerm(nameof(TestEntity.IntProperty)),
                             new MethodTerm(new EqualOperation(), new[]{ new SequenceTerm { new ConstantTerm(1) } })

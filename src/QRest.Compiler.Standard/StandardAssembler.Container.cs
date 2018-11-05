@@ -23,13 +23,18 @@ namespace QRest.Compiler.Standard
             return fields;
         }
 
-        public LambdaExpression CreateContainer(ParameterExpression root, IReadOnlyDictionary<string, Expression> fields)
+        public Expression CreateContainer(IReadOnlyDictionary<string, Expression> properties)
         {
-            var lambda = Expression.Lambda(DynamicContainer.CreateContainer(fields), root);
-            return lambda;
+            return DynamicContainer.CreateContainer(properties);
         }
 
-        private string GetName(Expression arg)
+        public Expression CreateContainer(IReadOnlyList<Expression> arguments)
+        {
+            var initializers = GetInitializers(arguments);
+            return CreateContainer(initializers);
+        }
+
+        public string GetName(Expression arg)
         {
             string name = null;
 

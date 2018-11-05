@@ -1,7 +1,9 @@
 ﻿using QRest.Core.Contracts;
 using QRest.Core.Expressions;
 using QRest.Core.Extensions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
@@ -12,20 +14,17 @@ namespace QRest.Core.Operations.Query
         {
             var queryElement = context.GetQueryElementType();
 
-            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { staticExpression.Type },
-                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { staticExpression.Type },
-                        Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { root.Type, staticExpression.Type }, last, staticLambda)
+            var lambda = (LambdaExpression)arguments[0];
+            var param = lambda.Parameters[0];
+
+            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { lambda.ReturnType },
+                    Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { lambda.ReturnType },
+                        Expression.Call(typeof(Queryable), nameof(Queryable.Select), new Type[] { queryElement, lambda.ReturnType }, context, lambda)
                     )
                 );
-
-            var fields = GetInitializers(arguments);
-
-            var expression = DynamicContainer.IsContainerType(queryElement) || !UseStaticTerminatingQuery ?
-                QueryDynamic(context, argumentsRoot, fields) :
-                QueryNonDynamic(context, argumentsRoot, fields);
-
-            var expName = GetName(context) ?? NamedExpression.DefaultQueryResultName;
-            return new NamedExpression(expression, expName);
+            
+            var expName = assembler.GetName(context) ?? NamedExpression.DefaultQueryResultName;
+            return new NamedExpression(resultExpression, expName);
         }
     }
 }
