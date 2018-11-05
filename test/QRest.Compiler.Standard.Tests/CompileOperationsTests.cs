@@ -1,4 +1,5 @@
 ﻿using QRest.Core;
+using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using System;
 using System.Dynamic;
@@ -31,15 +32,15 @@ namespace QRest.Compiler.Standard.Tests
         [Fact(DisplayName = "Can compile NEW Operation")]
         public void New()
         {
-            var tree = new LambdaTerm(BuiltIn.Roots.OriginalRoot)
+            var tree = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new[]
             {
-                new MethodTerm(BuiltIn.Operations.New,new[]
+                new MethodTerm(BuiltIn.Operations.New,new []
                 {
-                    new SequenceTerm { new PropertyTerm(nameof(CompileTestClass.IntProperty))},
-                    new SequenceTerm { new PropertyTerm(nameof(CompileTestClass.StringProperty))},
-                    new SequenceTerm { new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName")},
+                    new PropertyTerm(nameof(CompileTestClass.IntProperty)).AsSequence(),
+                    new PropertyTerm(nameof(CompileTestClass.StringProperty)).AsSequence(),
+                    new ITerm[]{ new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName")}.AsSequence(),
                 })
-            };
+            });
 
             var data = new CompileTestClass { IntProperty = 1, StringProperty = "MyText", DateTimeProperty = DateTime.Now };
             var compiled = _compiler.Compile<CompileTestClass>(tree);
@@ -55,19 +56,19 @@ namespace QRest.Compiler.Standard.Tests
         [Fact(DisplayName = "Can compile SELECT Operation")]
         public void Select()
         {
-            var tree = new LambdaTerm(BuiltIn.Roots.OriginalRoot)
+            var tree = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new[]
             {
                 new MethodTerm(BuiltIn.Operations.Select, new[]{
-                    new LambdaTerm(BuiltIn.Roots.ContextElement){
+                    new LambdaTerm(BuiltIn.Roots.ContextElement,new[]{
                         new MethodTerm(BuiltIn.Operations.New,new[]
                         {
-                            new SequenceTerm { new PropertyTerm(nameof(CompileTestClass.IntProperty))},
-                            new SequenceTerm { new PropertyTerm(nameof(CompileTestClass.StringProperty))},
-                            new SequenceTerm { new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName")},
+                            new PropertyTerm(nameof(CompileTestClass.IntProperty)).AsSequence(),
+                            new PropertyTerm(nameof(CompileTestClass.StringProperty)).AsSequence(),
+                            new ITerm[]{ new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName")}.AsSequence(),
                         })
-                    }
+                    })
                 })
-            };
+            });
 
             var data = new[]
             {

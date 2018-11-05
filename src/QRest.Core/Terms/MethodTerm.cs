@@ -1,5 +1,4 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +20,7 @@ namespace QRest.Core.Terms
         {
             var args = string.Join(",", Arguments.Select(viewSelector));
             var argsLiteral = args.Length > 0 ? $"({args})" : "";
-            return $"-{Operation.GetName()}{argsLiteral}";
+            return $"-{Operation.Key}{argsLiteral}";
         }
 
         public string SharedView => GetView(t => t.SharedView);

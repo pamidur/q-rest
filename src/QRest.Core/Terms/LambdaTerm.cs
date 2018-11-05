@@ -1,4 +1,5 @@
 ﻿using QRest.Core.Contracts;
+using System.Collections.Generic;
 
 namespace QRest.Core.Terms
 {
@@ -6,11 +7,12 @@ namespace QRest.Core.Terms
     {
         public IRootProvider RootProvider { get; }
 
-        public LambdaTerm(IRootProvider rootProvider) => RootProvider = rootProvider;
+        public LambdaTerm(IRootProvider rootProvider, IReadOnlyList<ITerm> terms) : base(terms) => RootProvider = rootProvider;
+        public LambdaTerm(IRootProvider rootProvider, SequenceTerm sequence) : base(sequence) => RootProvider = rootProvider;
 
         public override string DebugView => $"|{RootProvider.Key}>{base.DebugView}";
         public override string KeyView => $"|{RootProvider.Key}>{base.KeyView}";
         public override string SharedView => $"|{RootProvider.Key}>{base.SharedView}";
-        public override ITerm Clone() => new LambdaTerm(RootProvider) { Root.Clone() };
+        public override ITerm Clone() => new LambdaTerm(RootProvider, base.Clone().AsSequence());
     }
 }
