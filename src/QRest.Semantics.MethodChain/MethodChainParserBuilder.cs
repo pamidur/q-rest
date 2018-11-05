@@ -1,6 +1,6 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core;
+using QRest.Core.Contracts;
 using QRest.Core.Operations;
-using QRest.Core.RootProviders;
 using QRest.Core.Terms;
 using Sprache;
 using System;
@@ -32,8 +32,8 @@ namespace QRest.Semantics.MethodChain
 
 
         private readonly DefferedConstantParsing _defferedParsing;
-        private readonly Dictionary<string, IOperation> _callMap;
-        private readonly Dictionary<string, IOperation> _queryMap;
+        private readonly Dictionary<string, Func<SequenceTerm[], MethodTerm>> _callMap;
+        private readonly Dictionary<string, Func<SequenceTerm[], MethodTerm>> _queryMap;
         internal Parser<SequenceTerm> CallChain;
         internal Parser<LambdaTerm> TopLambda;
         internal Parser<ITerm> Call;
@@ -43,7 +43,7 @@ namespace QRest.Semantics.MethodChain
         internal Parser<ITerm> SubProperty;
         internal Parser<ITerm> Property;
         internal Parser<SequenceTerm> RootProperty;
-        internal Parser<SequenceTerm> ChainRoot;
+        internal Parser<ITerm> ChainRoot;
         internal Parser<ConstantTerm> Constant;
         internal Parser<ConstantTerm> ArrayConstant;
         internal Parser<ConstantTerm> NumberConstant;
@@ -52,7 +52,10 @@ namespace QRest.Semantics.MethodChain
         internal Parser<NameTerm> Name;
         internal Parser<string> MemberName;
 
-        public MethodChainParserBuilder(DefferedConstantParsing defferedParsing, Dictionary<string, IOperation> callMap, Dictionary<string, IOperation> queryMap)
+        public MethodChainParserBuilder(
+            DefferedConstantParsing defferedParsing,
+            Dictionary<string, Func<SequenceTerm[], MethodTerm>> callMap, 
+            Dictionary<string, Func<SequenceTerm[], MethodTerm>> queryMap)
         {
             _defferedParsing = defferedParsing;
             _callMap = callMap;
@@ -74,8 +77,8 @@ namespace QRest.Semantics.MethodChain
             SubProperty = BuildSubPropertyParser().Named("SubProperty");
             RootProperty = BuildRootPropertyParser().Named("Property");
 
-            Method = BuildMethodParser(BuildOperationParsers(_callMap.ToArray())).Named("Method Call");
-            Lambda = BuildLambdaParser(BuildOperationParsers(_queryMap.ToArray())).Named("Query Call");
+            Method = BuildMethodParser(BuildOperationParsers(_callMap)).Named("Method Call");
+            Lambda = BuildLambdaParser(BuildOperationParsers(_queryMap)).Named("Query Call");
             Call = Lambda.XOr(Method).Named("Call");
 
             Name = BuildNameTermParser().Named("Name");
@@ -91,54 +94,54 @@ namespace QRest.Semantics.MethodChain
 
         internal Parser<LambdaTerm> BuildTopLambdaParser() =>
           from seq in CallChain
-          select new LambdaTerm(BuiltInRootProviders.Root) { seq };
+          select new LambdaTerm(BuiltIn.Roots.OriginalRoot, seq);
 
-        internal Parser<SequenceTerm> BuildChainRootParser() =>
+        internal Parser<ITerm> BuildChainRootParser() =>
           from root in Call.Or(Constant)
-          select new SequenceTerm() { root };
+          select root.AsSequence();
 
         internal Parser<SequenceTerm> BuildCallChainParser() =>
           from root in ChainRoot.Or(RootProperty)
           from chunks in SubProperty.Or(Call).Or(Name).Many()
-          select chunks.Aggregate(root, (c1, c2) => { c1.Add(c2); return c1; });
+          select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc=> new SequenceTerm(acc));
 
         internal Parser<List<SequenceTerm>> BuildCallArgumentsParser() => Read.Ref(() =>
             from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
             select parameters.Where(r => r != null)?.ToList() ?? new List<SequenceTerm>()
             );
 
-        internal Parser<MethodTerm> BuildLambdaParser(Parser<IOperation> operationParser) =>
+        internal Parser<MethodTerm> BuildLambdaParser(Parser<Func<SequenceTerm[], MethodTerm>> operationFactoryParser) =>
             from semic in LambdaIndicator
-            from operation in operationParser
+            from operation in operationFactoryParser
             from arguments in CallArguments.Optional()
-            select new MethodTerm(operation, (arguments.GetOrDefault() ?? new List<SequenceTerm>()).Select(s => new LambdaTerm (BuiltInRootProviders.ContextElement) { s }).ToList());
+            select operation(arguments.GetOrDefault()?.ToArray() ?? new SequenceTerm[] { });
 
 
-        internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationParser) =>
+        internal Parser<MethodTerm> BuildMethodParser(Parser<Func<SequenceTerm[], MethodTerm>> operationFactoryParser) =>
              from semic in MethodIndicator
-             from operation in operationParser
+             from operation in operationFactoryParser
              from arguments in CallArguments.Optional()
-             select new MethodTerm(operation, arguments.GetOrDefault() ?? new List<SequenceTerm>());
+             select operation(arguments.GetOrDefault()?.ToArray() ?? new SequenceTerm[] { });
 
-        internal Parser<IOperation> BuildOperationParsers(KeyValuePair<string, IOperation>[] operationMap)
+        internal Parser<Func<SequenceTerm[], MethodTerm>> BuildOperationParsers(Dictionary<string, Func<SequenceTerm[], MethodTerm>> operationMap)
         {
-            if (operationMap.Length == 0)
+            if (operationMap.Count == 0)
                 throw new NotSupportedException("Must supply at least one opration.");
 
-            Parser<IOperation> parser = null;
+            Parser<Func<SequenceTerm[], MethodTerm>> parser = null;
 
             foreach (var map in operationMap)
             {
-                var next = BuildOperationParser(map.Key, map.Value).Named($"'{map.Key}'");
+                var next = BuildOperationFactory(map.Key, map.Value).Named($"'{map.Key}'");
                 parser = parser == null ? next : parser.Or(next);
             }
 
             return parser;
         }
 
-        internal Parser<IOperation> BuildOperationParser(string name, IOperation operation) =>
+        internal Parser<Func<SequenceTerm[], MethodTerm>> BuildOperationFactory(string name, Func<SequenceTerm[], MethodTerm> factory) =>
             from method in Read.String(name).Token()
-            select operation;
+            select factory;
 
 
         internal Parser<ITerm> BuildSubPropertyParser() =>
@@ -148,7 +151,7 @@ namespace QRest.Semantics.MethodChain
 
         internal Parser<SequenceTerm> BuildRootPropertyParser() =>
              from prop in Property
-             select new SequenceTerm { new MethodTerm(new ItOperation()), prop };
+             select new SequenceTerm(new[] { new MethodTerm(new ItOperation()), prop });
 
         internal Parser<ITerm> BuildPropertyParser() =>
              from name in MemberName

@@ -1,5 +1,6 @@
 ﻿using Moq;
-using QRest.Core.Operations;
+using QRest.Core.Contracts;
+using QRest.Core.Terms;
 using Sprache;
 using System;
 using System.Collections.Generic;
@@ -17,11 +18,15 @@ namespace QRest.Semantics.MethodChain.Tests
         public ParserTests()
         {
             _opration = new Mock<IOperation>();
-            _opration.Setup(m => m.SupportsCall).Returns(true);
-            _opration.Setup(m => m.SupportsQuery).Returns(true);
-            _opration.Setup(m => m.ToString()).Returns(_testUniversalOperationName);
+            _opration.Setup(m => m.Key).Returns(_testUniversalOperationName);
 
-            _parser = new MethodChainParserBuilder(DefferedConstantParsing.Disabled, new Dictionary<string, IOperation> { { _testUniversalOperationName, _opration.Object } });
+            _parser = new MethodChainParserBuilder(DefferedConstantParsing.Disabled, new Dictionary<string, Func<SequenceTerm[], MethodTerm>> {
+                { _testUniversalOperationName, s=>new MethodTerm(_opration.Object) }
+            },
+            new Dictionary<string, Func<SequenceTerm[], MethodTerm>>
+            {
+                { _testUniversalOperationName, s=>new MethodTerm(_opration.Object) }
+            });
             _parser.Build();
         }
 
@@ -88,7 +93,7 @@ namespace QRest.Semantics.MethodChain.Tests
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
-            Assert.Equal(_testUniversalOperationName, actual.Value.Operation.ToString());
+            Assert.Equal(_testUniversalOperationName, actual.Value.Operation.Key);
             Assert.Empty(actual.Value.Arguments);
         }
 
@@ -99,7 +104,7 @@ namespace QRest.Semantics.MethodChain.Tests
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
-            Assert.Equal(_testUniversalOperationName, actual.Value.Operation.ToString());
+            Assert.Equal(_testUniversalOperationName, actual.Value.Operation.Key);
             Assert.Empty(actual.Value.Arguments);
         }
     }
