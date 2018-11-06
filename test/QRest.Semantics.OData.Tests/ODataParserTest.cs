@@ -28,8 +28,8 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData(":where(-it.a-equal(-it.b))-select(:count@@odata.count,:select@value)", @"$filter = a eq b&$count=true")]
-        [InlineData(":where(-it.a-equal(-it.b))-select(:select@value)", @"$filter = a eq b&$count=false")]
+        [InlineData("-where(|ce>-it.a-equal(-it.b))-new(-count@@odata.count,-context@value)", @"$filter = a eq b&$count=true")]
+        [InlineData("-where(|ce>-it.a-equal(-it.b))-new(-context@value)", @"$filter = a eq b&$count=false")]
         public void ShouldParseCount(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -41,7 +41,7 @@ namespace QRest.OData.Tests
         public void ShouldParseEmptyString()
         {
             ITerm exp = Parse(string.Empty);
-            Assert.Equal("-select(:select@value)", exp.SharedView);
+            Assert.Equal("-new(-context@value)", exp.SharedView);
         }
 
         [Theory]

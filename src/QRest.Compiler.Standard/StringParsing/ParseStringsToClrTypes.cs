@@ -11,30 +11,29 @@ namespace QRest.Compiler.Standard.StringParsing
         private static readonly Type[] _parseWithFormatSignature = new[] { typeof(string), typeof(IFormatProvider) };
         private static readonly Type[] _parseSignature = new[] { typeof(string) };
 
-        private readonly Dictionary<Type, Func<string, object>> _parsers = new Dictionary<Type, Func<string, object>>();
+        private readonly Dictionary<Type, Func<Expression, Expression>> _parsers = new Dictionary<Type, Func<Expression, Expression>>();
 
-        public Func<string, object> GetParser(Type type)
+        public CultureInfo ParsingCulture { get; set; } = CultureInfo.InvariantCulture;
+
+        public Func<Expression, Expression> GetParser(Type type)
         {
             if (!_parsers.ContainsKey(type))
             {
                 var source = Expression.Parameter(typeof(string));
-                var format = Expression.Constant(CultureInfo.InvariantCulture, typeof(IFormatProvider));
+                var format = Expression.Constant(ParsingCulture, typeof(IFormatProvider));
 
-                Expression[] parameters;
+                Func<Expression,Expression[]> parameters;
 
                 var method = type.GetMethod(_parseMethodName, _parseWithFormatSignature);
-                if (method != null) parameters = new Expression[] { source, format };
+                if (method != null) parameters = e => new Expression[] { e, format };
                 else
                 {
                     method = type.GetMethod(_parseMethodName, _parseSignature);
-                    if (method != null) parameters = new Expression[] { source };
+                    if (method != null) parameters = e=> new Expression[] { e };
                     else return null;
-                }
+                } 
 
-                var call = Expression.Call(method, parameters);
-                var convert = Expression.Convert(call, typeof(object));
-                var lambda = Expression.Lambda<Func<string, object>>(convert, source);
-                _parsers[type] = lambda.Compile();
+                _parsers[type] = e => Expression.Call(method, parameters(e));
             }
 
             return _parsers[type];
@@ -44,7 +43,7 @@ namespace QRest.Compiler.Standard.StringParsing
         {
             var parser = GetParser(target);
             if (parser != null)
-                return Expression.Call(parser.Method, expression);
+                return parser(expression);
             return null;
         }
     }

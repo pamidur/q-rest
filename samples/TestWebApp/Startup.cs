@@ -29,7 +29,7 @@ namespace TestWebApp
                 .AddQRestOptions(qrest =>
                 {
                     qrest.Semantics = new MethodChainSemantics { UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers };
-                    qrest.Compiler = new StandardCompiler { };
+                    qrest.Compiler = new StandardCompiler {  };
                 })
                 ;
             ;

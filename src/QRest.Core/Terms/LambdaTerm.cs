@@ -8,6 +8,7 @@ namespace QRest.Core.Terms
         public IRootProvider RootProvider { get; }
 
         public LambdaTerm(IRootProvider rootProvider, IReadOnlyList<ITerm> terms) : base(terms) => RootProvider = rootProvider;
+        public LambdaTerm(IRootProvider rootProvider, params ITerm[] terms) : base(terms) => RootProvider = rootProvider;
         public LambdaTerm(IRootProvider rootProvider, SequenceTerm sequence) : base(sequence) => RootProvider = rootProvider;
 
         public override string DebugView => $"|{RootProvider.Key}>{base.DebugView}";

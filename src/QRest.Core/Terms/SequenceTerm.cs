@@ -10,6 +10,7 @@ namespace QRest.Core.Terms
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
         public SequenceTerm(IReadOnlyList<ITerm> terms) => Add(terms);
+        public SequenceTerm(params ITerm[] terms) => Add(terms);
         public SequenceTerm(SequenceTerm sequence) => Add((IEnumerable<ITerm>)sequence);
 
         public ITerm Root => _sequence.First.Value;
@@ -22,7 +23,7 @@ namespace QRest.Core.Terms
 
         protected void Add(ITerm term)
         {
-            if (term is SequenceTerm s)
+            if (!(term is LambdaTerm) && term is SequenceTerm s)
                 Add((IEnumerable<ITerm>)s);
             else if (term != null)
                 _sequence.AddLast(term);
