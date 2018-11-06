@@ -103,7 +103,7 @@ namespace QRest.Semantics.MethodChain
         internal Parser<SequenceTerm> BuildCallChainParser() =>
           from root in ChainRoot.Or(RootProperty)
           from chunks in SubProperty.Or(Call).Or(Name).Many()
-          select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc=> new SequenceTerm(acc));
+          select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc=> new SequenceTerm(acc.ToArray()));
 
         internal Parser<List<SequenceTerm>> BuildCallArgumentsParser() => Read.Ref(() =>
             from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)

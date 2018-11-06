@@ -9,7 +9,6 @@ namespace QRest.Core.Terms
     {
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
-        public SequenceTerm(IReadOnlyList<ITerm> terms) => Add(terms);
         public SequenceTerm(params ITerm[] terms) => Add(terms);
         public SequenceTerm(SequenceTerm sequence) => Add((IEnumerable<ITerm>)sequence);
 

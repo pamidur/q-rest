@@ -12,7 +12,7 @@ namespace QRest.Compiler.Standard
     {
         public bool UseCompilerCache { get; set; } = true;
         private static readonly ConstantsCollector _constantsCollector = new ConstantsCollector();
-        private static readonly Dictionary<string, LambdaExpression> _cache = new Dictionary<string, LambdaExpression>();
+        private static readonly Dictionary<string, Delegate> _cache = new Dictionary<string, Delegate>();
 
         public Func<TRoot, object> Compile<TRoot>(LambdaTerm sequence)
         {
@@ -23,29 +23,31 @@ namespace QRest.Compiler.Standard
 
         public Expression<Func<TRoot, object>> Assemble<TRoot>(LambdaTerm lambdaterm)
         {
-            LambdaExpression lambda = null;
+            Delegate compiled = null;
             IReadOnlyList<ConstantExpression> constants = null;
 
-            if (UseCompilerCache && _cache.TryGetValue(lambdaterm.KeyView, out var expression))
+            var root = Expression.Parameter(typeof(TRoot), "r");
+
+            if (UseCompilerCache && _cache.TryGetValue(lambdaterm.KeyView, out var @delegate))
             {
-                lambda = expression;
+                compiled = @delegate;
                 constants = _constantsCollector.Collect(lambdaterm);
             }
             else
             {
                 var ctx = new StandardAssembler(this);
-                (lambda, constants) = ctx.Assemble(lambdaterm, Expression.Parameter(typeof(TRoot), "r"));
+                var (lambda, consts) = ctx.Assemble(lambdaterm, root);
+
+                constants = consts;
+                compiled = lambda.Compile();
 
                 if (UseCompilerCache)
-                    _cache[lambdaterm.KeyView] = lambda;
-            }
+                    _cache[lambdaterm.KeyView] = compiled;
+            }            
 
-            var root = lambda.Parameters[0];
-
-            var deleg = lambda.Compile();
-
-            var resultInvokeParams = new[] { root }.Concat<Expression>(constants).ToArray();
-            var topLambda = Expression.Lambda<Func<TRoot, object>>(Expression.Convert(Expression.Invoke(lambda, resultInvokeParams), typeof(object)), root);
+            var resultInvokeParams = new Expression[] { root }.Concat(constants).ToArray();
+            
+            var topLambda = Expression.Lambda<Func<TRoot, object>>(Expression.Convert(Expression.Invoke(Expression.Constant(compiled), resultInvokeParams), typeof(object)), root);
 
             return topLambda;
         }

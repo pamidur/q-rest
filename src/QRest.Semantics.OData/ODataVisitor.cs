@@ -57,7 +57,7 @@ namespace QRest.OData
             var selectTerm = new MethodTerm(new NewOperation(), selectArgs);
 
             seq.Add(selectTerm);
-            return new SequenceTerm(seq);
+            return new SequenceTerm(seq.ToArray());
         }
 
         private SequenceTerm BuildSelectArgs(List<SequenceTerm> sortedLambdas)
@@ -72,7 +72,7 @@ namespace QRest.OData
 
             seq.Add(new NameTerm("value"));
 
-            return new SequenceTerm(seq);
+            return new SequenceTerm(seq.ToArray());
         }
 
         private static QueryOptionContext GetContext<T>(IEnumerable<QueryOptionContext> opts)
