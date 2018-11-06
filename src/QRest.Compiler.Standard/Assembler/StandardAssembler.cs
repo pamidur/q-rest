@@ -1,4 +1,5 @@
-﻿using QRest.Core.Expressions;
+﻿using QRest.Compiler.Standard.Expressions;
+using QRest.Core.Expressions;
 using QRest.Core.Extensions;
 using QRest.Core.Terms;
 using System;
@@ -10,6 +11,8 @@ namespace QRest.Compiler.Standard.Assembler
 {
     public partial class StandardAssembler : TermVisitor
     {
+        protected readonly bool _terminateSelects = true;
+
         private readonly IAssemblerOptions _options;
 
         public StandardAssembler(IAssemblerOptions options)
@@ -18,7 +21,7 @@ namespace QRest.Compiler.Standard.Assembler
         }
 
         public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
-            Assemble(LambdaTerm sequence, ParameterExpression root, bool finalize = true)
+            Assemble(LambdaTerm sequence, ParameterExpression root)
         {
             var assembled = AssembleSequence(sequence, root, root);
 
@@ -83,14 +86,8 @@ namespace QRest.Compiler.Standard.Assembler
 
             var exp = m.Operation.CreateExpression(root, ctx, argValues, this);
 
-            if (_options.TerminateAfterSelect)
-            {
-                if (exp is MethodCallExpression call && call.Method.Name == "Select" && call.Method.DeclaringType == typeof(Queryable))
-                {
-                    var element = call.Arguments[0].GetQueryElementType();
-                    exp = Terminate(exp, element);
-                }
-            }
+            if (_terminateSelects && exp is MethodCallExpression call && call.Method.Name == "Select" && call.Method.DeclaringType == typeof(Queryable))            
+                exp = TerminationExpression.Create(exp);            
 
             return (exp, constants, parameters);
         }
@@ -108,13 +105,8 @@ namespace QRest.Compiler.Standard.Assembler
 
             var exp = result.Expression;
 
-            if (_options.TerminateSequence)
-            {
-                var element = exp.GetQueryElementType();                
-
-                if (element != null)                
-                    exp = Terminate(exp, element);                
-            }
+            if (!_options.AllowUncompletedQueries)
+                exp = TerminationExpression.Create(exp);
 
             return (exp, result.Constants, result.Parameters);
         }
@@ -129,16 +121,6 @@ namespace QRest.Compiler.Standard.Assembler
 
             var resultLambda = Expression.Lambda(sequence.Expression, rootarg);
             return (resultLambda, sequence.Constants, sequence.Parameters);
-        }
-
-        protected Expression Terminate(Expression exp, Type element)
-        {
-            var name = GetName(exp) ?? NamedExpression.DefaultQueryResultName;
-
-            exp = NamedExpression.Create(Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { element }
-            , Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray)
-            , new[] { element }, exp)), name);
-            return exp;
         }
     }
 }

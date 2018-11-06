@@ -135,5 +135,14 @@ namespace QRest.Compiler.Standard.Assembler
             result = null;
             return false;
         }
+
+        public Expression SetName(Expression expression, string name = null)
+        {
+            if(name == null)            
+                name = typeof(IQueryable).IsAssignableFrom(expression.Type) ? "Entities" : "Entity";
+            
+
+            return NamedExpression.Create(expression, name);
+        }
     }
 }

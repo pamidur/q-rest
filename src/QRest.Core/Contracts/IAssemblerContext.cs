@@ -10,6 +10,7 @@ namespace QRest.Core.Contracts
         bool TryConvert(Expression expression, Type target, out Expression result);
         Expression CreateContainer(IReadOnlyList<Expression> arguments);
         Expression CreateContainer(IReadOnlyDictionary<string, Expression> properties);
-        string GetName(Expression arg);
+        string GetName(Expression expression);
+        Expression SetName(Expression expression, string name = null);
     }
 }

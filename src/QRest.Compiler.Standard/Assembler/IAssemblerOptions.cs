@@ -4,8 +4,7 @@ namespace QRest.Compiler.Standard.Assembler
 {
     public interface IAssemblerOptions
     {
-        bool TerminateAfterSelect { get; set; }
-        bool TerminateSequence { get; set; }
+        bool AllowUncompletedQueries { get; set; }
         IStringParsingBehavior StringParsing { get; set; }
     }
 }

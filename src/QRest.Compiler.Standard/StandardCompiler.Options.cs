@@ -5,8 +5,7 @@ namespace QRest.Compiler.Standard
 {
     public partial class StandardCompiler : IAssemblerOptions
     {
-        public bool TerminateAfterSelect { get; set; } = true;
-        public bool TerminateSequence { get; set; } = true;
+        public bool AllowUncompletedQueries { get; set; } = false;
         public IStringParsingBehavior StringParsing { get; set; } = new ParseStringsToClrTypes();
     }
 }

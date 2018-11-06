@@ -35,7 +35,7 @@ namespace QRest.Compiler.Standard.Tests
                     })
             });
 
-            var result = _compiler.Assemble<string>(seq, false);
+            var result = _compiler.Assemble<string>(seq);
             var compiled = result.Compile();
 
             Assert.True((bool)compiled("Ololo"));
@@ -56,7 +56,7 @@ namespace QRest.Compiler.Standard.Tests
                     })
             });
 
-            var result = _compiler.Assemble<IQueryable<TestEntity>>(seq, false);
+            var result = _compiler.Assemble<IQueryable<TestEntity>>(seq);
             var compiled = result.Compile();
 
             var executed = (IQueryable<TestEntity>)compiled(new List<TestEntity> { new TestEntity { IntProperty = 1 }, new TestEntity { IntProperty = 2 } }.AsQueryable());
