@@ -1,20 +1,24 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Expressions;
-using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class NameTerm : TermBase
+    public class NameTerm : ITerm
     {
-        public string Name { get; set; }
+        public string Name { get; }
 
-        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
+        public NameTerm(string name)
         {
-            return new NamedExpression(prev, Name);
+            Name = name;
+
+            SharedView = $"@{Name}";
+            DebugView = SharedView;
+            KeyView = SharedView;
         }
 
-        public override string SharedView => $"@{Name}";
+        public string SharedView { get; }
+        public string DebugView { get; }
+        public string KeyView { get; }
 
-        public override ITerm Clone() => new NameTerm { Name = Name };
+        public ITerm Clone() => new NameTerm(Name);
     }
 }

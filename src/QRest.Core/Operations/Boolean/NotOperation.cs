@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using QRest.Core.Contracts;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Boolean
 {
     public class NotOperation : OperationBase
     {
-        public override bool SupportsCall => true;
+        public override string Key { get; } = "not";
 
-        public override Expression CreateCallExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 0)
                 throw new ExpressionCreationException();

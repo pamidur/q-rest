@@ -8,9 +8,9 @@ namespace QRest.OData.Tests
     public class ODataParserTest
     {
         [Theory]
-        [InlineData(":where(-it.param1-equal('L72'))-select(:select@value)", @"$filter =   param1 eq 'L72'")]
-        [InlineData(":where('L72'-equal(-it.param1))-select(:select@value)", @"$filter =  'L72' eq param1 ")]
-        [InlineData(":where(-every(-it.param1-equal('L72'),-oneof(-it.param2-equal('qwerty'),-it.param3-equal('asdf'))))-select(:select@value)",
+        [InlineData("-where(|ce>-it.param1-eq('L72'))-new(-ctx@value)", @"$filter =   param1 eq 'L72'")]
+        [InlineData("-where(|ce>'L72'-eq(-it.param1))-new(-ctx@value)", @"$filter =  'L72' eq param1 ")]
+        [InlineData("-where(|ce>-every(-it.param1-eq('L72'),-oneof(-it.param2-eq('qwerty'),-it.param3-eq('asdf'))))-new(-ctx@value)",
             @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ")]
         public void ShouldParseFilterQueryOption(string expected, string input)
         {
@@ -23,13 +23,13 @@ namespace QRest.OData.Tests
         {
             var input = @"$filter = not contains(param,'b')";
             ITerm exp = Parse(input);
-            Assert.Equal(":where(-it.param-contains('b')-not)-select(:select@value)", exp.SharedView);
+            Assert.Equal("-where(|ce>-it.param-contains('b')-not)-new(-ctx@value)", exp.SharedView);
 
         }
 
         [Theory]
-        [InlineData(":where(-it.a-equal(-it.b))-select(:count@@odata.count,:select@value)", @"$filter = a eq b&$count=true")]
-        [InlineData(":where(-it.a-equal(-it.b))-select(:select@value)", @"$filter = a eq b&$count=false")]
+        [InlineData("-where(|ce>-it.a-eq(-it.b))-new(-count@@odata.count,-ctx@value)", @"$filter = a eq b&$count=true")]
+        [InlineData("-where(|ce>-it.a-eq(-it.b))-new(-ctx@value)", @"$filter = a eq b&$count=false")]
         public void ShouldParseCount(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -41,12 +41,12 @@ namespace QRest.OData.Tests
         public void ShouldParseEmptyString()
         {
             ITerm exp = Parse(string.Empty);
-            Assert.Equal("-select(:select@value)", exp.SharedView);
+            Assert.Equal("-new(-ctx@value)", exp.SharedView);
         }
 
         [Theory]
-        [InlineData(":where(-it.a-equal(-it.b))-select(:select(-it.f1,-it.f2)@value)", @"$filter = a eq b&$count=false&$select=f1,f2")]
-        [InlineData(":where(-it.a-equal(-it.b))-select(:count@@odata.count,:select(-it.f1,-it.f2)@value)", @"$filter = a eq b&$count=true&$select=f1,f2")]
+        [InlineData("-where(|ce>-it.a-eq(-it.b))-new(-select(|ce>-new(-it.f1,-it.f2))@value)", @"$filter = a eq b&$count=false&$select=f1,f2")]
+        [InlineData("-where(|ce>-it.a-eq(-it.b))-new(-count@@odata.count,-select(|ce>-new(-it.f1,-it.f2))@value)", @"$filter = a eq b&$count=true&$select=f1,f2")]
         public void ShouldParseSelect(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -54,18 +54,18 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("-select(:skip('1'):take('1'):select(-it.f1,-it.f2)@value)", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
+        [InlineData("-new(-skip('1')-take('1')-select(|ce>-new(-it.f1,-it.f2))@value)", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
         public void ShouldParseTopSkip(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.ToString());
+            Assert.Equal(expected, exp.SharedView);
         }
 
 
         [Theory]
-        [InlineData("-select(:order(-it.f1-ascending,-it.f2-ascending)@value)", @"$orderby=f1,f2")]
-        [InlineData("-select(:order(-it.f1-ascending,-it.f2-descending)@value)", @"$orderby=f1 asc,f2 desc" )]
-        [InlineData("-select(:count@@odata.count,:order(-it.f1-ascending,-it.f2-descending)@value)", @"$orderby=f1 asc,f2 desc&$count=true")]
+        [InlineData("-new(-order(|ce>-it.f1-ctx,|ce>-it.f2-ctx)@value)", @"$orderby=f1,f2")]
+        [InlineData("-new(-order(|ce>-it.f1-ctx,|ce>-it.f2-!rev)@value)", @"$orderby=f1 asc,f2 desc" )]
+        [InlineData("-new(-count@@odata.count,-order(|ce>-it.f1-ctx,|ce>-it.f2-!rev)@value)", @"$orderby=f1 asc,f2 desc&$count=true")]
         public void ShouldParseOrderBy(string expected, string input)
         {
             ITerm exp = Parse(input);

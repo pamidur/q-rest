@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using QRest.Compiller.Standard;
+using QRest.Compiler.Standard;
 using QRest.Core;
 using QRest.Core.Contracts;
 using QRest.Core.Operations;
@@ -83,7 +83,7 @@ namespace TestApp
             //:where(Sub.Text-eq(`SubText`))
             //:where(`SubText`-eq(-it.Sub.Text)
 
-
+            
 
             //tree = new LambdaTerm
             //{

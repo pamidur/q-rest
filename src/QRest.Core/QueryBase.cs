@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using QRest.Core.Contracts;
+using QRest.Core.Terms;
 
 namespace QRest.Core
 {
@@ -7,17 +8,17 @@ namespace QRest.Core
     {
         private readonly ICompiler _compiller;
 
-        public ITermSequence Sequence { get; }
+        public LambdaTerm Lambda { get; }
 
-        protected QueryBase(ITermSequence sequence, ICompiler compiller)
+        protected QueryBase(LambdaTerm lambda, ICompiler compiller)
         {
-            Sequence = sequence;
+            Lambda = lambda;
             _compiller = compiller;
         }
 
         public object Apply<T>(IQueryable<T> target, bool finalize = true)
         {
-            var lambda = _compiller.Compile<IQueryable<T>>(Sequence);
+            var lambda = _compiller.Compile<IQueryable<T>>(Lambda);
             var result = lambda(target);
             return result;
         }

@@ -1,4 +1,5 @@
-﻿using QRest.Core.Expressions;
+﻿using QRest.Core.Contracts;
+using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +9,16 @@ namespace QRest.Core.Operations.Aggregations
 {
     public class FirstOperation : OperationBase
     {
-        public override bool SupportsQuery => true;
+        public override string Key { get; } = "first";
 
-        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 0)
                 throw new ExpressionCreationException();
 
-            var exp =  Expression.Call(typeof(Queryable), nameof(Queryable.FirstOrDefault), new Type[] { argumentsRoot.Type }, context);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.FirstOrDefault), new Type[] { context.GetQueryElementType() }, context);
 
-            return new NamedExpression(exp, NamedExpression.DefaultObjectResultName);
+            return assembler.SetName(exp);
         }
     }
 }

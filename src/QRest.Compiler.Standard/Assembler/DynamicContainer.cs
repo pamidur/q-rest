@@ -4,7 +4,7 @@ using System.Dynamic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace QRest.Core.Containers
+namespace QRest.Compiler.Standard.Assembler
 {
     internal class DynamicContainer : DynamicObject
     {

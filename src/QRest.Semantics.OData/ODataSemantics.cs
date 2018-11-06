@@ -1,18 +1,16 @@
 ﻿using Antlr4.Runtime;
 using QRest.Core;
 using QRest.Core.Contracts;
+using QRest.Core.Terms;
 using QRest.OData;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace QRest.Semantics.OData
 {
-    public class ODataSemantics : IQuerySemanticsProvider
+    public class ODataSemantics : ISemantics
     {
 
-        public ITermSequence Parse(IRequestModel model)
+        public LambdaTerm Parse(IRequestModel model)
         {
             var clauses = new[] { "$filter", "$select", "$orderby", "$count", "$top", "$skip" };
 
@@ -27,9 +25,11 @@ namespace QRest.Semantics.OData
             var context = parser.parse();
 
             var vis = new ODataVisitor();
-            var exp = vis.Visit(context).AsSequence();
+            var exp = vis.Visit(context);
 
-            return exp;
+            var lambda = new LambdaTerm(BuiltIn.Roots.OriginalRoot, exp);
+
+            return lambda;
         }
     }
 }

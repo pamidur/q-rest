@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Expressions
+namespace QRest.Compiler.Standard.Expressions
 {
     public class NamedExpression : Expression
     {
-        public static readonly string DefaultQueryResultName = "Query";
-        public static readonly string DefaultObjectResultName = "Object";
-        public static readonly string DefaultValueResultName = "Value";
+        public static readonly ExpressionType NamedExpressionType = (ExpressionType)2101;
 
-        public static readonly ExpressionType NamedExpressionType = (ExpressionType)1010;
-
-        public NamedExpression(Expression expression, string name)
+        private NamedExpression(Expression expression, string name)
         {
             Expression = expression;
             Name = name;
@@ -28,7 +24,15 @@ namespace QRest.Core.Expressions
 
         public override string ToString()
         {
-            return $"@{Name} = {Expression.ToString()}";
+            return $"{Expression.ToString()}@{Name}";
+        }
+
+        public static NamedExpression Create(Expression expression, string name)
+        {
+            if(expression is NamedExpression named)            
+                expression = named.Expression;            
+
+            return new NamedExpression(expression, name);
         }
     }
 }

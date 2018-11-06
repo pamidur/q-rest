@@ -1,29 +1,26 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Extensions;
-using System;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class LambdaTerm : MethodTerm
+    public class LambdaTerm : SequenceTerm
     {
-        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
+        public IRootProvider RootProvider { get; }
+
+        public LambdaTerm(IRootProvider rootProvider, params ITerm[] terms) : base(terms)
         {
-            if (!Operation.SupportsQuery)
-                throw new ExpressionCreationException();
+            RootProvider = rootProvider;
 
-            var etype = prev.GetQueryElementType();
-
-            var argsroot = Expression.Parameter(etype, etype.Name.ToLowerInvariant());
-
-            var args = Arguments.Select(a => compiler.Assemble(a, argsroot, argsroot)).ToList();
-            var exp = Operation.CreateQueryExpression(root, prev, argsroot, args);
-
-            return exp;
+            DebugView = $"|{RootProvider.Key}>{base.DebugView}";
+            KeyView = $"|{RootProvider.Key}>{base.KeyView}";
+            SharedView = $"|{RootProvider.Key}>{base.SharedView}";
         }
 
-        protected override string GetView(Func<ITerm, string> viewSelector) => $":{ base.GetView(viewSelector).Substring(1)}";
-        public override ITerm Clone() => new LambdaTerm { Operation = Operation, Arguments = Arguments.Select(a => (ITermSequence)a.Clone()).ToList() };
+        public LambdaTerm(IRootProvider rootProvider, SequenceTerm sequence) : this(rootProvider, sequence.ToArray()) { }
+
+        public override string DebugView { get; }
+        public override string KeyView { get; }
+        public override string SharedView { get; }
+        public override ITerm Clone() => new LambdaTerm(RootProvider, base.Clone().AsSequence());
     }
 }

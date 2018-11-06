@@ -1,4 +1,4 @@
-﻿using QRest.Core.Expressions;
+﻿using QRest.Core.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,21 +8,21 @@ namespace QRest.Core.Operations.Query
 {
     public class WhereOperation : OperationBase
     {
-        public override bool SupportsQuery => true;
+        public override string Key { get; } = "where";
 
-        public override Expression CreateQueryExpression(ParameterExpression root, Expression context, ParameterExpression argumentsRoot, IReadOnlyList<Expression> arguments)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            if (arguments[0].Type != typeof(bool))
+            if (arguments[0].NodeType != ExpressionType.Lambda)
                 throw new ExpressionCreationException();
 
-            var lambda = Expression.Lambda(arguments[0], argumentsRoot);
+            var lambda = (LambdaExpression)arguments[0];
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Where), new Type[] { argumentsRoot.Type }, context, lambda);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Where), new Type[] { lambda.Parameters[0].Type }, context, lambda);
 
-            return new NamedExpression(exp, NamedExpression.DefaultQueryResultName);
-        }       
+            return assembler.SetName(exp);
+        }      
     }
 }

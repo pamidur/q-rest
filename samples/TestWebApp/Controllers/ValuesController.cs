@@ -20,8 +20,6 @@ namespace TestWebApp.Controllers
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonConverter(typeof(ObjectIdConverter))]
         public ObjectId Id { get; set; }
-
-
         public string Text { get; set; }
         public int Number { get; set; }
         public DateTime Datetime { get; set; }
@@ -73,6 +71,8 @@ namespace TestWebApp.Controllers
         [HttpGet("{query?}")]
         public ActionResult Get(Query query)
         {
+            //var r = collection.AsQueryable().OrderBy(e => e.Number).ToArray();
+
             var data = collection.AsQueryable();
             var result = query.Apply(data);          
 

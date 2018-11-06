@@ -1,4 +1,5 @@
-﻿using QRest.Core.Operations;
+﻿using QRest.Core.Contracts;
+using QRest.Core.Operations;
 using System;
 using System.Collections.Generic;
 
@@ -27,24 +28,11 @@ namespace QRest.Semantics.MethodChain
     public partial class MethodChainSemantics
     {
         /// <summary>
-        /// Configures Select() to be executed with with following ToArray(). Useful for Qury Providers that don't support dynamic return e.g. EF6, MongoDriver.
-        /// True by default
-        /// </summary>
-        public bool UseStaticQueryTerminator { get; set; } = true;
-
-        /// <summary>
         /// Allows using TypeName.Parse(string) static methods in the place of comparison operations.
-        /// Default value is <see cref="DefferedConstantParsing.Strings" />
+        /// Default value is <see cref="DefferedConstantParsing.StringsAndNumbers" />
         /// </summary>
-        public DefferedConstantParsing UseDefferedConstantParsing { get; set; } = DefferedConstantParsing.Strings;
+        public DefferedConstantParsing UseDefferedConstantParsing { get; set; } = DefferedConstantParsing.StringsAndNumbers;
 
-        public Dictionary<string, IOperation> CustomOperations { get; set; } = new Dictionary<string, IOperation>();
-
-
-        /// <summary>
-        /// Custom parsers for types without TypeName.Parse(string) method.
-        /// Requires minimum deffered setting <see cref="UseDefferedConstantParsing" />=<see cref="DefferedConstantParsing.Strings" />
-        /// </summary>
-        public Dictionary<Type, Func<string, object>> CustomConstantParsers { get; set; } = new Dictionary<Type, Func<string, object>>();
+        //public Dictionary<string, IOperation> CustomOperations { get; set; } = new Dictionary<string, IOperation>();
     }
 }

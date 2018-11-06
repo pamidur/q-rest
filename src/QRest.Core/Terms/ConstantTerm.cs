@@ -1,19 +1,23 @@
 ﻿using QRest.Core.Contracts;
-using System.Linq.Expressions;
 
 namespace QRest.Core.Terms
 {
-    public class ConstantTerm : TermBase
+    public class ConstantTerm : ITerm
     {
-        public object Value { get; set; }
+        public object Value { get; }
 
-        public override Expression CreateExpression(ICompilationContext compiler, Expression prev, ParameterExpression root)
+        public ConstantTerm(object value)
         {
-            return Expression.Constant(Value, Value.GetType());
+            Value = value;
+
+            SharedView = $"'{Value.ToString()}'";
+            KeyView = $"[{Value.GetType()}]";
+            DebugView = SharedView;
         }
 
-        public override string SharedView => $"'{Value.ToString()}'";
-        public override string KeyView => $"[{Value.GetType()}]";
-        public override ITerm Clone() => new ConstantTerm { Value = Value };
+        public string DebugView { get; }
+        public string SharedView { get; }
+        public string KeyView { get; }
+        public ITerm Clone() => new ConstantTerm(Value);
     }
 }
