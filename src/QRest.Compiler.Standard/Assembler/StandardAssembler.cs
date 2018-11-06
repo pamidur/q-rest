@@ -21,11 +21,16 @@ namespace QRest.Compiler.Standard.Assembler
         }
 
         public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
-            Assemble(LambdaTerm sequence, ParameterExpression root)
+            Assemble(LambdaTerm sequence, ParameterExpression root, Type expectedType = null)
         {
             var assembled = AssembleSequence(sequence, root, root);
 
-            var resultLambda = Expression.Lambda(assembled.Expression, new[] { root }.Concat(assembled.Parameters));
+            var expression = assembled.Expression;
+
+            if (expectedType != null)
+                expression = Expression.Convert(expression, expectedType);
+
+            var resultLambda = Expression.Lambda(expression, new[] { root }.Concat(assembled.Parameters));
             return (resultLambda, assembled.Constants);
         }
 

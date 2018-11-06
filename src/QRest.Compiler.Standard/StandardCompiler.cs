@@ -12,7 +12,7 @@ namespace QRest.Compiler.Standard
     {
         public bool UseCompilerCache { get; set; } = true;
         private static readonly ConstantsCollector _constantsCollector = new ConstantsCollector();
-        private static readonly Dictionary<string, Delegate> _cache = new Dictionary<string, Delegate>();
+        private static readonly Dictionary<string, ConstantExpression> _cache = new Dictionary<string, ConstantExpression>();
 
         public Func<TRoot, object> Compile<TRoot>(LambdaTerm sequence)
         {
@@ -23,7 +23,7 @@ namespace QRest.Compiler.Standard
 
         public Expression<Func<TRoot, object>> Assemble<TRoot>(LambdaTerm lambdaterm)
         {
-            Delegate compiled = null;
+            ConstantExpression compiled = null;
             IReadOnlyList<ConstantExpression> constants = null;
 
             var root = Expression.Parameter(typeof(TRoot), "r");
@@ -36,18 +36,18 @@ namespace QRest.Compiler.Standard
             else
             {
                 var ctx = new StandardAssembler(this);
-                var (lambda, consts) = ctx.Assemble(lambdaterm, root);
+                var (lambda, consts) = ctx.Assemble(lambdaterm, root, typeof(object));
 
                 constants = consts;
-                compiled = lambda.Compile();
+                compiled = Expression.Constant(lambda.Compile());
 
                 if (UseCompilerCache)
                     _cache[lambdaterm.KeyView] = compiled;
-            }            
+            }
 
             var resultInvokeParams = new Expression[] { root }.Concat(constants).ToArray();
-            
-            var topLambda = Expression.Lambda<Func<TRoot, object>>(Expression.Convert(Expression.Invoke(Expression.Constant(compiled), resultInvokeParams), typeof(object)), root);
+
+            var topLambda = Expression.Lambda<Func<TRoot, object>>(Expression.Invoke(compiled, resultInvokeParams), root);
 
             return topLambda;
         }
