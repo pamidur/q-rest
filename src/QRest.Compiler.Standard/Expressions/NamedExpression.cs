@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace QRest.Core.Expressions
+namespace QRest.Compiler.Standard.Expressions
 {
     public class NamedExpression : Expression
     {
-        public static readonly string DefaultQueryResultName = "Query";
-        public static readonly string DefaultObjectResultName = "Object";
-
-        public static readonly ExpressionType NamedExpressionType = (ExpressionType)1010;
+        public static readonly ExpressionType NamedExpressionType = (ExpressionType)2101;
 
         private NamedExpression(Expression expression, string name)
         {

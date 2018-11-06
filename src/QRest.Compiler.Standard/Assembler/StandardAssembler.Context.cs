@@ -1,6 +1,6 @@
-﻿using QRest.Core;
+﻿using QRest.Compiler.Standard.Expressions;
+using QRest.Core;
 using QRest.Core.Contracts;
-using QRest.Core.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;

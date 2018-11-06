@@ -19,9 +19,8 @@ namespace QRest.Core.Operations.Query
 
             var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.Select)
                 , new Type[] { queryElement, lambda.ReturnType }, context, lambda);
-            
-            var expName = assembler.GetName(context) ?? NamedExpression.DefaultQueryResultName;
-            return NamedExpression.Create(resultExpression, expName);
+
+            return assembler.SetName(resultExpression, assembler.GetName(context));
         }
     }
 }

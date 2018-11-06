@@ -34,23 +34,6 @@ namespace QRest.Compiler.Standard.Assembler
             return (resultLambda, assembled.Constants);
         }
 
-        protected virtual Expression Finalize(Expression exp)
-        {
-            var eType = exp.GetQueryElementType();
-
-            if (eType == null)
-                return exp;
-
-            var name = NamedExpression.DefaultQueryResultName;
-
-            if (exp.NodeType == NamedExpression.NamedExpressionType)
-                name = ((NamedExpression)exp).Name;
-
-            exp = NamedExpression.Create(Expression.Call(typeof(Enumerable), nameof(Enumerable.ToArray), new[] { eType }, exp), name);
-
-            return exp;
-        }
-
         protected override
             (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
             AssembleConstant(ConstantTerm c, ParameterExpression root, Expression ctx)

@@ -5,9 +5,9 @@ using System.Linq.Expressions;
 
 namespace QRest.Compiler.Standard.Expressions
 {
-    internal class TerminationExpression : Expression
+    public class TerminationExpression : Expression
     {
-        public static readonly ExpressionType ExpressionNodeType = (ExpressionType)2000;
+        public static readonly ExpressionType ExpressionNodeType = (ExpressionType)2100;
         private readonly Type _element;
         private readonly Type _type;
 

@@ -27,7 +27,7 @@ namespace QRest.Core.Operations.Query
                 exp = Expression.Call(typeof(Queryable), method, new Type[] { lambda.Parameters[0].Type, reduced.Type }, exp, lambda);
             }
 
-            return NamedExpression.Create(exp, NamedExpression.DefaultQueryResultName);
+            return assembler.SetName(exp);
         }
     }
 }
