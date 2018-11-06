@@ -2,7 +2,7 @@
 
 namespace QRest.Core.Contracts
 {
-    public interface IQuerySemanticsProvider
+    public interface ISemantics
     {
         LambdaTerm Parse(IRequestModel model);
     }

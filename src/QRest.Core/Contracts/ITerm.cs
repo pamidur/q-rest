@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace QRest.Core.Contracts
+﻿namespace QRest.Core.Contracts
 {
     public interface ITerm
     {

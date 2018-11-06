@@ -7,6 +7,8 @@ namespace QRest.Core.Operations.Boolean
 {
     public class EveryOperation : OperationBase
     {
+        public override string Key { get; } = "every";
+
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count < 1)

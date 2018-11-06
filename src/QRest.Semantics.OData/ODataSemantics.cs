@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace QRest.Semantics.OData
 {
-    public class ODataSemantics : IQuerySemanticsProvider
+    public class ODataSemantics : ISemantics
     {
 
         public LambdaTerm Parse(IRequestModel model)

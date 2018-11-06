@@ -9,16 +9,23 @@ namespace QRest.Core.Terms
     {
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
-        public SequenceTerm(params ITerm[] terms) => Add(terms);
-        public SequenceTerm(SequenceTerm sequence) => Add((IEnumerable<ITerm>)sequence);
+        public SequenceTerm(SequenceTerm sequence) : this(sequence.ToArray()) { }
+        public SequenceTerm(params ITerm[] terms)
+        {
+            Add(terms);
+
+            SharedView = $"{string.Join("", _sequence.Select(t => t.SharedView))}";
+            KeyView = string.Join("", _sequence.Select(t => t.KeyView));
+            DebugView = $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
+        }
 
         public ITerm Root => _sequence.First.Value;
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
 
-        public virtual string SharedView => $"{string.Join("", _sequence.Select(t => t.SharedView))}";
-        public virtual string KeyView => string.Join("", _sequence.Select(t => t.KeyView));
-        public virtual string DebugView => $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
+        public virtual string SharedView { get; }
+        public virtual string KeyView { get; }
+        public virtual string DebugView { get; }
 
         protected void Add(ITerm term)
         {

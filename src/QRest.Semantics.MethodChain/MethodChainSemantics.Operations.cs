@@ -4,7 +4,6 @@ using QRest.Core.Operations;
 using QRest.Core.Operations.Aggregations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
-using QRest.Core.Operations.Query.OrderDirectionOperations;
 using QRest.Core.Operations.Selectors;
 using QRest.Core.Terms;
 using System;
@@ -29,22 +28,24 @@ namespace QRest.Semantics.MethodChain
             { "has",s=> DefaultMethod(  new ContainsOperation() ,s)},
             { "get",s=> DefaultMethod(  new NewOperation() ,s)},
 
-            {"asc", s=> DefaultMethod( new AscendingOperation(),s)},
-            {"desc", s=> DefaultMethod( new DescendingOperation(),s)},
+            {"skip", s=> DefaultMethod(new SkipOperation(),s)},
+            {"take", s=> DefaultMethod(new TakeOperation(),s)},
+
+            {"asc", s=> DefaultMethod( new ContextOperation(),s)},
+            {"desc", s=> DefaultMethod( new ReverseOrderOperation(),s)},
 
             {"it", s=> DefaultMethod( new ItOperation(),s)},
             {"ctx", s=> DefaultMethod( new ContextOperation(),s)},
+
+            {"first",s=> DefaultMethod( new FirstOperation(),s)},
+            {"count",s=> DefaultMethod( new CountOperation(),s)},
         };
 
         private readonly Dictionary<string, Func<SequenceTerm[], MethodTerm>> _queryMap = new Dictionary<string, Func<SequenceTerm[], MethodTerm>>
         {
             {"where",s=> DefaultLambda( new WhereOperation(),s)},
             {"get", s=> SelectLambda(s)},
-            {"first",s=> DefaultLambda( new FirstOperation(),s)},
-            {"count",s=> DefaultLambda( new CountOperation(),s)},
             {"sum",s=> DefaultLambda( new SumOperation(),s)},
-            {"skip",s=> DefaultLambda( new SkipOperation(),s)},
-            {"take", s=> DefaultLambda(new TakeOperation(),s)},
             {"order", s=> DefaultLambda(new OrderOperation(),s)},
         };
 

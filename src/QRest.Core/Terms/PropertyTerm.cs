@@ -6,11 +6,18 @@ namespace QRest.Core.Terms
     {
         public string Name { get; }
 
-        public PropertyTerm(string name) => Name = name;
+        public PropertyTerm(string name)
+        {
+            Name = name;
 
-        public string SharedView => $".{Name}";
-        public string DebugView => SharedView;
-        public string KeyView => SharedView;
+            SharedView = $".{Name}";
+            DebugView = SharedView;
+            KeyView = SharedView;
+        }
+
+        public string SharedView { get; }
+        public string DebugView { get; }
+        public string KeyView { get; }
 
         public ITerm Clone() => new PropertyTerm(Name);
     }

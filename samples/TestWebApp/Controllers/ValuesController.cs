@@ -71,6 +71,8 @@ namespace TestWebApp.Controllers
         [HttpGet("{query?}")]
         public ActionResult Get(Query query)
         {
+            //var r = collection.AsQueryable().OrderBy(e => e.Number).ToArray();
+
             var data = collection.AsQueryable();
             var result = query.Apply(data);          
 

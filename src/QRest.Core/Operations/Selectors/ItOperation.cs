@@ -6,6 +6,8 @@ namespace QRest.Core.Operations
 {
     public class ItOperation : OperationBase
     {
+        public override string Key { get; } = "it";
+
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             return root;

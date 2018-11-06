@@ -6,11 +6,18 @@ namespace QRest.Core.Terms
     {
         public object Value { get; }
 
-        public ConstantTerm(object value) => Value = value;
+        public ConstantTerm(object value)
+        {
+            Value = value;
 
-        public string DebugView => SharedView;
-        public string SharedView => $"'{Value.ToString()}'";
-        public string KeyView => $"[{Value.GetType()}]";
+            SharedView = $"'{Value.ToString()}'";
+            KeyView = $"[{Value.GetType()}]";
+            DebugView = SharedView;
+        }
+
+        public string DebugView { get; }
+        public string SharedView { get; }
+        public string KeyView { get; }
         public ITerm Clone() => new ConstantTerm(Value);
     }
 }

@@ -6,7 +6,6 @@ using QRest.Core.Operations;
 using QRest.Core.Operations.Aggregations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
-using QRest.Core.Operations.Query.OrderDirectionOperations;
 using QRest.Core.Operations.Selectors;
 using QRest.Core.Terms;
 using QRest.Semantics.OData;
@@ -28,7 +27,7 @@ namespace QRest.OData
         {
             var operationLambdas = context.children.OfType<QueryOptionContext>().Select(c => Visit(c));
 
-            var sortedLambdas = operationLambdas.Where(c => !c.IsEmpty)
+            var sortedLambdas = operationLambdas.Where(c => c != null && !c.IsEmpty)
                 .OrderBy(c => ((MethodTerm)c.Root).Operation.GetType(), new ODataOperationOrder()).ToList();
 
             return BuildTerms(sortedLambdas);
@@ -234,14 +233,14 @@ namespace QRest.OData
         {
             var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).ToList();
 
-            return new MethodTerm(new OrderOperation(), args).AsSequence();
+            return new MethodTerm(new OrderOperation(), args.Select(a => new LambdaTerm(BuiltIn.Roots.ContextElement, a)).ToArray()).AsSequence();
         }
 
         public override SequenceTerm VisitOrderbyItem([NotNull] OrderbyItemContext context)
         {
             SequenceTerm order = context.ChildCount > 1 ?
                 Visit(context.children[1])
-                : new MethodTerm(new AscendingOperation()).AsSequence();
+                : new MethodTerm(new ContextOperation()).AsSequence();
 
 
             return new SequenceTerm(
@@ -257,10 +256,10 @@ namespace QRest.OData
             switch (context.GetText())
             {
                 case "asc":
-                    method = new MethodTerm(new AscendingOperation());
+                    method = new MethodTerm(new ContextOperation());
                     break;
                 case "desc":
-                    method = new MethodTerm(new DescendingOperation());
+                    method = new MethodTerm(new ReverseOrderOperation());
                     break;
                 default:
                     throw new Exception($"Order direction {context.GetText()} is unknown");

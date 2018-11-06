@@ -1,5 +1,4 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Expressions;
 using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,8 @@ namespace QRest.Core.Operations.Aggregations
 {
     public class CountOperation : OperationBase
     {
+        public override string Key { get; } = "count";
+
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 0)
