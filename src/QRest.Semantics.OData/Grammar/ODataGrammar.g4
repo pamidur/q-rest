@@ -84,5 +84,5 @@ RPAREN     : ')' ;
 DECIMAL    : INT '.' [0-9]+  ;
 INT        : '-'? [0-9]+ ;
 IDENTIFIER : [a-zA-Z_] [a-zA-Z_0-9]* ;
-STRINGLITERAL : SQ [a-zA-Z_0-9\-:.+]* SQ ;
+STRINGLITERAL : SQ [a-zA-Z_0-9\-:.+ ]* SQ ;
 WS         : [ \r\t\u000C\n]+ -> skip;
