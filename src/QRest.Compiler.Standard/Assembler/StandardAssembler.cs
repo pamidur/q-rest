@@ -51,7 +51,7 @@ namespace QRest.Compiler.Standard.Assembler
 
             if (DynamicContainer.IsContainerType(ctx.Type))
             {
-                exp = DynamicContainer.CreateReadProperty(ctx, p.Name);
+                exp = DynamicContainer.CreateReadPropertyIndexer(ctx, p.Name);
             }
             else
             {
