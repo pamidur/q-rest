@@ -1,4 +1,5 @@
 ﻿using QRest.Compiler.Standard.Expressions;
+using QRest.Core;
 using QRest.Core.Terms;
 using System;
 using System.Collections.Generic;
@@ -72,11 +73,11 @@ namespace QRest.Compiler.Standard.Assembler
 
             var exp = m.Operation.CreateExpression(root, ctx, argValues, this);
 
-            if (_terminateSelects)
+            if (_terminateSelects && !(exp is TerminationExpression))
             {
                 var testexp = exp;
-                if (testexp is NamedExpression named)
-                    testexp = named.Expression;
+                if (testexp is ProxyExpression proxy)
+                    testexp = proxy.OriginalExpression;
 
                 if (testexp is MethodCallExpression call && call.Method.Name == "Select" && call.Method.DeclaringType == typeof(Queryable))
                     exp = TerminationExpression.Create(exp);
