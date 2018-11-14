@@ -54,7 +54,7 @@ namespace QRest.Core.Operations.Query
                 exp = Expression.Call(typeof(Queryable), method, new Type[] { lambda.Parameters[0].Type, lambda.ReturnType }, exp, lambda);
             }
 
-            return assembler.SetName(exp);
+            return exp;
         } 
     }
 

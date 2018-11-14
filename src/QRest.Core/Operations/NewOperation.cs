@@ -12,7 +12,7 @@ namespace QRest.Core.Operations
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {            
             var expression = arguments.Any() ? assembler.CreateContainer(arguments) : context;
-            return assembler.SetName(expression, assembler.GetName(context));
+            return expression;
         }
     }
 }

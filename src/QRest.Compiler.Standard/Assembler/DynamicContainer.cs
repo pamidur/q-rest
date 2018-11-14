@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QRest.Compiler.Standard.Expressions;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq.Expressions;
@@ -70,14 +71,17 @@ namespace QRest.Compiler.Standard.Assembler
 
             var createContainer = Expression.MemberInit(Expression.New(_type),
                 Expression.Bind(_sourceSetter, Expression.NewArrayInit(_valueContainerType, initializers)));
-            return createContainer;
+            return ContainerExpression.Create(createContainer, properties);
         }
 
         public static Expression CreateReadProperty(Expression context, string name)
         {
-            var ed = Expression.Dynamic(
+            Expression ed = Expression.Dynamic(
                 Microsoft.CSharp.RuntimeBinder.Binder.GetMember(0, name, context.Type,
                 new[] { Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo.Create(0, null) }), typeof(object), context);
+
+            if (context is ContainerExpression container)
+                ed = Expression.Convert(ed, container.Properties[name].Type);
 
             return ed;
         }
