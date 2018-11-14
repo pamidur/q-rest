@@ -1,6 +1,5 @@
 using Antlr4.Runtime;
 using QRest.Core.Contracts;
-using QRest.Core.Terms;
 using Xunit;
 
 namespace QRest.OData.Tests
@@ -8,7 +7,7 @@ namespace QRest.OData.Tests
     public class ODataParserTest
     {
         [Theory]
-        [InlineData("-where(|ce>-it.param1-eq('L72'))-new(-ctx@value)", @"$filter =   param1 eq 'L72'")]
+        [InlineData("-where(|ce>-it.param1-eq('[L72]'))-new(-ctx@value)", @"$filter =   param1 eq '[L72]'")]
         [InlineData("-where(|ce>'L72'-eq(-it.param1))-new(-ctx@value)", @"$filter =  'L72' eq param1 ")]
         [InlineData("-where(|ce>-every(-it.param1-eq('L72'),-oneof(-it.param2-eq('qwerty'),-it.param3-eq('asdf'))))-new(-ctx@value)",
             @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ")]
