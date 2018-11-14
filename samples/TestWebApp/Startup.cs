@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
 using QRest.Compiler.Standard;
 using QRest.Semantics.MethodChain;
-using QRest.Semantics.OData;
 
 namespace TestWebApp
 {
@@ -25,14 +24,14 @@ namespace TestWebApp
                 .AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
 
-                .AddQRestOptions(qrest => qrest.Semantics = new ODataSemantics())
+                //.AddQRestOptions(qrest => qrest.Semantics = new ODataSemantics())
 
-                //.AddQRestOptions(qrest =>
-                //{
-                //    qrest.Semantics = new MethodChainSemantics { UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers };
-                //    qrest.Compiler = new StandardCompiler {  UseCompilerCache = false};
-                //})
-                //;
+                .AddQRestOptions(qrest =>
+                {
+                    qrest.Semantics = new MethodChainSemantics { UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers };
+                    qrest.Compiler = new StandardCompiler {  UseCompilerCache = false};
+                })
+                ;
             ;
         }
 
