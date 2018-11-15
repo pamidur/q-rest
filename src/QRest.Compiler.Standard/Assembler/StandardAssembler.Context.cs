@@ -11,20 +11,6 @@ namespace QRest.Compiler.Standard.Assembler
 {
     public partial class StandardAssembler : IAssemblerContext
     {
-        public IReadOnlyDictionary<string, Expression> GetInitializers(IReadOnlyList<Expression> arguments)
-        {
-            var fields = new Dictionary<string, Expression>();
-            foreach (var arg in arguments)
-            {
-                var name = GetName(arg);
-                if (string.IsNullOrEmpty(name) || fields.ContainsKey(name))
-                    name = CreateUniquePropName(fields);
-                fields.Add(name, arg);
-            }
-
-            return fields;
-        }
-
         public Expression CreateContainer(IReadOnlyDictionary<string, Expression> properties)
         {
             return DynamicContainer.CreateContainer(properties);
@@ -36,72 +22,26 @@ namespace QRest.Compiler.Standard.Assembler
             return CreateContainer(initializers);
         }
 
-        public string GetName(Expression arg)
+        public Expression SetName(Expression expression, string name)
         {
-            string name = null;
-
-            if (arg is TerminationExpression term)
-                arg = term.Expression;
-
-            if (arg.NodeType == NamedExpression.NamedExpressionType)
-            {
-                name = ((NamedExpression)arg).Name;
-            }
-            else if (arg.NodeType == ExpressionType.MemberAccess)
-            {
-                name = ((MemberExpression)arg).Member.Name;
-            }
-            else if (arg.NodeType == ExpressionType.Parameter)
-            {
-                name = ((ParameterExpression)arg).Name;
-            }
-            else if (arg.NodeType == ExpressionType.Index)
-            {
-                var index = (IndexExpression)arg;
-                var indexArg = index.Arguments.FirstOrDefault();
-                if (indexArg == null)
-                    throw new ExpressionCreationException();
-
-                if (indexArg.NodeType != ExpressionType.Constant)
-                    throw new ExpressionCreationException();
-
-                name = ((ConstantExpression)indexArg).Value.ToString();
-            }
-            else if (arg.NodeType == ExpressionType.Call)
-            {
-                var call = (MethodCallExpression)arg;
-                name = call.Method.Name;
-            }
-            else if (arg.NodeType == ExpressionType.Dynamic)
-            {
-                var dyn = (DynamicExpression)arg;
-
-                if (dyn.Binder is GetMemberBinder)
-                    name = ((GetMemberBinder)dyn.Binder).Name;
-                else
-                    throw new ExpressionCreationException();
-            }
-            else if (DynamicContainer.IsContainerType(arg.Type))
-            {
-                throw new ExpressionCreationException();
-            }
-
-            return name;
+            return NamedExpression.Create(expression, name);
         }
 
-        private string CreateUniquePropName(Dictionary<string, Expression> initializers)
+        public string GetName(Expression arg)
         {
-            var namePrefix = "Data";
-            var ind = 0;
-
-            var name = "";
-
-            do
+            if (arg is NamedExpression named) return named.Name;
+            if (arg is UnaryExpression unary) return GetName(unary.Operand);
+            if (arg is MemberExpression member) return member.Member.Name;
+            if (arg is ParameterExpression parameter) return parameter.Name;
+            if (arg is IndexExpression index && index.Arguments.Count == 1 && index.Arguments[0] is ConstantExpression constant) return constant.Value.ToString();
+            if (arg is DynamicExpression dynamic && dynamic.Binder is GetMemberBinder binder) return binder.Name;
+            if (arg.CanReduce) return GetName(arg.Reduce());
+            if (arg is MethodCallExpression call)
             {
-                name = $"{namePrefix}{ind++}";
-            } while (initializers.ContainsKey(name));
-
-            return name;
+                if (call.Object != null) return GetName(call.Object);
+                else if (call.Arguments.Count != 0) return GetName(call.Arguments[0]);
+            }
+            return typeof(IQueryable).IsAssignableFrom(arg.Type) ? "Entities" : "Entity";
         }
 
         public virtual (Expression Left, Expression Right) Convert(Expression left, Expression right)
@@ -139,13 +79,32 @@ namespace QRest.Compiler.Standard.Assembler
             return false;
         }
 
-        public Expression SetName(Expression expression, string name = null)
+        protected IReadOnlyDictionary<string, Expression> GetInitializers(IReadOnlyList<Expression> arguments)
         {
-            if(name == null)            
-                name = typeof(IQueryable).IsAssignableFrom(expression.Type) ? "Entities" : "Entity";
-            
+            var fields = new Dictionary<string, Expression>();
+            foreach (var arg in arguments)
+            {
+                var name = GetName(arg);
+                if (fields.ContainsKey(name)) name = CreateUniquePropName(fields, name);
+                fields.Add(name, arg);
+            }
 
-            return NamedExpression.Create(expression, name);
+            return fields;
+        }
+
+        private string CreateUniquePropName(Dictionary<string, Expression> initializers, string initialName)
+        {
+            var namePrefix = initialName;
+            var ind = 0;
+
+            var name = "";
+
+            do
+            {
+                name = $"{namePrefix}{ind++}";
+            } while (initializers.ContainsKey(name));
+
+            return name;
         }
     }
 }

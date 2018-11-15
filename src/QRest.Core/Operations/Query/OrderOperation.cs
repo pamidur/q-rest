@@ -6,18 +6,10 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
 {
-    class ReverseOrderExpression : Expression
+    class ReverseOrderExpression : ProxyExpression
     {
         public static readonly ExpressionType ReverseOrderNodeType = (ExpressionType)1100;
-        public ReverseOrderExpression(Expression expression) => Expression = expression;
-
-        public Expression Expression { get; }
-
-        public override ExpressionType NodeType => ReverseOrderNodeType;
-        public override Type Type => Expression.Type;
-
-        public override Expression Reduce() => Expression;
-        public override bool CanReduce => true;
+        public ReverseOrderExpression(Expression expression) : base(expression, ReverseOrderNodeType) { }
     }
 
     public class OrderOperation : OperationBase
@@ -54,7 +46,7 @@ namespace QRest.Core.Operations.Query
                 exp = Expression.Call(typeof(Queryable), method, new Type[] { lambda.Parameters[0].Type, lambda.ReturnType }, exp, lambda);
             }
 
-            return assembler.SetName(exp);
+            return exp;
         } 
     }
 

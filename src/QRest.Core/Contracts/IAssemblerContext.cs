@@ -11,6 +11,6 @@ namespace QRest.Core.Contracts
         Expression CreateContainer(IReadOnlyList<Expression> arguments);
         Expression CreateContainer(IReadOnlyDictionary<string, Expression> properties);
         string GetName(Expression expression);
-        Expression SetName(Expression expression, string name = null);
+        Expression SetName(Expression expression, string name);
     }
 }
