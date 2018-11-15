@@ -40,6 +40,9 @@ namespace QRest.Compiler.Standard.Assembler
         {
             string name = null;
 
+            if (arg is TerminationExpression term)
+                arg = term.Expression;
+
             if (arg.NodeType == NamedExpression.NamedExpressionType)
             {
                 name = ((NamedExpression)arg).Name;
