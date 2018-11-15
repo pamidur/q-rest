@@ -2,6 +2,7 @@
 using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,7 +13,7 @@ namespace QRest.Compiler.Standard
     {
         public bool UseCompilerCache { get; set; } = true;
         private static readonly ConstantsCollector _constantsCollector = new ConstantsCollector();
-        private static readonly Dictionary<string, ConstantExpression> _cache = new Dictionary<string, ConstantExpression>();
+        private static readonly ConcurrentDictionary<string, ConstantExpression> _cache = new ConcurrentDictionary<string, ConstantExpression>();
 
         public Func<TRoot, object> Compile<TRoot>(LambdaTerm sequence)
         {
@@ -26,9 +27,12 @@ namespace QRest.Compiler.Standard
             ConstantExpression compiled = null;
             IReadOnlyList<ConstantExpression> constants = null;
 
-            var root = Expression.Parameter(typeof(TRoot), "r");
+            var rootType = typeof(TRoot);
 
-            if (UseCompilerCache && _cache.TryGetValue(lambdaterm.KeyView, out var @delegate))
+            var root = Expression.Parameter(rootType, "r");
+            var cacheKey = $"{rootType.ToString()}++{lambdaterm.KeyView}";
+
+            if (UseCompilerCache && _cache.TryGetValue(cacheKey, out var @delegate))
             {
                 compiled = @delegate;
                 constants = _constantsCollector.Collect(lambdaterm);
@@ -42,7 +46,7 @@ namespace QRest.Compiler.Standard
                 compiled = Expression.Constant(lambda.Compile());
 
                 if (UseCompilerCache)
-                    _cache[lambdaterm.KeyView] = compiled;
+                    _cache[cacheKey] = compiled;
             }
 
             var resultInvokeParams = new Expression[] { root }.Concat(constants).ToArray();
