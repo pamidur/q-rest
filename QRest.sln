@@ -11,13 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.AspNetCore", "src\QRe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Core", "src\QRest.Core\QRest.Core.csproj", "{CD8B758A-D241-4870-AAEA-C2467C8300ED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain", "src\QRest.Semantics.MethodChain\QRest.Semantics.MethodChain.csproj", "{BA0ADEB8-5AC0-42DB-A00E-8E6D4C0CBF1F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.QRest", "src\QRest.Semantics.QRest\QRest.Semantics.QRest.csproj", "{BA0ADEB8-5AC0-42DB-A00E-8E6D4C0CBF1F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.MethodChain.Tests", "test\QRest.Semantics.MethodChain.Tests\QRest.Semantics.MethodChain.Tests.csproj", "{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.QRest.Tests", "test\QRest.Semantics.QRest.Tests\QRest.Semantics.QRest.Tests.csproj", "{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{7D715283-67A8-43E2-938E-6CB12ACD30F8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "samples\TestApp\TestApp.csproj", "{E8C52A35-B463-403E-BBCB-AF257E620FBB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestWebApp", "samples\TestWebApp\TestWebApp.csproj", "{284FC041-7F0D-4F0C-8F49-71A52E92E46D}"
 EndProject
@@ -48,7 +46,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Compiler.Standard", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Compiler.Fast", "src\QRest.Compiler.Fast\QRest.Compiler.Fast.csproj", "{84C9CBAD-BF81-4E57-A67F-B3442D4A506C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRest.Compiler.Standard.Tests", "test\QRest.Compiler.Standard.Tests\QRest.Compiler.Standard.Tests.csproj", "{DA987B08-765B-46E2-ADB7-6D739B95A4F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Compiler.Standard.Tests", "test\QRest.Compiler.Standard.Tests\QRest.Compiler.Standard.Tests.csproj", "{DA987B08-765B-46E2-ADB7-6D739B95A4F0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{2F017B8E-15C6-4340-985C-B4E5F0EDDE04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,10 +72,6 @@ Global
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E8C52A35-B463-403E-BBCB-AF257E620FBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E8C52A35-B463-403E-BBCB-AF257E620FBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E8C52A35-B463-403E-BBCB-AF257E620FBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E8C52A35-B463-403E-BBCB-AF257E620FBB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -109,7 +105,6 @@ Global
 		{CD8B758A-D241-4870-AAEA-C2467C8300ED} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
 		{BA0ADEB8-5AC0-42DB-A00E-8E6D4C0CBF1F} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
 		{DECB973D-1BBD-41FF-AA58-BEF3F760AB6E} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
-		{E8C52A35-B463-403E-BBCB-AF257E620FBB} = {7D715283-67A8-43E2-938E-6CB12ACD30F8}
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D} = {7D715283-67A8-43E2-938E-6CB12ACD30F8}
 		{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
 		{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}

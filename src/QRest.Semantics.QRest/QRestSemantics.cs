@@ -5,22 +5,22 @@ using QRest.Core.Terms;
 using Sprache;
 using System;
 
-namespace QRest.Semantics.MethodChain
+namespace QRest.Semantics.QRest
 {
-    public partial class MethodChainSemantics : ISemantics
+    public partial class QRestSemantics : ISemantics
     {
         private static readonly LambdaTerm _default = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new MethodTerm(new ItOperation()).AsSequence());
 
         private Lazy<Parser<LambdaTerm>> Parser { get; }
 
-        public MethodChainSemantics()
+        public QRestSemantics()
         {
             Parser = new Lazy<Parser<LambdaTerm>>(() => PrepareParser());
         }
 
         private Parser<LambdaTerm> PrepareParser()
         {
-            return new MethodChainParserBuilder(UseDefferedConstantParsing, _callMap, _queryMap).Build();
+            return new QRestParserBuilder(UseDefferedConstantParsing, _callMap).Build();
         }
 
         public LambdaTerm Parse(IRequestModel model)

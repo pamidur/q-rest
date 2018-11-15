@@ -6,12 +6,12 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace QRest.Semantics.MethodChain.Tests
+namespace QRest.Semantics.QRest.Tests
 {
     public class ParserTests
     {
         private readonly Mock<IOperation> _opration;
-        private readonly MethodChainParserBuilder _parser;
+        private readonly QRestParserBuilder _parser;
 
         private static readonly string _testUniversalOperationName = "test";
 
@@ -20,12 +20,8 @@ namespace QRest.Semantics.MethodChain.Tests
             _opration = new Mock<IOperation>();
             _opration.Setup(m => m.Key).Returns(_testUniversalOperationName);
 
-            _parser = new MethodChainParserBuilder(DefferedConstantParsing.Disabled, new Dictionary<string, Func<SequenceTerm[], MethodTerm>> {
-                { _testUniversalOperationName, s=>new MethodTerm(_opration.Object) }
-            },
-            new Dictionary<string, Func<SequenceTerm[], MethodTerm>>
-            {
-                { _testUniversalOperationName, s=>new MethodTerm(_opration.Object) }
+            _parser = new QRestParserBuilder(DefferedConstantParsing.Disabled, new Dictionary<string, Func<SequenceTerm[], MethodTerm>> {
+                { _testUniversalOperationName, s=>new MethodTerm(_opration.Object) }  
             });
             _parser.Build();
         }
@@ -89,7 +85,7 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Parsed Method Without Params and Brakets")]
         public void MethodWithoutParamsAndBrakets()
         {
-            var actual = _parser.Method.TryParse($"-{_testUniversalOperationName}");
+            var actual = _parser.Call.TryParse($"-{_testUniversalOperationName}");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
@@ -100,7 +96,7 @@ namespace QRest.Semantics.MethodChain.Tests
         [Fact(DisplayName = "Parsed Method Without Params")]
         public void MethodWithoutParams()
         {
-            var actual = _parser.Method.TryParse($"-{_testUniversalOperationName}()");
+            var actual = _parser.Call.TryParse($"-{_testUniversalOperationName}()");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);

@@ -9,9 +9,9 @@ using System.Globalization;
 using System.Linq;
 using Read = Sprache.Parse;
 
-namespace QRest.Semantics.MethodChain
+namespace QRest.Semantics.QRest
 {
-    public class MethodChainParserBuilder
+    public class QRestParserBuilder
     {
         internal static readonly Parser<char> StringDelimiter = Read.Char('`');
         internal static readonly Parser<char> ArgumentDelimiter = Read.Char(',');
@@ -23,7 +23,6 @@ namespace QRest.Semantics.MethodChain
         internal static readonly Parser<char> ArrayCloseBracket = Read.Char(']');
 
         internal static readonly Parser<char> MethodIndicator = Read.Char('-');
-        internal static readonly Parser<char> LambdaIndicator = Read.Char(':');
 
         internal static readonly Parser<char> PropertyNavigator = Read.Char('.');
 
@@ -33,13 +32,10 @@ namespace QRest.Semantics.MethodChain
 
         private readonly DefferedConstantParsing _defferedParsing;
         private readonly Dictionary<string, Func<SequenceTerm[], MethodTerm>> _callMap;
-        private readonly Dictionary<string, Func<SequenceTerm[], MethodTerm>> _queryMap;
         internal Parser<SequenceTerm> CallChain;
         internal Parser<LambdaTerm> TopLambda;
-        internal Parser<ITerm> Call;
+        internal Parser<MethodTerm> Call;
         internal Parser<List<SequenceTerm>> CallArguments;
-        internal Parser<MethodTerm> Lambda;
-        internal Parser<MethodTerm> Method;
         internal Parser<ITerm> SubProperty;
         internal Parser<ITerm> Property;
         internal Parser<SequenceTerm> RootProperty;
@@ -52,14 +48,12 @@ namespace QRest.Semantics.MethodChain
         internal Parser<NameTerm> Name;
         internal Parser<string> MemberName;
 
-        public MethodChainParserBuilder(
+        public QRestParserBuilder(
             DefferedConstantParsing defferedParsing,
-            Dictionary<string, Func<SequenceTerm[], MethodTerm>> callMap, 
-            Dictionary<string, Func<SequenceTerm[], MethodTerm>> queryMap)
+            Dictionary<string, Func<SequenceTerm[], MethodTerm>> callMap)
         {
             _defferedParsing = defferedParsing;
             _callMap = callMap;
-            _queryMap = queryMap;
         }
 
         public Parser<LambdaTerm> Build()
@@ -77,9 +71,7 @@ namespace QRest.Semantics.MethodChain
             SubProperty = BuildSubPropertyParser().Named("SubProperty");
             RootProperty = BuildRootPropertyParser().Named("Property");
 
-            Method = BuildMethodParser(BuildOperationParsers(_callMap)).Named("Method Call");
-            Lambda = BuildLambdaParser(BuildOperationParsers(_queryMap)).Named("Query Call");
-            Call = Lambda.XOr(Method).Named("Call");
+            Call = BuildMethodParser(BuildOperationParsers(_callMap)).Named("Call");
 
             Name = BuildNameTermParser().Named("Name");
 
@@ -97,7 +89,7 @@ namespace QRest.Semantics.MethodChain
           select new LambdaTerm(BuiltIn.Roots.OriginalRoot, seq);
 
         internal Parser<ITerm> BuildChainRootParser() =>
-          from root in Call.Or(Constant)
+          from root in Call.Or<ITerm>(Constant)
           select root.AsSequence();
 
         internal Parser<SequenceTerm> BuildCallChainParser() =>
@@ -109,13 +101,6 @@ namespace QRest.Semantics.MethodChain
             from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
             select parameters.Where(r => r != null)?.ToList() ?? new List<SequenceTerm>()
             );
-
-        internal Parser<MethodTerm> BuildLambdaParser(Parser<Func<SequenceTerm[], MethodTerm>> operationFactoryParser) =>
-            from semic in LambdaIndicator
-            from operation in operationFactoryParser
-            from arguments in CallArguments.Optional()
-            select operation(arguments.GetOrDefault()?.ToArray() ?? new SequenceTerm[] { });
-
 
         internal Parser<MethodTerm> BuildMethodParser(Parser<Func<SequenceTerm[], MethodTerm>> operationFactoryParser) =>
              from semic in MethodIndicator

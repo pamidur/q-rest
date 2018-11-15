@@ -3,7 +3,7 @@ using QRest.Core.Operations;
 using System;
 using System.Collections.Generic;
 
-namespace QRest.Semantics.MethodChain
+namespace QRest.Semantics.QRest
 {
     public enum DefferedConstantParsing : byte
     {
@@ -25,7 +25,7 @@ namespace QRest.Semantics.MethodChain
         All = 4,
     }
 
-    public partial class MethodChainSemantics
+    public partial class QRestSemantics
     {
         /// <summary>
         /// Allows using TypeName.Parse(string) static methods in the place of comparison operations.

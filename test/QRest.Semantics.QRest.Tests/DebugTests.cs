@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace QRest.Semantics.MethodChain.Tests
+namespace QRest.Semantics.QRest.Tests
 {
     public class Data
     {

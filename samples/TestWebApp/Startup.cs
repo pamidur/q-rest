@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
-using QRest.Compiler.Standard;
-using QRest.Semantics.MethodChain;
 using QRest.Semantics.OData;
 
 namespace TestWebApp
