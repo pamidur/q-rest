@@ -2,6 +2,7 @@ grammar ODataGrammar;
 
 parse
  : queryOptions EOF
+ | EOF
  ;
 
 
