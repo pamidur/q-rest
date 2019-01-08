@@ -20,6 +20,14 @@ namespace QRest.OData
     {
         public override SequenceTerm VisitParse([NotNull] ParseContext context)
         {
+            if (context.children.Count < 2)
+            {
+                var selectArgs = new SequenceTerm(
+                    new MethodTerm(new ContextOperation()),
+                    new NameTerm("value")
+                );
+                return new MethodTerm(new NewOperation(), new List<SequenceTerm> { selectArgs }).AsSequence();
+            }
             return Visit(context.queryOptions());
         }
 
@@ -280,6 +288,14 @@ namespace QRest.OData
             if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
                 return new MethodTerm(new TakeOperation(), new[] { new ConstantTerm(value).AsSequence() }).AsSequence();
             else return new SequenceTerm();
+        }
+
+        public override SequenceTerm VisitDatetimeExpression([NotNull] DatetimeExpressionContext context)
+        {
+            var dt = new ConstantTerm(DateTimeOffset.Parse(context.GetText()));
+            return dt.AsSequence();
+
+
         }
 
         private MethodTerm GetFuncTerm(string funcName)

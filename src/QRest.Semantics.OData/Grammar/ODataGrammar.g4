@@ -2,6 +2,7 @@ grammar ODataGrammar;
 
 parse
  : queryOptions EOF
+ | EOF
  ;
 
 
@@ -39,6 +40,7 @@ expression
  | NOT expression                                 #notExpression
  | left=expression op=comparator right=expression #comparatorExpression
  | left=expression op=binary right=expression     #binaryExpression
+ | DATETIME										  #datetimeExpression
  | bool                                           #boolExpression
  | IDENTIFIER                                     #identifierExpression
  | DECIMAL                                        #decimalExpression
@@ -63,6 +65,7 @@ functionParams
  :   expression (COMMA expression)*
  ;
 
+DATETIME   : DIGIT4 '-' DIGIT2 '-' DIGIT2 'T' DIGIT2 ':' DIGIT2 ':' DIGIT2 ('.' [0-9]+)? ( 'Z' | ('+'|'-') DIGIT2 ':' DIGIT2 ) ;
 EQPARAM	   : '=' ;
 DOLLAR     : '$' ;
 AMPERSAND  : '&' ;
@@ -85,6 +88,9 @@ LQPAREN	   : '[' ;
 RQPAREN	   : ']' ;
 DECIMAL    : INT '.' [0-9]+  ;
 INT        : '-'? [0-9]+ ;
+DIGIT	   : [0-9] ;
+DIGIT2     : DIGIT DIGIT;
+DIGIT4     : DIGIT2 DIGIT2 ;
 IDENTIFIER : [a-zA-Z_] [a-zA-Z_0-9]* ;
 STRINGLITERAL : SQ .*? SQ ;
 WS         : [ \r\t\u000C\n]+ -> skip;
