@@ -20,7 +20,7 @@ namespace QRest.OData
     {
         public override SequenceTerm VisitParse([NotNull] ParseContext context)
         {
-            if (context.IsEmpty)
+            if (context.children.Count < 2)
             {
                 var selectArgs = new SequenceTerm(
                     new MethodTerm(new ContextOperation()),
