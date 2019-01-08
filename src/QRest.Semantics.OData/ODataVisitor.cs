@@ -282,6 +282,14 @@ namespace QRest.OData
             else return new SequenceTerm();
         }
 
+        public override SequenceTerm VisitDatetimeExpression([NotNull] DatetimeExpressionContext context)
+        {
+            var dt = new ConstantTerm(DateTimeOffset.Parse(context.GetText()));
+            return dt.AsSequence();
+
+            
+        }
+
         private MethodTerm GetFuncTerm(string funcName)
         {
             OperationBase operation;

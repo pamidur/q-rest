@@ -44,6 +44,16 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
+        [InlineData("-where(|ce>-it.a-eq('12/22/2019 9:02:00 PM +00:00'))-new(-ctx@value)", @"$filter = a eq 2019-12-22T21:02:00.3434Z")]
+        [InlineData("-where(|ce>-it.a-eq('12/22/2019 9:02:00 PM +02:00'))-new(-ctx@value)", @"$filter = a eq 2019-12-22T21:02:00.34346767+02:00")]
+        [InlineData("-where(|ce>-it.a-eq('12/22/2019 9:02:00 PM -03:00'))-new(-ctx@value)", @"$filter = a eq 2019-12-22T21:02:00-03:00")]
+        public void ShouldParseDateTimeOffset(string expected, string input)
+        {
+            ITerm exp = Parse(input);
+            Assert.Equal(expected, exp.SharedView);
+        }
+
+        [Theory]
         [InlineData("-where(|ce>-it.a-eq(-it.b))-new(-select(|ce>-new(-it.f1,-it.f2))@value)", @"$filter = a eq b&$count=false&$select=f1,f2")]
         [InlineData("-where(|ce>-it.a-eq(-it.b))-new(-count@@odata.count,-select(|ce>-new(-it.f1,-it.f2))@value)", @"$filter = a eq b&$count=true&$select=f1,f2")]
         public void ShouldParseSelect(string expected, string input)
