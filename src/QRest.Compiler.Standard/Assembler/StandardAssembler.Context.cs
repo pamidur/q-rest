@@ -71,7 +71,7 @@ namespace QRest.Compiler.Standard.Assembler
             }
             else if (expression.Type == typeof(string))
             {
-                result = _options.StringParsing.Parse(expression, target);
+                result = _stringParsingBehavior.Parse(expression, target);
                 return result != null;
             }
 

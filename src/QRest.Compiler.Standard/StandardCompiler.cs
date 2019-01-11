@@ -1,4 +1,5 @@
-﻿using QRest.Compiler.Standard.Assembler;
+﻿using Microsoft.Extensions.Options;
+using QRest.Compiler.Standard.Assembler;
 using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using System;
@@ -9,11 +10,17 @@ using System.Linq.Expressions;
 
 namespace QRest.Compiler.Standard
 {
-    public partial class StandardCompiler : ICompiler
+    public class StandardCompiler : ICompiler
     {
-        public bool UseCompilerCache { get; set; } = true;
         private static readonly ConstantsCollector _constantsCollector = new ConstantsCollector();
         private static readonly ConcurrentDictionary<string, ConstantExpression> _cache = new ConcurrentDictionary<string, ConstantExpression>();
+
+        private readonly StandardCompilerOptions _options;
+
+        public StandardCompiler(IOptions<StandardCompilerOptions> options = null)
+        {
+            _options = options?.Value ?? new StandardCompilerOptions();
+        }
 
         public Func<TRoot, object> Compile<TRoot>(RootTerm sequence)
         {
@@ -32,20 +39,20 @@ namespace QRest.Compiler.Standard
             var root = Expression.Parameter(rootType, "r");
             var cacheKey = $"{rootType.ToString()}++{rootTerm.KeyView}";
 
-            if (UseCompilerCache && _cache.TryGetValue(cacheKey, out var @delegate))
+            if (_options.UseCompilerCache && _cache.TryGetValue(cacheKey, out var @delegate))
             {
                 compiled = @delegate;
                 constants = _constantsCollector.Collect(rootTerm);
             }
             else
             {
-                var ctx = new StandardAssembler(this);
+                var ctx = new StandardAssembler(_options.AllowUncompletedQueries, _options.StringParsing);
                 var (lambda, consts) = ctx.Assemble(rootTerm, root, typeof(object));
 
                 constants = consts;
                 compiled = Expression.Constant(lambda.Compile());
 
-                if (UseCompilerCache)
+                if (_options.UseCompilerCache)
                     _cache[cacheKey] = compiled;
             }
 

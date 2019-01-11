@@ -1,4 +1,5 @@
 ﻿using QRest.Compiler.Standard.Expressions;
+using QRest.Compiler.Standard.StringParsing;
 using QRest.Core;
 using QRest.Core.Extensions;
 using QRest.Core.Operations;
@@ -14,11 +15,13 @@ namespace QRest.Compiler.Standard.Assembler
     {
         protected readonly bool _terminateSelects = true;
 
-        private readonly IAssemblerOptions _options;
+        private readonly bool _allowUncompletedQueries;
+        private readonly IStringParsingBehavior _stringParsingBehavior;
 
-        public StandardAssembler(IAssemblerOptions options)
+        public StandardAssembler(bool allowUncompletedQueries, IStringParsingBehavior stringParsingBehavior)
         {
-            _options = options;
+            _allowUncompletedQueries = allowUncompletedQueries;
+            _stringParsingBehavior = stringParsingBehavior;
         }
 
         public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
@@ -101,7 +104,7 @@ namespace QRest.Compiler.Standard.Assembler
 
             var exp = result.Expression;
 
-            if (!_options.AllowUncompletedQueries)
+            if (!_allowUncompletedQueries)
                 exp = TerminationExpression.Create(exp);
 
             return (exp, result.Constants, result.Parameters);

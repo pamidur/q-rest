@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
+using QRest.Core;
 using System;
 
 namespace TestWebApp
@@ -22,14 +23,19 @@ namespace TestWebApp
             //services.AddOData("/api");
 
             services
+                .AddQRest()
+                .UseNativeSemantics(sem =>
+                {
+                    sem.UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers;
+                })
+                .UseStandardCompiler(cpl =>
+                {
+                    cpl.UseCompilerCache = false;
+                });
+
+            services
                 .AddMvc()
-                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
-                //.AddQRestOptions(qrest =>
-                //{
-                //    qrest.Semantics = new QRestSemantics { UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers };
-                //    qrest.Compiler = new StandardCompiler { UseCompilerCache = false };
-                //})
-                ;
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
