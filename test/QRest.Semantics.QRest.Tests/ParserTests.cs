@@ -27,7 +27,7 @@ namespace QRest.Semantics.QRest.Tests
         public void ValidStringConstant()
         {
             var expected = "Test123-:=/\\+()!@#$%$String\r\n\t!";
-            var actual = _parser.StringConstant.TryParse($"`{expected}`");
+            var actual = _parser.StringConstant.TryParse($"'{expected}'");
 
             Assert.True(actual.Remainder.AtEnd);
             Assert.Empty(actual.Remainder.Memos);
@@ -42,7 +42,7 @@ namespace QRest.Semantics.QRest.Tests
         public void ValidEmptyStringConstant()
         {
             var expected = "";
-            var actual = _parser.StringConstant.TryParse($"`{expected}`");
+            var actual = _parser.StringConstant.TryParse($"'{expected}'");
 
             Assert.True(actual.WasSuccessful);
             Assert.Empty(actual.Expectations);

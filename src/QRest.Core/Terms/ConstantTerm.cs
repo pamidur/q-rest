@@ -1,4 +1,5 @@
 ﻿using QRest.Core.Contracts;
+using System.ComponentModel;
 
 namespace QRest.Core.Terms
 {
@@ -10,7 +11,7 @@ namespace QRest.Core.Terms
         {
             Value = value;
 
-            SharedView = $"'{Value.ToString()}'";
+            SharedView = $"'{new TypeConverter().ConvertToInvariantString(Value)}'";
             KeyView = $"[{Value.GetType()}]";
             DebugView = SharedView;
         }

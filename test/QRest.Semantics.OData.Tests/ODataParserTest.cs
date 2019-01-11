@@ -44,9 +44,9 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("-where(:-$.a-eq('12/22/2019 9:02:00 PM +00:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00.3434Z")]
-        [InlineData("-where(:-$.a-eq('12/22/2019 9:02:00 PM +02:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00.34346767+02:00")]
-        [InlineData("-where(:-$.a-eq('12/22/2019 9:02:00 PM -03:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00-03:00")]
+        [InlineData("-where(:-$.a-eq('12/22/2019 21:02:00 +00:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00.3434Z")]
+        [InlineData("-where(:-$.a-eq('12/22/2019 21:02:00 +02:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00.34346767+02:00")]
+        [InlineData("-where(:-$.a-eq('12/22/2019 21:02:00 -03:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00-03:00")]
         public void ShouldParseDateTimeOffset(string expected, string input)
         {
             ITerm exp = Parse(input);
