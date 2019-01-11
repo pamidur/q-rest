@@ -1,4 +1,5 @@
 ﻿using Moq;
+using QRest.AspNetCore.Native;
 using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using Sprache;

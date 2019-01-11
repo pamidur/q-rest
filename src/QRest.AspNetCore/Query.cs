@@ -1,39 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Options;
-using QRest.Core;
+using QRest.AspNetCore.Contracts;
 using QRest.Core.Contracts;
-using QRest.Core.Terms;
-using System.Threading.Tasks;
+using System;
 
 namespace QRest.AspNetCore
 {
-    [ModelBinder(typeof(QueryModelBinder))]
-    public class Query : QueryBase
+    public abstract class Query
     {
-        public Query(LambdaTerm lambda, ICompiler compiller) : base(lambda, compiller)
+        public IQueryStructure Structure { get; }
+        public ICompiler Compiller { get; }
+
+        protected Query(IQueryStructure structure, ICompiler compiller)
         {
+            Structure = structure;
+            Compiller = compiller;
         }
     }
 
-    public class QueryModelBinder : IModelBinder
+    public abstract class TypedQueryBase : Query
     {
-        private readonly QRestOptions _options;
-
-        public QueryModelBinder(IOptions<QRestOptions> options)
+        protected TypedQueryBase(IQueryStructure structure, ICompiler compiller) : base(structure, compiller)
         {
-            _options = options.Value;
         }
 
-        public Task BindModelAsync(ModelBindingContext bindingContext)
+        public abstract Type SourceType { get; }        
+    }
+
+    [ModelBinder(typeof(QueryModelBinder))]
+    public class Query<T> : TypedQueryBase
+    {
+        private readonly Type _sourceType;
+
+        public Query(IQueryStructure structure, ICompiler compiller) : base(structure, compiller)
         {
-            var sequence = _options.Semantics.Parse(new RequestModel(bindingContext));
+            _sourceType = typeof(T);
+        }
 
-            var query = new Query(sequence, _options.Compiler);
+        public override Type SourceType => _sourceType;
 
-            bindingContext.Result = ModelBindingResult.Success(query);
-
-            return Task.FromResult(true);
+        public object Apply(T source)
+        {
+            var lambda = Compiller.Compile<T>(Structure.Data);
+            var result = lambda(source);
+            return result;
         }
     }
 }

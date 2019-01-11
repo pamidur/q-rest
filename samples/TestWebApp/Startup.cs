@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
-using QRest.Semantics.OData;
+using System;
 
 namespace TestWebApp
 {
@@ -19,19 +19,17 @@ namespace TestWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddOData("/api");
+
             services
                 .AddMvc()
                 .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
-
-                .AddQRestOptions(qrest => qrest.Semantics = new ODataSemantics())
-
                 //.AddQRestOptions(qrest =>
                 //{
-                //    qrest.Semantics = new MethodChainSemantics { UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers };
-                //    qrest.Compiler = new StandardCompiler {  UseCompilerCache = false};
+                //    qrest.Semantics = new QRestSemantics { UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers };
+                //    qrest.Compiler = new StandardCompiler { UseCompilerCache = false };
                 //})
-                //;
-            ;
+                ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,7 +40,14 @@ namespace TestWebApp
                 app.UseDeveloperExceptionPage();
             }
 
+            app.Use(async (context, next) =>
+            {
+                Console.WriteLine($"{context.Request.Path}{context.Request.QueryString}");
+                await next.Invoke();
+            });
 
+
+            //app.UseODataMetadata();
             app.UseMvc();
         }
     }

@@ -9,7 +9,7 @@ using System.Globalization;
 using System.Linq;
 using Read = Sprache.Parse;
 
-namespace QRest.Semantics.QRest
+namespace QRest.AspNetCore.Native
 {
     public class QRestParserBuilder
     {

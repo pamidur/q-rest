@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QRest.Semantics.QRest
+namespace QRest.AspNetCore.Native
 {
-    public partial class QRestSemantics
+    public partial class NativeSemantics
     {
         private readonly Dictionary<string, Func<SequenceTerm[], MethodTerm>> _callMap = new Dictionary<string, Func<SequenceTerm[], MethodTerm>>
         {
@@ -34,12 +34,13 @@ namespace QRest.Semantics.QRest
             {"asc",     s=> DefaultMethod( new ContextOperation(),s)},
             {"desc",    s=> DefaultMethod( new ReverseOrderOperation(),s)},
 
-            {"it",      s=> DefaultMethod( new ItOperation(),s)},
-            {"out",     s=> DefaultMethod( new ContextOperation(),s)},
+            {"$$",      s=> DefaultMethod( new ItOperation(),s)},
+            {"$",     s=> DefaultMethod( new ContextOperation(),s)},
 
             {"first",   s=> DefaultMethod( new FirstOperation(),s)},
             {"count",   s=> DefaultMethod( new CountOperation(),s)},
             {"where",   s=> DefaultLambda( new WhereOperation(),s)},
+            {"any",     s=> DefaultLambda( new AnyOperation(),s)},
             {"map",     s=> SelectLambda(s)},
             {"sum",     s=> DefaultLambda( new SumOperation(),s)},
             {"order",   s=> DefaultLambda( new OrderOperation(),s)},

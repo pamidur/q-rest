@@ -10,9 +10,7 @@ namespace QRest.Core
         public static class Roots
         {
             public static readonly IRootProvider OriginalRoot = new SameRootProvider();
-            public static readonly IRootProvider Context = new SameContextRootProvider();
-            public static readonly IRootProvider ContextElement = new ElementRootProvider(Context);
-            public static readonly IRootProvider OriginalRootElement = new ElementRootProvider(OriginalRoot);
+            public static readonly IRootProvider ContextElement = new ElementRootProvider(new SameContextProvider());
         }
 
         public static class Operations

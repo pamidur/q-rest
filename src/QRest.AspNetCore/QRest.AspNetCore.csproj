@@ -8,12 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.1" />
+    <PackageReference Include="Sprache" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\QRest.Compiler.Standard\QRest.Compiler.Standard.csproj" />
     <ProjectReference Include="..\QRest.Core\QRest.Core.csproj" />
-    <ProjectReference Include="..\QRest.Semantics.QRest\QRest.Semantics.QRest.csproj" />
   </ItemGroup>
   
   

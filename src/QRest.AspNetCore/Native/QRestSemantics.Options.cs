@@ -3,7 +3,7 @@ using QRest.Core.Operations;
 using System;
 using System.Collections.Generic;
 
-namespace QRest.Semantics.QRest
+namespace QRest.AspNetCore.Native
 {
     public enum DefferedConstantParsing : byte
     {
@@ -25,7 +25,7 @@ namespace QRest.Semantics.QRest
         All = 4,
     }
 
-    public partial class QRestSemantics
+    public partial class NativeSemantics
     {
         /// <summary>
         /// Allows using TypeName.Parse(string) static methods in the place of comparison operations.

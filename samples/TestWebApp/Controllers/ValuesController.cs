@@ -1,31 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
+﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using Newtonsoft.Json;
 using QRest.AspNetCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TestWebApp.Controllers
 {
     [BsonIgnoreExtraElements]
     public class Entity
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonConverter(typeof(ObjectIdConverter))]
-        public ObjectId Id { get; set; }
+        //[BsonId]
+        //[BsonRepresentation(BsonType.ObjectId)]
+        //[JsonConverter(typeof(ObjectIdConverter))]
+        //public ObjectId Id { get; set; }
         public string Text { get; set; }
         public int Number { get; set; }
-        public DateTime Datetime { get; set; }
-        public DateTimeOffset Datetimeoffset { get; set; }
+        //public DateTime Datetime { get; set; }
+        //public DateTimeOffset Datetimeoffset { get; set; }
 
-        public SubEntity Sub { get; set; }
+        //public SubEntity Sub { get; set; }
 
         public override string ToString()
         {
@@ -52,10 +47,11 @@ namespace TestWebApp.Controllers
     public class ValuesController : Controller
     {
         private readonly IMongoCollection<Entity> collection;
-        IQueryable<Entity> _data = new List<Entity>
+        private readonly IMongoQueryable<Entity> _source;
+        private IQueryable<Entity> _data = new List<Entity>
             {
-                new Entity { Number = 1, Text = "CCC", Sub = new SubEntity { Text = "SubText" } },
-                new Entity { Number = 2, Text = "AAA", Sub = new SubEntity { Text = "SubText2" } },
+                new Entity { Number = 1, Text = "CCC", /*Sub = new SubEntity { Text = "SubText" } */},
+                new Entity { Number = 2, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
             }.AsQueryable();
 
 
@@ -65,18 +61,20 @@ namespace TestWebApp.Controllers
             var client = new MongoClient(new MongoClientSettings() { Server = new MongoServerAddress("localhost", 27017) });
             collection = client.GetDatabase("test").GetCollection<Entity>("entities");
             //collection.InsertOne(new Entity { Number = 1, Text = "dateTime tests", Datetime=DateTime.Now, Datetimeoffset = DateTime.Now });
+
+            _source = collection.AsQueryable();
+
         }
 
         // GET api/values
         [HttpGet("{query?}")]
-        public ActionResult Get(Query query)
+        public QueryActionResult Get(Query<IQueryable<Entity>> query)
         {
-            //var r = collection.AsQueryable().OrderBy(e => e.Number).ToArray();
+            //var result = query.Apply(_source);
 
-            var data = collection.AsQueryable();
-            var result = query.Apply(data);          
+            var aresult = query.ToActionResult(_source);
 
-            return Ok(result);
-        }        
+            return aresult;
+        }
     }
 }

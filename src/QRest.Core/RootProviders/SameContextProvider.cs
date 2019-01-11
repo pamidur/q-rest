@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.RootProviders
 {
-    public class SameContextRootProvider : IRootProvider
+    public class SameContextProvider : IRootProvider
     {
         public string Key => "c";
 

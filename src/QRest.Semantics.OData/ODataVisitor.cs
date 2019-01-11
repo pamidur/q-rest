@@ -54,7 +54,9 @@ namespace QRest.OData
                 }
             }
 
-            var selectArgs = new List<SequenceTerm>();
+            var selectArgs = new List<SequenceTerm>() {
+                //new SequenceTerm(new ConstantTerm(_serviceRoot), new NameTerm("@odata.context"))
+            };
 
             var countTerm = sortedLambdas.Where(c => ((MethodTerm)c.Root).Operation is CountOperation).FirstOrDefault();
             if (countTerm != null) selectArgs.Add(new SequenceTerm(countTerm.Concat(new[] { new NameTerm("@odata.count") }).ToArray()));
