@@ -1,4 +1,4 @@
-﻿using QRest.Core;
+﻿using QRest.Core.Operations;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 

@@ -18,9 +18,9 @@ namespace QRest.AspNetCore
     public class QueryActionResult : ActionResult
     {
         private readonly IQueryStructure _structure;
-        private readonly IReadOnlyDictionary<LambdaTerm, object> _results;
+        private readonly IReadOnlyDictionary<RootTerm, object> _results;
 
-        public QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<LambdaTerm, object> results)
+        public QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<RootTerm, object> results)
         {
             _structure = structure;
             _results = results;
@@ -28,7 +28,7 @@ namespace QRest.AspNetCore
 
         internal static QueryActionResult From<T>(Query<T> query, T source)
         {
-            var results = new Dictionary<LambdaTerm, object>();
+            var results = new Dictionary<RootTerm, object>();
 
             foreach (var lambda in query.Structure.GetAll())
                 results[lambda] = query.Compiller.Compile<T>(lambda)(source);

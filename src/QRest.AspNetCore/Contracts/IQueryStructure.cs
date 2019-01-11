@@ -5,7 +5,7 @@ namespace QRest.AspNetCore.Contracts
 {
     public interface IQueryStructure
     {
-        LambdaTerm Data { get; }
-        IReadOnlyList<LambdaTerm> GetAll();
+        RootTerm Data { get; }
+        IReadOnlyList<RootTerm> GetAll();
     }
 }

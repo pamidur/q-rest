@@ -1,5 +1,4 @@
 using QRest.Core;
-using QRest.Core.Contracts;
 using QRest.Core.Operations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
@@ -27,13 +26,13 @@ namespace QRest.Compiler.Standard.Tests
         [Fact]
         public void Can_Compile_Simple_Method()
         {
-            var seq = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new[] {
+            var seq = new RootTerm(
                 new MethodTerm(
                     new EqualOperation(),
                     new[] {
                         new ConstantTerm("Ololo").AsSequence()
                     })
-            });
+            );
 
             var result = _compiler.Assemble<string>(seq);
             var compiled = result.Compile();
@@ -44,15 +43,15 @@ namespace QRest.Compiler.Standard.Tests
         [Fact]
         public void Can_Compile_Lambda()
         {
-            var seq = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new[]{
+            var seq = new RootTerm(new[]{
                 new MethodTerm(
                     new WhereOperation(),
                     new[] {
-                        new LambdaTerm(BuiltIn.Roots.ContextElement,new ITerm[] {
-                            new MethodTerm(new ItOperation()),
+                        new LambdaTerm(
+                            new MethodTerm(new RootOperation()),
                             new PropertyTerm(nameof(TestEntity.IntProperty)),
                             new MethodTerm(new EqualOperation(), new[]{ new ConstantTerm(1).AsSequence() })
-                        })
+                        )
                     })
             });
 

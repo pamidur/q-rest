@@ -6,7 +6,7 @@ namespace QRest.AspNetCore.Native
 {
     class NativeQueryStructure : IQueryStructure
     {
-        public LambdaTerm Data { get; set; }
-        public IReadOnlyList<LambdaTerm> GetAll() => new[] { Data };
+        public RootTerm Data { get; set; }
+        public IReadOnlyList<RootTerm> GetAll() => new[] { Data };
     }
 }

@@ -1,4 +1,4 @@
-﻿using QRest.Core;
+﻿using QRest.Core.Operations;
 using System.Linq.Expressions;
 
 namespace QRest.Compiler.Standard.Expressions

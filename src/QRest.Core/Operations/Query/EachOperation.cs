@@ -7,9 +7,9 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
 {
-    public class SelectOperation : OperationBase
+    public class EachOperation : OperationBase
     {
-        public override string Key { get; } = "select";
+        public override string Key { get; } = "each";
 
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {

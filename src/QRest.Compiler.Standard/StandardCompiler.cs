@@ -15,14 +15,14 @@ namespace QRest.Compiler.Standard
         private static readonly ConstantsCollector _constantsCollector = new ConstantsCollector();
         private static readonly ConcurrentDictionary<string, ConstantExpression> _cache = new ConcurrentDictionary<string, ConstantExpression>();
 
-        public Func<TRoot, object> Compile<TRoot>(LambdaTerm sequence)
+        public Func<TRoot, object> Compile<TRoot>(RootTerm sequence)
         {
             var exp = Assemble<TRoot>(sequence);
             var compiled = exp.Compile();
             return (TRoot root) => compiled(root);
         }
 
-        public Expression<Func<TRoot, object>> Assemble<TRoot>(LambdaTerm lambdaterm)
+        public Expression<Func<TRoot, object>> Assemble<TRoot>(RootTerm rootTerm)
         {
             ConstantExpression compiled = null;
             IReadOnlyList<ConstantExpression> constants = null;
@@ -30,17 +30,17 @@ namespace QRest.Compiler.Standard
             var rootType = typeof(TRoot);
 
             var root = Expression.Parameter(rootType, "r");
-            var cacheKey = $"{rootType.ToString()}++{lambdaterm.KeyView}";
+            var cacheKey = $"{rootType.ToString()}++{rootTerm.KeyView}";
 
             if (UseCompilerCache && _cache.TryGetValue(cacheKey, out var @delegate))
             {
                 compiled = @delegate;
-                constants = _constantsCollector.Collect(lambdaterm);
+                constants = _constantsCollector.Collect(rootTerm);
             }
             else
             {
                 var ctx = new StandardAssembler(this);
-                var (lambda, consts) = ctx.Assemble(lambdaterm, root, typeof(object));
+                var (lambda, consts) = ctx.Assemble(rootTerm, root, typeof(object));
 
                 constants = consts;
                 compiled = Expression.Constant(lambda.Compile());

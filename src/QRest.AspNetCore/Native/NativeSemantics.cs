@@ -12,25 +12,25 @@ namespace QRest.AspNetCore.Native
 {
     public partial class NativeSemantics : ISemantics
     {
-        private static readonly NativeQueryStructure _default = new NativeQueryStructure { Data = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new MethodTerm(new ItOperation()).AsSequence()) };
+        private static readonly NativeQueryStructure _default = new NativeQueryStructure { Data = new RootTerm(new MethodTerm(new RootOperation()).AsSequence()) };
 
-        private Lazy<Parser<LambdaTerm>> Parser { get; }
+        private Lazy<Parser<RootTerm>> Parser { get; }
 
         public NativeSemantics()
         {
-            Parser = new Lazy<Parser<LambdaTerm>>(() => PrepareParser());
+            Parser = new Lazy<Parser<RootTerm>>(() => PrepareParser());
         }
 
-        private Parser<LambdaTerm> PrepareParser()
+        private Parser<RootTerm> PrepareParser()
         {
-            return new QRestParserBuilder(UseDefferedConstantParsing, _callMap).Build();
+            return new TermParser(UseDefferedConstantParsing, OperationsMap.GetRegisteredOperationNames(), OperationsMap.LookupOperation).Build();
         }
 
-        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<LambdaTerm, object> results)
+        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
         {
             var result = results[query.Data];
             return new OkObjectResult(result);
-        }        
+        }
 
         public IQueryStructure ReadQueryStructure(IReadOnlyList<string> values, HttpRequest request)
         {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace QRest.Core
+namespace QRest.Core.Operations
 {
     public abstract class ProxyExpression : Expression
     {

@@ -23,9 +23,9 @@ namespace QRest.Core.Terms
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
 
-        public virtual string SharedView { get; }
-        public virtual string KeyView { get; }
-        public virtual string DebugView { get; }
+        public virtual string SharedView { get; protected set; }
+        public virtual string KeyView { get; protected set; }
+        public virtual string DebugView { get; protected set; }
 
         protected void Add(ITerm term)
         {

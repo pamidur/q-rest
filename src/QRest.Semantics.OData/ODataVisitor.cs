@@ -26,7 +26,7 @@ namespace QRest.OData
                     new MethodTerm(new ContextOperation()),
                     new NameTerm("value")
                 );
-                return new MethodTerm(new NewOperation(), new List<SequenceTerm> { selectArgs }).AsSequence();
+                return new MethodTerm(new MapOperation(), new List<SequenceTerm> { selectArgs }).AsSequence();
             }
             return Visit(context.queryOptions());
         }
@@ -63,7 +63,7 @@ namespace QRest.OData
 
             selectArgs.Add(BuildSelectArgs(sortedLambdas));
 
-            var selectTerm = new MethodTerm(new NewOperation(), selectArgs);
+            var selectTerm = new MethodTerm(new MapOperation(), selectArgs);
 
             seq.Add(selectTerm);
             return new SequenceTerm(seq.ToArray());
@@ -94,21 +94,21 @@ namespace QRest.OData
         {
             var filterExpression = Visit(context.filterexpr);
 
-            var termFilter = new MethodTerm(new WhereOperation(), new[] { new LambdaTerm(BuiltIn.Roots.ContextElement, filterExpression) });
+            var termFilter = new MethodTerm(new WhereOperation(), new[] { new LambdaTerm(filterExpression) });
             return termFilter.AsSequence();
         }
 
         public override SequenceTerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var select = new MethodTerm(new SelectOperation(), new[] { new LambdaTerm(BuiltIn.Roots.ContextElement, new MethodTerm(new NewOperation(), selectArgs.ToList())) });
+            var select = new MethodTerm(new EachOperation(), new[] { new LambdaTerm(new MethodTerm(new MapOperation(), selectArgs.ToList())) });
             return select.AsSequence();
         }
 
         public override SequenceTerm VisitSelectItem([NotNull] SelectItemContext context)
         {
             return new SequenceTerm(
-                new MethodTerm(new ItOperation()),
+                new MethodTerm(new RootOperation()),
                 new PropertyTerm(context.GetText())
             );
         }
@@ -151,7 +151,7 @@ namespace QRest.OData
         {
             return new SequenceTerm
             (
-                new MethodTerm(new ItOperation()),
+                new MethodTerm(new RootOperation()),
                 new PropertyTerm(context.GetText())
             );
         }
@@ -243,7 +243,7 @@ namespace QRest.OData
         {
             var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).ToList();
 
-            return new MethodTerm(new OrderOperation(), args.Select(a => new LambdaTerm(BuiltIn.Roots.ContextElement, a)).ToArray()).AsSequence();
+            return new MethodTerm(new OrderOperation(), args.Select(a => new LambdaTerm(a)).ToArray()).AsSequence();
         }
 
         public override SequenceTerm VisitOrderbyItem([NotNull] OrderbyItemContext context)
@@ -254,7 +254,7 @@ namespace QRest.OData
 
 
             return new SequenceTerm(
-                new MethodTerm(new ItOperation()),
+                new MethodTerm(new RootOperation()),
                 new PropertyTerm(context.children[0].GetText()),
                 order
             );
@@ -309,7 +309,7 @@ namespace QRest.OData
                 //case "IsEmpty":
                 //    return typeof(string).GetMethod("IsNullOrWhiteSpace", new Type[] { typeof(string) });
                 case "contains":
-                    operation = new ContainsOperation();
+                    operation = new HasOperation();
                     break;
                 default:
                     throw new Exception($"Function {funcName} not found");

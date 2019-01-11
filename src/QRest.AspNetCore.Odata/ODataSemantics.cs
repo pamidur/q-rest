@@ -32,12 +32,12 @@ namespace QRest.AspNetCore.OData
             var vis = new ODataVisitor();
             var exp = vis.Visit(context);
 
-            var lambda = new LambdaTerm(BuiltIn.Roots.OriginalRoot, exp);
+            var root = new RootTerm(exp);
 
-            return new ODataQueryStructure { Data = lambda };
+            return new ODataQueryStructure { Data = root };
         }
 
-        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<LambdaTerm, object> results)
+        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
         {
             var result = results[query.Data];
             return new ODataActionResult(result);

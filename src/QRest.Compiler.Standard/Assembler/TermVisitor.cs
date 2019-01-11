@@ -32,6 +32,9 @@ namespace QRest.Compiler.Standard.Assembler
                 case LambdaTerm l:
                     result = AssembleLambda(l, root, ctx);
                     break;
+                case RootTerm r:
+                    result = AssembleRoot(r, root, ctx);
+                    break;
                 case SequenceTerm s:
                     result = AssembleSequence(s, root, ctx);
                     break;
@@ -75,6 +78,7 @@ namespace QRest.Compiler.Standard.Assembler
 
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleName(NameTerm n, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleLambda(LambdaTerm l, ParameterExpression root, Expression ctx);
+        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleRoot(RootTerm r, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleMethod(MethodTerm m, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleProperty(PropertyTerm p, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleConstant(ConstantTerm c, ParameterExpression root, Expression ctx);

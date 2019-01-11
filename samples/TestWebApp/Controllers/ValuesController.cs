@@ -3,6 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using QRest.AspNetCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -63,17 +64,15 @@ namespace TestWebApp.Controllers
             //collection.InsertOne(new Entity { Number = 1, Text = "dateTime tests", Datetime=DateTime.Now, Datetimeoffset = DateTime.Now });
 
             _source = collection.AsQueryable();
-
         }
 
         // GET api/values
         [HttpGet("{query?}")]
-        public QueryActionResult Get(Query<IQueryable<Entity>> query)
+        public ActionResult Get(Query<IQueryable<Entity>> query)
         {
             //var result = query.Apply(_source);
 
             var aresult = query.ToActionResult(_source);
-
             return aresult;
         }
     }

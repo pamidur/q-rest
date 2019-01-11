@@ -3,11 +3,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using QRest.Core.Contracts;
 
-namespace QRest.Core.Operations
+namespace QRest.Core.Operations.Selectors
 {
-    public class NewOperation : OperationBase
+    public class MapOperation : OperationBase
     {
-        public override string Key { get; } = "new";
+        public override string Key { get; } = "map";
 
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {            

@@ -1,5 +1,4 @@
-﻿using QRest.Core;
-using QRest.Core.Contracts;
+﻿using QRest.Core.Contracts;
 using QRest.Core.Operations;
 using QRest.Core.Terms;
 using Sprache;
@@ -9,11 +8,35 @@ using System.Globalization;
 using System.Linq;
 using Read = Sprache.Parse;
 
-namespace QRest.AspNetCore.Native
+namespace QRest.Core
 {
-    public class QRestParserBuilder
+    public enum DefferedConstantParsing : byte
     {
-        internal static readonly Parser<char> StringDelimiter = Read.Char('`');
+        /// <summary>
+        /// Don't use deffered parsing.
+        /// </summary>
+        Disabled = 0,
+        /// <summary>
+        /// Use only for string values. Allows '{Guid}' and '{DateTime}' to be parsed.
+        /// </summary>
+        Strings = 1,
+        /// <summary>
+        /// Use for strings and number values. Useful for cases when need long int suport and additional precision for decimals and doubles
+        /// </summary>
+        StringsAndNumbers = 3,
+        /// <summary>
+        /// Use for all values
+        /// </summary>
+        All = 4,
+    }
+
+    public class TermParser
+    {
+        public static Parser<RootTerm> Default { get; }
+
+        static TermParser() => Default = new TermParser(DefferedConstantParsing.StringsAndNumbers, OperationsMap.GetRegisteredOperationNames(), OperationsMap.LookupOperation).Build();
+
+        internal static readonly Parser<char> StringDelimiter = Read.Char('\'');
         internal static readonly Parser<char> ArgumentDelimiter = Read.Char(',');
 
         internal static readonly Parser<char> CallOpenBracket = Read.Char('(');
@@ -23,21 +46,26 @@ namespace QRest.AspNetCore.Native
         internal static readonly Parser<char> ArrayCloseBracket = Read.Char(']');
 
         internal static readonly Parser<char> MethodIndicator = Read.Char('-');
+        internal static readonly Parser<char> LambdaIndicator = Read.Char(':');
 
         internal static readonly Parser<char> PropertyNavigator = Read.Char('.');
+
 
         internal static readonly Parser<IEnumerable<char>> TrueConstantString = Read.String("true").Token();
         internal static readonly Parser<IEnumerable<char>> FalseConstantString = Read.String("false").Token();
 
 
         private readonly DefferedConstantParsing _defferedParsing;
-        private readonly Dictionary<string, Func<SequenceTerm[], MethodTerm>> _callMap;
+        private readonly IReadOnlyList<string> _operations;
+        private readonly Func<string, IOperation> _selector;
+
         internal Parser<SequenceTerm> CallChain;
-        internal Parser<LambdaTerm> TopLambda;
+        internal Parser<RootTerm> Root;
         internal Parser<MethodTerm> Call;
         internal Parser<List<SequenceTerm>> CallArguments;
         internal Parser<ITerm> SubProperty;
         internal Parser<ITerm> Property;
+        internal Parser<LambdaTerm> Lambda;
         internal Parser<SequenceTerm> RootProperty;
         internal Parser<ITerm> ChainRoot;
         internal Parser<ConstantTerm> Constant;
@@ -48,15 +76,17 @@ namespace QRest.AspNetCore.Native
         internal Parser<NameTerm> Name;
         internal Parser<string> MemberName;
 
-        public QRestParserBuilder(
+        public TermParser(
             DefferedConstantParsing defferedParsing,
-            Dictionary<string, Func<SequenceTerm[], MethodTerm>> callMap)
+            IReadOnlyList<string> operations,
+            Func<string, IOperation> selector)
         {
             _defferedParsing = defferedParsing;
-            _callMap = callMap;
+            _operations = operations;
+            _selector = selector;
         }
 
-        public Parser<LambdaTerm> Build()
+        public Parser<RootTerm> Build()
         {
             MemberName = BuildMemberNameParser().Named("Member Name");
 
@@ -68,10 +98,11 @@ namespace QRest.AspNetCore.Native
 
 
             Property = BuildPropertyParser().Named("Property");
+            Lambda = BuildLambdaParser().Named("Lambda");
             SubProperty = BuildSubPropertyParser().Named("SubProperty");
             RootProperty = BuildRootPropertyParser().Named("Property");
 
-            Call = BuildMethodParser(BuildOperationParsers(_callMap)).Named("Call");
+            Call = BuildMethodParser(BuildOperationParsers()).Named("Call");
 
             Name = BuildNameTermParser().Named("Name");
 
@@ -79,54 +110,59 @@ namespace QRest.AspNetCore.Native
             CallArguments = BuildCallArgumentsParser().Named("Call Arguments");
             CallChain = BuildCallChainParser().Named("Expression");
 
-            TopLambda = BuildTopLambdaParser().Named("Lambda");
+            Root = BuildTopLambdaParser().Named("Root");
 
-            return TopLambda.End();
+            return Root.End();
         }
 
-        internal Parser<LambdaTerm> BuildTopLambdaParser() =>
+        internal Parser<RootTerm> BuildTopLambdaParser() =>
           from seq in CallChain
-          select new LambdaTerm(BuiltIn.Roots.OriginalRoot, seq);
+          select new RootTerm(seq);
 
         internal Parser<ITerm> BuildChainRootParser() =>
-          from root in Call.Or<ITerm>(Constant)
+          from root in Call.Or<ITerm>(Constant).Or(Lambda)
           select root.AsSequence();
 
         internal Parser<SequenceTerm> BuildCallChainParser() =>
           from root in ChainRoot.Or(RootProperty)
           from chunks in SubProperty.Or(Call).Or(Name).Many()
-          select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc=> new SequenceTerm(acc.ToArray()));
+          select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc => new SequenceTerm(acc.ToArray()));
 
         internal Parser<List<SequenceTerm>> BuildCallArgumentsParser() => Read.Ref(() =>
             from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
             select parameters.Where(r => r != null)?.ToList() ?? new List<SequenceTerm>()
             );
 
-        internal Parser<MethodTerm> BuildMethodParser(Parser<Func<SequenceTerm[], MethodTerm>> operationFactoryParser) =>
+        internal Parser<LambdaTerm> BuildLambdaParser() =>
+            from semic in LambdaIndicator
+            from seq in CallChain
+            select new LambdaTerm(seq);
+
+        internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationFactoryParser) =>
              from semic in MethodIndicator
              from operation in operationFactoryParser
              from arguments in CallArguments.Optional()
-             select operation(arguments.GetOrDefault()?.ToArray() ?? new SequenceTerm[] { });
+             select new MethodTerm(operation, arguments.GetOrDefault()?.ToArray() ?? new SequenceTerm[] { });
 
-        internal Parser<Func<SequenceTerm[], MethodTerm>> BuildOperationParsers(Dictionary<string, Func<SequenceTerm[], MethodTerm>> operationMap)
+        internal Parser<IOperation> BuildOperationParsers()
         {
-            if (operationMap.Count == 0)
+            if (_operations.Count == 0)
                 throw new NotSupportedException("Must supply at least one opration.");
 
-            Parser<Func<SequenceTerm[], MethodTerm>> parser = null;
+            Parser<IOperation> parser = null;
 
-            foreach (var map in operationMap)
+            foreach (var opname in _operations)
             {
-                var next = BuildOperationFactory(map.Key, map.Value).Named($"'{map.Key}'");
+                var next = BuildOperationFactory(opname).Named($"'{opname}'");
                 parser = parser == null ? next : parser.Or(next);
             }
 
             return parser;
         }
 
-        internal Parser<Func<SequenceTerm[], MethodTerm>> BuildOperationFactory(string name, Func<SequenceTerm[], MethodTerm> factory) =>
-            from method in Read.String(name).Token()
-            select factory;
+        internal Parser<IOperation> BuildOperationFactory(string name) =>
+            from method in Read.String(name).Token().Text()
+            select _selector(method);
 
 
         internal Parser<ITerm> BuildSubPropertyParser() =>
@@ -136,7 +172,7 @@ namespace QRest.AspNetCore.Native
 
         internal Parser<SequenceTerm> BuildRootPropertyParser() =>
              from prop in Property
-             select new SequenceTerm(new[] { new MethodTerm(new ItOperation()), prop });
+             select new SequenceTerm(new[] { new MethodTerm(new RootOperation()), prop });
 
         internal Parser<ITerm> BuildPropertyParser() =>
              from name in MemberName

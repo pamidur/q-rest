@@ -1,5 +1,5 @@
-﻿using QRest.Core;
-using QRest.Core.Extensions;
+﻿using QRest.Core.Extensions;
+using QRest.Core.Operations;
 using System;
 using System.Linq;
 using System.Linq.Expressions;

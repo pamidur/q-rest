@@ -9,7 +9,7 @@ namespace QRest.Compiler.Standard.Assembler
     {
         private static readonly ParameterExpression _fakeroot = Expression.Parameter(typeof(object));
 
-        public IReadOnlyList<ConstantExpression> Collect(LambdaTerm lambda)
+        public IReadOnlyList<ConstantExpression> Collect(RootTerm lambda)
         {
             var assembled = AssembleTerm(lambda, _fakeroot, _fakeroot);
             return assembled.Constants;
@@ -41,6 +41,11 @@ namespace QRest.Compiler.Standard.Assembler
         protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleProperty(PropertyTerm p, ParameterExpression root, Expression ctx)
         {
             return (ctx, new ConstantExpression[] { }, new ParameterExpression[] { });
+        }
+
+        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleRoot(RootTerm r, ParameterExpression root, Expression ctx)
+        {
+            return AssembleSequence(r, root, ctx);
         }
     }
 }

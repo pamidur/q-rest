@@ -20,9 +20,9 @@ namespace QRest.Compiler.Standard.Tests
         [Fact(DisplayName = "Can compile NEW Operation")]
         public void New()
         {
-            var tree = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new[]
+            var tree = new RootTerm(new[]
             {
-                new MethodTerm(BuiltIn.Operations.New,new []
+                new MethodTerm(OperationsMap.Map,new []
                 {
                     new PropertyTerm(nameof(CompileTestClass.IntProperty)).AsSequence(),
                     new PropertyTerm(nameof(CompileTestClass.StringProperty)).AsSequence(),
@@ -44,11 +44,11 @@ namespace QRest.Compiler.Standard.Tests
         [Fact(DisplayName = "Can compile SELECT Operation")]
         public void Select()
         {
-            var tree = new LambdaTerm(BuiltIn.Roots.OriginalRoot, new[]
+            var tree = new RootTerm(new[]
             {
-                new MethodTerm(BuiltIn.Operations.Select, new[]{
-                    new LambdaTerm(BuiltIn.Roots.ContextElement,new[]{
-                        new MethodTerm(BuiltIn.Operations.New,new[]
+                new MethodTerm(OperationsMap.Each, new[]{
+                    new LambdaTerm(new[]{
+                        new MethodTerm(OperationsMap.Map,new[]
                         {
                             new PropertyTerm(nameof(CompileTestClass.IntProperty)).AsSequence(),
                             new PropertyTerm(nameof(CompileTestClass.StringProperty)).AsSequence(),

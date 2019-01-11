@@ -6,9 +6,9 @@ namespace QRest.AspNetCore.OData
 {
     public class ODataQueryStructure : IQueryStructure
     {
-        public LambdaTerm Data { get; set; }
-        public LambdaTerm Count { get; set; }
+        public RootTerm Data { get; set; }
+        public RootTerm Count { get; set; }
 
-        public IReadOnlyList<LambdaTerm> GetAll() => new[] { Data, Count };
+        public IReadOnlyList<RootTerm> GetAll() => new[] { Data, Count };
     }
 }

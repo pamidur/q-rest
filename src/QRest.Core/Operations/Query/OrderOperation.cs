@@ -52,7 +52,7 @@ namespace QRest.Core.Operations.Query
 
     public class ReverseOrderOperation : OperationBase
     {
-        public override string Key { get; } = "!rev";
+        public override string Key { get; } = "desc";
 
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {

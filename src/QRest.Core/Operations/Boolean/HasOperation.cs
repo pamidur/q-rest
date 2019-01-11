@@ -5,9 +5,9 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Boolean
 {
-    public class ContainsOperation : OperationBase
+    public class HasOperation : OperationBase
     {
-        public override string Key { get; } = "contains";
+        public override string Key { get; } = "has";
 
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {

@@ -1,10 +1,8 @@
 ﻿using Moq;
-using QRest.AspNetCore.Native;
+using QRest.Core;
 using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using Sprache;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace QRest.Semantics.QRest.Tests
@@ -12,18 +10,16 @@ namespace QRest.Semantics.QRest.Tests
     public class ParserTests
     {
         private readonly Mock<IOperation> _opration;
-        private readonly QRestParserBuilder _parser;
 
         private static readonly string _testUniversalOperationName = "test";
+        private TermParser _parser;
 
         public ParserTests()
         {
             _opration = new Mock<IOperation>();
             _opration.Setup(m => m.Key).Returns(_testUniversalOperationName);
 
-            _parser = new QRestParserBuilder(DefferedConstantParsing.Disabled, new Dictionary<string, Func<SequenceTerm[], MethodTerm>> {
-                { _testUniversalOperationName, s=>new MethodTerm(_opration.Object) }  
-            });
+            _parser = new TermParser(DefferedConstantParsing.Disabled, new[] { _testUniversalOperationName }, n => n == _testUniversalOperationName ? _opration.Object : null);
             _parser.Build();
         }
 
@@ -81,7 +77,7 @@ namespace QRest.Semantics.QRest.Tests
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
             Assert.Equal(567, (int)actual.Value.Value);
-        }
+        }    
 
         [Fact(DisplayName = "Parsed Method Without Params and Brakets")]
         public void MethodWithoutParamsAndBrakets()
@@ -103,6 +99,20 @@ namespace QRest.Semantics.QRest.Tests
             Assert.True(actual.WasSuccessful);
             Assert.Equal(_testUniversalOperationName, actual.Value.Operation.Key);
             Assert.Empty(actual.Value.Arguments);
+        }
+
+        [Fact(DisplayName = "Lambda Is Parsed")]
+        public void LambdaParseTest()
+        {
+            var actual = _parser.Lambda.TryParse($":-{_testUniversalOperationName}()");
+
+            Assert.Empty(actual.Expectations);
+            Assert.True(actual.WasSuccessful);
+
+            var method = (MethodTerm) actual.Value.Root;
+
+            Assert.Equal(_testUniversalOperationName, method.Operation.Key);
+            Assert.Empty(method.Arguments);
         }
     }
 }

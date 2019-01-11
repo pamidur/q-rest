@@ -7,7 +7,7 @@ namespace QRest.AspNetCore.Contracts
 {
     public interface ISemantics
     {
-        ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<LambdaTerm, object> results);
+        ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results);
         IQueryStructure ReadQueryStructure(IReadOnlyList<string> values, HttpRequest request);
     }
 }

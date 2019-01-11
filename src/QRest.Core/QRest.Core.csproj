@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <PackageReference Include="Sprache" Version="2.2.0" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
   </ItemGroup>
 
