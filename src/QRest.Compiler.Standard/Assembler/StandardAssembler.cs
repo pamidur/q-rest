@@ -125,11 +125,9 @@ namespace QRest.Compiler.Standard.Assembler
 
         protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleRoot(RootTerm r, ParameterExpression root, Expression ctx)
         {
-            var rootarg = root;
+            var sequence = base.AssembleSequence(r, root, root);
 
-            var sequence = base.AssembleSequence(r, rootarg, rootarg);
-
-            var resultLambda = Expression.Lambda(sequence.Expression, rootarg);
+            var resultLambda = Expression.Lambda(sequence.Expression, root);
             return (resultLambda, sequence.Constants, sequence.Parameters);
         }
     }

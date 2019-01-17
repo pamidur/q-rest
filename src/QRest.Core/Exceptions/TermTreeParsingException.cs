@@ -1,10 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace QRest.Core
 {
-    public class TermTreeParsingException : Exception
+    public abstract class TermTreeParsingException : Exception
     {
+        protected TermTreeParsingException(string message):base(message)
+        {
+        }
     }
 }

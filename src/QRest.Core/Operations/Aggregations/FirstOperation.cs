@@ -18,7 +18,7 @@ namespace QRest.Core.Operations.Aggregations
 
             var exp = Expression.Call(typeof(Queryable), nameof(Queryable.FirstOrDefault), new Type[] { context.GetQueryElementType() }, context);
 
-            return exp;
+            return assembler.SetName(exp, Key);
         }
     }
 }

@@ -19,9 +19,9 @@ namespace QRest.Core.Operations.Query
             if (!assembler.TryConvert(arguments[0], typeof(int), out var argument))
                 throw new ExpressionCreationException($"Cannot cast {arguments[0].Type} to Int32");
 
-            var exp =  Expression.Call(typeof(Queryable), nameof(Queryable.Skip), new Type[] { context.GetQueryElementType() }, context, argument);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Skip), new Type[] { context.GetQueryElementType() }, context, argument);
 
-            return exp;
-        }       
+            return assembler.SetName(exp, "data");
+        }
     }
 }

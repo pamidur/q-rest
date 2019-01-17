@@ -50,6 +50,8 @@ namespace QRest.Core
 
         internal static readonly Parser<char> PropertyNavigator = Read.Char('.');
 
+        internal static readonly Parser<char> NameIndicator = Read.Char('@');
+
 
         internal static readonly Parser<IEnumerable<char>> TrueConstantString = Read.String("true").Token();
         internal static readonly Parser<IEnumerable<char>> FalseConstantString = Read.String("false").Token();
@@ -106,9 +108,9 @@ namespace QRest.Core
 
             Name = BuildNameTermParser().Named("Name");
 
-            ChainRoot = BuildChainRootParser().Named("Call or Constant");
+            ChainRoot = BuildChainRootParser();
             CallArguments = BuildCallArgumentsParser().Named("Call Arguments");
-            CallChain = BuildCallChainParser().Named("Expression");
+            CallChain = BuildCallChainParser();
 
             Root = BuildTopLambdaParser().Named("Root");
 
@@ -120,16 +122,16 @@ namespace QRest.Core
           select new RootTerm(seq);
 
         internal Parser<ITerm> BuildChainRootParser() =>
-          from root in Call.Or<ITerm>(Constant).Or(Lambda)
+          from root in Call.XOr<ITerm>(Lambda).XOr(Constant)
           select root.AsSequence();
 
         internal Parser<SequenceTerm> BuildCallChainParser() =>
-          from root in ChainRoot.Or(RootProperty)
-          from chunks in SubProperty.Or(Call).Or(Name).Many()
+          from root in ChainRoot.XOr(RootProperty)
+          from chunks in SubProperty.XOr(Call).XOr(Name).XMany()
           select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc => new SequenceTerm(acc.ToArray()));
 
         internal Parser<List<SequenceTerm>> BuildCallArgumentsParser() => Read.Ref(() =>
-            from parameters in Read.Contained(Read.DelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
+            from parameters in Read.Contained(Read.XDelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
             select parameters.Where(r => r != null)?.ToList() ?? new List<SequenceTerm>()
             );
 
@@ -141,7 +143,7 @@ namespace QRest.Core
         internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationFactoryParser) =>
              from semic in MethodIndicator
              from operation in operationFactoryParser
-             from arguments in CallArguments.Optional()
+             from arguments in CallArguments.XOptional()
              select new MethodTerm(operation, arguments.GetOrDefault()?.ToArray() ?? new SequenceTerm[] { });
 
         internal Parser<IOperation> BuildOperationParsers()
@@ -161,8 +163,8 @@ namespace QRest.Core
         }
 
         internal Parser<IOperation> BuildOperationFactory(string name) =>
-            from method in Read.String(name).Token().Text()
-            select _selector(method);
+            from method in Read.String(name)
+            select _selector(string.Join("", method));
 
 
         internal Parser<ITerm> BuildSubPropertyParser() =>
@@ -205,7 +207,7 @@ namespace QRest.Core
             select new ConstantTerm(ParseConstant<bool>(str));
 
         protected Parser<NameTerm> BuildNameTermParser() =>
-            from at in Read.Char('@')
+            from at in NameIndicator
             from name in MemberName
             select new NameTerm(name);
 

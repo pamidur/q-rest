@@ -18,10 +18,10 @@ namespace QRest.Core.Operations.Query
             var lambda = (LambdaExpression)arguments[0];
             var param = lambda.Parameters[0];
 
-            var resultExpression = Expression.Call(typeof(Queryable), nameof(Queryable.Select)
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Select)
                 , new Type[] { queryElement, lambda.ReturnType }, context, lambda);
 
-            return resultExpression;
+            return assembler.SetName(exp, "data");
         }
     }
 }

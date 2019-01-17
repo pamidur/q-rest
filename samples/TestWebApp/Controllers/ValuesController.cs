@@ -70,6 +70,11 @@ namespace TestWebApp.Controllers
         [HttpGet("{query?}")]
         public ActionResult Get(Query<IQueryable<Entity>> query)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             //var result = query.Apply(_source);
 
             var aresult = query.ToActionResult(_source);

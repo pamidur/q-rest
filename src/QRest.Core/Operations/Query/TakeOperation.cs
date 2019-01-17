@@ -21,7 +21,7 @@ namespace QRest.Core.Operations.Query
 
             var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Take), new Type[] { context.GetQueryElementType() }, context, argument);
 
-            return exp;
+            return assembler.SetName(exp, "data");
         }
     }
 }

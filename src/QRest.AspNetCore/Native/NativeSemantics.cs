@@ -44,7 +44,7 @@ namespace QRest.AspNetCore.Native
             op = OperationsMap.LookupOperation(name);
             if (op != null) return op;
 
-            throw new UnknownOperationException(name);
+            throw new InvalidSemanticsException($"Unknown operation '{name}'");
         }
 
         public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
@@ -59,6 +59,11 @@ namespace QRest.AspNetCore.Native
                 return _default;
 
             var result = _parser.Value.TryParse(values[0]);
+
+            if (!result.WasSuccessful)
+            {
+                throw new InvalidSemanticsException(result.Message) { Position = result.Remainder.Column, Expectations = result.Expectations.ToArray() };
+            }
 
             return new NativeQueryStructure { Data = result.Value };
         }
