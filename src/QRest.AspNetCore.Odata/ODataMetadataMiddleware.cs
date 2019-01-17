@@ -42,10 +42,10 @@ namespace QRest.AspNetCore.OData
 
         private Task ApiMetadata(HttpContext context)
         {
-            var edm = MetadataBuilder.New(context.Request.Host.ToString());
+            var edm = MetadataBuilder.New(_options.Namespace);
 
             foreach (var api in _provider.ApiDescriptionGroups.Items.SelectMany(i => i.Items).ToArray())
-                edm.Map(api.ActionDescriptor.Parameters[0].ParameterType.GetGenericArguments()[0]);
+                edm.Map(api.ActionDescriptor.Parameters[0].ParameterType.GetGenericArguments()[0].GetGenericArguments()[0]);
 
             context.Response.ContentType = "application/xml";
 

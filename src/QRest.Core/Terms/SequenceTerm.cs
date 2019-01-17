@@ -37,7 +37,7 @@ namespace QRest.Core.Terms
 
         protected void Add(IEnumerable<ITerm> terms)
         {
-            foreach (var term in terms)
+            foreach (var term in terms.Where(t => t != null))
                 Add(term);
         }
 

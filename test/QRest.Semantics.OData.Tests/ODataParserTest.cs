@@ -7,9 +7,9 @@ namespace QRest.OData.Tests
     public class ODataParserTest
     {
         [Theory]
-        [InlineData("-where(:-$.param1-eq('[L72]'))-map(-$$@value)", @"$filter =   param1 eq '[L72]'")]
-        [InlineData("-where(:'L72'-eq(-$.param1))-map(-$$@value)", @"$filter =  'L72' eq param1 ")]
-        [InlineData("-where(:-every(-$.param1-eq('L72'),-oneof(-$.param2-eq('qwerty'),-$.param3-eq('asdf'))))-map(-$$@value)",
+        [InlineData("value=-where(:-$.param1-eq('[L72]'))", @"$filter =   param1 eq '[L72]'")]
+        [InlineData("value=-where(:'L72'-eq(-$.param1))", @"$filter =  'L72' eq param1 ")]
+        [InlineData("value=-where(:-every(-$.param1-eq('L72'),-oneof(-$.param2-eq('qwerty'),-$.param3-eq('asdf'))))",
             @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ")]
         public void ShouldParseFilterQueryOption(string expected, string input)
         {
@@ -22,13 +22,13 @@ namespace QRest.OData.Tests
         {
             var input = @"$filter = not contains(param,'b')";
             ITerm exp = Parse(input);
-            Assert.Equal("-where(:-$.param-has('b')-not)-map(-$$@value)", exp.SharedView);
+            Assert.Equal("value=-where(:-$.param-has('b')-not)", exp.SharedView);
 
         }
 
         [Theory]
-        [InlineData("-where(:-$.a-eq(-$.b))-map(-count@@odata.count,-$$@value)", @"$filter = a eq b&$count=true")]
-        [InlineData("-where(:-$.a-eq(-$.b))-map(-$$@value)", @"$filter = a eq b&$count=false")]
+        [InlineData("value=-where(:-$.a-eq(-$.b));count=-where(:-$.a-eq(-$.b))-count", @"$filter = a eq b&$count=true")]
+        [InlineData("value=-where(:-$.a-eq(-$.b))", @"$filter = a eq b&$count=false")]
         public void ShouldParseCount(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -40,13 +40,13 @@ namespace QRest.OData.Tests
         public void ShouldParseEmptyString()
         {
             ITerm exp = Parse(string.Empty);
-            Assert.Equal("-map(-$$@value)", exp.SharedView);
+            Assert.Equal("value=-$$", exp.SharedView);
         }
 
         [Theory]
-        [InlineData("-where(:-$.a-eq('12/22/2019 21:02:00 +00:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00.3434Z")]
-        [InlineData("-where(:-$.a-eq('12/22/2019 21:02:00 +02:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00.34346767+02:00")]
-        [InlineData("-where(:-$.a-eq('12/22/2019 21:02:00 -03:00'))-map(-$$@value)", @"$filter = a eq 2019-12-22T21:02:00-03:00")]
+        [InlineData("value=-where(:-$.a-eq('12/22/2019 21:02:00 +00:00'))", @"$filter = a eq 2019-12-22T21:02:00.3434Z")]
+        [InlineData("value=-where(:-$.a-eq('12/22/2019 21:02:00 +02:00'))", @"$filter = a eq 2019-12-22T21:02:00.34346767+02:00")]
+        [InlineData("value=-where(:-$.a-eq('12/22/2019 21:02:00 -03:00'))", @"$filter = a eq 2019-12-22T21:02:00-03:00")]
         public void ShouldParseDateTimeOffset(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -54,8 +54,8 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("-where(:-$.a-eq(-$.b))-map(-each(:-map(-$.f1,-$.f2))@value)", @"$filter = a eq b&$count=false&$select=f1,f2")]
-        [InlineData("-where(:-$.a-eq(-$.b))-map(-count@@odata.count,-each(:-map(-$.f1,-$.f2))@value)", @"$filter = a eq b&$count=true&$select=f1,f2")]
+        [InlineData("value=-where(:-$.a-eq(-$.b))-each(:-map(-$.f1,-$.f2))", @"$filter = a eq b&$count=false&$select=f1,f2")]
+        [InlineData("value=-where(:-$.a-eq(-$.b))-each(:-map(-$.f1,-$.f2));count=-where(:-$.a-eq(-$.b))-count", @"$filter = a eq b&$count=true&$select=f1,f2")]
         public void ShouldParseeach(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -63,7 +63,7 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("-map(-skip('1')-take('1')-each(:-map(-$.f1,-$.f2))@value)", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
+        [InlineData("value=-skip('1')-take('1')-each(:-map(-$.f1,-$.f2))", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
         public void ShouldParseTopSkip(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -72,9 +72,9 @@ namespace QRest.OData.Tests
 
 
         [Theory]
-        [InlineData("-map(-order(:-$.f1-$$,:-$.f2-$$)@value)", @"$orderby=f1,f2")]
-        [InlineData("-map(-order(:-$.f1-$$,:-$.f2-desc)@value)", @"$orderby=f1 asc,f2 desc" )]
-        [InlineData("-map(-count@@odata.count,-order(:-$.f1-$$,:-$.f2-desc)@value)", @"$orderby=f1 asc,f2 desc&$count=true")]
+        [InlineData("value=-order(:-$.f1-$$,:-$.f2-$$)", @"$orderby=f1,f2")]
+        [InlineData("value=-order(:-$.f1-$$,:-$.f2-desc)", @"$orderby=f1 asc,f2 desc" )]
+        [InlineData("value=-order(:-$.f1-$$,:-$.f2-desc);count=-count", @"$orderby=f1 asc,f2 desc&$count=true")]
         public void ShouldParseOrderBy(string expected, string input)
         {
             ITerm exp = Parse(input);

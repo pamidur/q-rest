@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using QRest.AspNetCore;
 using QRest.AspNetCore.Contracts;
 using QRest.AspNetCore.OData;
-using QRest.Semantics.OData;
+using System;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -18,15 +18,15 @@ namespace Microsoft.Extensions.DependencyInjection
 
     public static class QRestExtensions
     {
-        public static IServiceCollection AddOData(this IServiceCollection services, PathString path)
+        public static QRestConfiguration UseODataSemantics(this QRestConfiguration qrest, Action<ODataOptions> options)
         {
-            services.Configure<MvcOptions>(mvc => mvc.Conventions.Add(new ODataAppConvention()));
-            services.Configure<ODataOptions>(odata => odata.MetadataPath = path);
+            qrest.Services.Configure<MvcOptions>(mvc => mvc.Conventions.Add(new ODataAppConvention()));
+            qrest.Services.Configure<ODataOptions>(options);
 
-            services.AddTransient<ISemantics, ODataSemantics>();
-            services.AddSingleton<ODataMetadataMiddleware>();
+            qrest.Services.AddTransient<ISemantics, ODataSemantics>();
+            qrest.Services.AddSingleton<ODataMetadataMiddleware>();
 
-            return services;
+            return qrest;
         }
 
         public static IApplicationBuilder UseODataMetadata(this IApplicationBuilder app)

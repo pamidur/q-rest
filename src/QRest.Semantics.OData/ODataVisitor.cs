@@ -21,13 +21,8 @@ namespace QRest.OData
         public override SequenceTerm VisitParse([NotNull] ParseContext context)
         {
             if (context.children.Count < 2)
-            {
-                var selectArgs = new SequenceTerm(
-                    new MethodTerm(new ContextOperation()),
-                    new NameTerm("value")
-                );
-                return new MethodTerm(new MapOperation(), new List<SequenceTerm> { selectArgs }).AsSequence();
-            }
+                return new ODataTermContainer { Data = new MethodTerm(OperationsMap.Context) };
+
             return Visit(context.queryOptions());
         }
 
@@ -43,52 +38,36 @@ namespace QRest.OData
 
         private SequenceTerm BuildTerms(List<SequenceTerm> sortedLambdas)
         {
-            var seq = new List<ITerm>();
+            ITerm dataOut = null;
+            ITerm countOut = null;
 
             if (sortedLambdas.Any())
             {
-                if (((MethodTerm)sortedLambdas.First().Root).Operation is WhereOperation)
+                var filter = sortedLambdas.FirstOrDefault(l => l.Root is MethodTerm method && method.Operation is WhereOperation);
+                if (filter != null)
                 {
-                    seq.Add(sortedLambdas.First());
-                    sortedLambdas = sortedLambdas.Skip(1).ToList();
+                    dataOut = filter.Root;
+                    sortedLambdas = sortedLambdas.Except(new[] { filter }).ToList();
                 }
+
+                var count = sortedLambdas.FirstOrDefault(l => l.Root is MethodTerm method && method.Operation is CountOperation);
+                if (count != null)
+                {
+                    countOut = new SequenceTerm(dataOut, count.Root);
+                    sortedLambdas = sortedLambdas.Except(new[] { count }).ToList();
+                }
+
+                if (sortedLambdas.Any())
+                    dataOut = new SequenceTerm(new[] { dataOut }.Concat(sortedLambdas).ToArray());
             }
 
-            var selectArgs = new List<SequenceTerm>() {
-                //new SequenceTerm(new ConstantTerm(_serviceRoot), new NameTerm("@odata.context"))
-            };
-
-            var countTerm = sortedLambdas.Where(c => ((MethodTerm)c.Root).Operation is CountOperation).FirstOrDefault();
-            if (countTerm != null) selectArgs.Add(new SequenceTerm(countTerm.Concat(new[] { new NameTerm("@odata.count") }).ToArray()));
-
-            selectArgs.Add(BuildSelectArgs(sortedLambdas));
-
-            var selectTerm = new MethodTerm(new MapOperation(), selectArgs);
-
-            seq.Add(selectTerm);
-            return new SequenceTerm(seq.ToArray());
-        }
-
-        private SequenceTerm BuildSelectArgs(List<SequenceTerm> sortedLambdas)
-        {
-            var seq = new List<ITerm>();
-
-            foreach (var lambda in sortedLambdas.Where(c => !(((MethodTerm)c.Root).Operation is CountOperation)))
-                seq.Add(lambda);
-
-            if (seq.Count == 0)
-                seq.Add(new MethodTerm(new ContextOperation()));
-
-            seq.Add(new NameTerm("value"));
-
-            return new SequenceTerm(seq.ToArray());
+            return new ODataTermContainer() { Data = dataOut ?? new MethodTerm(OperationsMap.Context), Count = countOut };
         }
 
         private static QueryOptionContext GetContext<T>(IEnumerable<QueryOptionContext> opts)
         {
             return opts.Where(c => c.children.Any(x => x is T)).FirstOrDefault();
         }
-
 
         public override SequenceTerm VisitFilter([NotNull] ODataGrammarParser.FilterContext context)
         {

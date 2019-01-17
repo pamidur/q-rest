@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
-using QRest.Core;
 using System;
 
 namespace TestWebApp
@@ -20,14 +19,17 @@ namespace TestWebApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddOData("/api");
-
             services
                 .AddQRest()
-                .UseNativeSemantics(sem =>
+                .UseODataSemantics(odata =>
                 {
-                    sem.UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers;
+                    odata.MetadataPath = "/api";
+                    odata.Namespace = "MyTest";
                 })
+                //.UseNativeSemantics(sem =>
+                //{
+                //    sem.UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers;
+                //})
                 .UseStandardCompiler(cpl =>
                 {
                     cpl.UseCompilerCache = false;
@@ -55,7 +57,7 @@ namespace TestWebApp
             });
 
 
-            //app.UseODataMetadata();
+            app.UseODataMetadata();
             app.UseMvc();
         }
     }
