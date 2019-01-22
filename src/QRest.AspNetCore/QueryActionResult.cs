@@ -55,7 +55,7 @@ namespace QRest.AspNetCore
         private ActionResult GetActualResult(ActionContext context)
         {
             var semantics = (context.HttpContext.RequestServices.GetService(typeof(ISemantics)) as ISemantics) ?? new NativeSemantics();
-            return semantics.WriteQueryResponse(_structure, _results, _sourceType);
+            return semantics.WriteQueryResponse(_structure, _results);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using QRest.AspNetCore.OData.Metadata;
+using System.Text;
 using System.Xml;
 using Xunit;
 
@@ -17,8 +18,8 @@ namespace QRest.AspNetCore.OData.Tests
         {
             var edm =
                 ODataModel.New("TestNS")
-                .MapSet(typeof(MyEntity),"TestSet")
-                .Build();
+                .MapSet(typeof(MyEntity),"TestSet","")
+                .Schema;
 
             var sb = new StringBuilder();
 

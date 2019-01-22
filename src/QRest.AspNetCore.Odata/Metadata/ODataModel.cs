@@ -10,14 +10,14 @@ namespace QRest.AspNetCore.OData.Metadata
         private readonly string _namespace;
         private readonly EdmEntityContainer _container;
 
-        public EdmModel Edm { get; }
-        public IDictionary<string, IEdmEntityContainerElement> UrlMap { get; } = new Dictionary<string, IEdmEntityContainerElement>();
+        public EdmModel Schema { get; }
+        public IDictionary<string, IEdmEntityContainerElement> Registry { get; } = new Dictionary<string, IEdmEntityContainerElement>();
 
         private ODataModel(string @namespace)
         {
             _namespace = @namespace;
-            Edm = new EdmModel();
-            _container = Edm.AddEntityContainer(_namespace, "Container");
+            Schema = new EdmModel();
+            _container = Schema.AddEntityContainer(_namespace, "Container");
         }
 
         public static ODataModel New(string @namespace)
@@ -30,7 +30,7 @@ namespace QRest.AspNetCore.OData.Metadata
             var edmType = MapType(type);
 
             var set = _container.AddEntitySet(setName, (IEdmEntityType) edmType);
-            UrlMap.Add(url, set);
+            Registry.Add(url, set);
             return this;
         }
 
@@ -47,7 +47,7 @@ namespace QRest.AspNetCore.OData.Metadata
 
         private IEdmType MapClass(Type type)
         {
-            var entityType = Edm.AddEntityType(_namespace, type.Name);
+            var entityType = Schema.AddEntityType(_namespace, type.Name);
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance))
             {

@@ -9,7 +9,6 @@ using QRest.Semantics.OData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace QRest.AspNetCore.OData
 {
@@ -47,7 +46,7 @@ namespace QRest.AspNetCore.OData
 
             var container = (ODataTermContainer)exp;
 
-            var result = new ODataQueryStructure($"{request.Scheme}://{request.Host}")
+            var result = new ODataQueryStructure()
             {
                 Data = new RootTerm(container.Data)
             };
@@ -58,20 +57,10 @@ namespace QRest.AspNetCore.OData
             return result;
         }
 
-        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, Type source)
+        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
         {
             var odataquery = (ODataQueryStructure)query;
             return new ODataQueryResult(odataquery, results, _options?.MetadataPath);
-        }
-
-        private static Type GetQueryElementType(Type typeInfo)
-        {
-            if (!typeInfo.IsGenericType || (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() != _queryableIface))
-            {
-                typeInfo = typeInfo.GetInterface(_queryableIfaceName)?.GetTypeInfo();
-            }
-
-            return typeInfo?.GetGenericArguments()[0];
         }
     }
 }

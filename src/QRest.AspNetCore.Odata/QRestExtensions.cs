@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using QRest.AspNetCore;
 using QRest.AspNetCore.Contracts;
 using QRest.AspNetCore.OData;
+using QRest.AspNetCore.OData.Metadata;
 using System;
 using System.Reflection;
 
@@ -41,6 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection
             qrest.Services.Configure<ODataOptions>(options);
 
             qrest.Services.AddTransient<ISemantics, ODataSemantics>();
+            qrest.Services.AddTransient<IModelBuilder, ConventionalModelBuilder>();
             qrest.Services.AddSingleton<ODataMetadataMiddleware>();
 
             return qrest;

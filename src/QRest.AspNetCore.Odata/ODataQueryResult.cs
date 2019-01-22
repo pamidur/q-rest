@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
+using QRest.AspNetCore.OData.Metadata;
 using QRest.Core.Terms;
 using System.Collections.Generic;
 using System.IO;
@@ -22,7 +22,7 @@ namespace QRest.AspNetCore.OData
             _metadataUrl = metadataUrl;
         }
 
-        public override async Task ExecuteResultAsync(ActionContext context)
+        public override Task ExecuteResultAsync(ActionContext context)
         {            
             context.HttpContext.Response.ContentType = "application/json; odata.metadata=minimal; charset=utf-8";
 
@@ -31,19 +31,19 @@ namespace QRest.AspNetCore.OData
 
             using (var sw = new StreamWriter(context.HttpContext.Response.Body, Encoding.UTF8))
                 ser.Serialize(sw, response);
+
+            return Task.CompletedTask;
         }
 
         private object CreateResponse(ActionContext context)
         {
+            var builder = (IModelBuilder)context.HttpContext.RequestServices.GetService(typeof(IModelBuilder));
+
             var result = new Dictionary<string, object>();
 
             if (_metadataUrl != null)
             {
-                var edmType = context.ActionDescriptor.Id;
-
-                if (context.ActionDescriptor is ControllerActionDescriptor cad)
-                    edmType = cad.ControllerName;
-
+                var edmType = builder.GetEdmName(context.ActionDescriptor);
                 result.Add("@odata.context", $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{_metadataUrl}/$metadata#{edmType}");
             }
 

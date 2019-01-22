@@ -1,7 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm.Csdl;
 using Newtonsoft.Json;
@@ -18,15 +15,12 @@ namespace QRest.AspNetCore.OData
 {
     internal class ODataMetadataMiddleware : IMiddleware
     {
-        private readonly IApiDescriptionGroupCollectionProvider _provider;
         private readonly ODataOptions _options;
         private readonly Lazy<ODataModel> _model;
 
-        public ODataMetadataMiddleware(IModelBuilder modelBuilder, IApiDescriptionGroupCollectionProvider provider, IOptions<ODataOptions> options)
+        public ODataMetadataMiddleware(IModelBuilder modelBuilder, IOptions<ODataOptions> options)
         {
-            _provider = provider;
             _options = options.Value;
-
             _model = new Lazy<ODataModel>(modelBuilder.Build);
         }
 
@@ -45,7 +39,7 @@ namespace QRest.AspNetCore.OData
 
         private Task ApiList(HttpContext context)
         {
-            var urlMap = _model.Value.UrlMap.Select(u => new { name = u.Value.Name, kind = u.Value.ContainerElementKind.ToString(), url = u.Key });
+            var urlMap = _model.Value.Registry.Select(u => new { name = u.Value.Name, kind = u.Value.ContainerElementKind.ToString(), url = u.Key });
 
             var result = new Dictionary<string, object>
             {
@@ -65,35 +59,12 @@ namespace QRest.AspNetCore.OData
 
         private Task ApiMetadata(HttpContext context)
         {
-            context.Response.ContentType = "application/xml";
+            context.Response.ContentType = "application/xml; charset=utf-8";
 
             using (var xw = XmlWriter.Create(context.Response.Body, new XmlWriterSettings { Encoding = Encoding.UTF8 }))
-                CsdlWriter.TryWriteCsdl(_model.Value.Edm, xw, CsdlTarget.OData, out var errors);
+                CsdlWriter.TryWriteCsdl(_model.Value.Schema, xw, CsdlTarget.OData, out var errors);
 
             return Task.CompletedTask;
-        }
-
-        private ODataModel CreateModel()
-        {
-            var model = ODataModel.New(_options.Namespace);
-            foreach (var api in _provider.ApiDescriptionGroups.Items.SelectMany(i => i.Items).ToArray())
-            {
-                var cad = (ControllerActionDescriptor)api.ActionDescriptor;
-
-                model.MapSet(api.ActionDescriptor.Parameters[0].ParameterType.GetGenericArguments()[0].GetGenericArguments()[0], cad.ControllerName, FormatUrl( api.RelativePath, api.ActionDescriptor.Parameters));
-            }
-
-            return model;
-        }
-        
-        private string FormatUrl(string relativePath, IList<ParameterDescriptor> parameters)
-        {
-            relativePath = relativePath.Replace(_options.MetadataPath.ToString().TrimStart('/'), "").TrimStart('/');
-
-            foreach (var par in parameters)
-                relativePath = relativePath.Replace($"{{{par.Name}}}", "").TrimEnd('/');
-
-            return relativePath;
         }
 
         private bool IsMetadataRequest(HttpContext context)
