@@ -76,7 +76,7 @@ namespace TestWebApp.Controllers
         }
 
         // GET api/values
-        [HttpGet("Data/{query?}")]
+        [HttpGet("{query?}")]
         public ActionResult Get(Query<IQueryable<Entity>> query)
         {
             if (!ModelState.IsValid)
@@ -88,6 +88,28 @@ namespace TestWebApp.Controllers
 
             var aresult = query.ToActionResult(_data);
             return aresult;
+        }
+
+        // GET api/values
+        [HttpGet("Data/{query?}")]
+        public ActionResult GetData(Query<IQueryable<Entity>> query)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            //var result = query.Apply(_source);
+
+            var aresult = query.ToActionResult(_data);
+            return aresult;
+        }
+
+        // GET api/values
+        [HttpGet("Ok/{data}")]
+        public ActionResult GetData(string data)
+        {
+            return Ok();
         }
     }
 }

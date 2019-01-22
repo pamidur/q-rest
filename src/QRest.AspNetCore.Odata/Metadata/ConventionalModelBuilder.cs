@@ -42,7 +42,15 @@ namespace QRest.AspNetCore.OData.Metadata
 
         private Type GetActionElementType(ActionDescriptor actionDescriptor)
         {
-            return actionDescriptor.Parameters[0].ParameterType.GetGenericArguments()[0].GetGenericArguments()[0];
+            if (actionDescriptor.Parameters.Count > 1)
+                return null;
+
+            var queryParam = actionDescriptor.Parameters[0];
+
+            if (!typeof(Query).IsAssignableFrom(queryParam.ParameterType))
+                return null;
+
+            return queryParam.ParameterType.GetGenericArguments()[0].GetGenericArguments()[0];
         }
 
         private string FormatUrl(string relativePath, IList<ParameterDescriptor> parameters)
