@@ -1,9 +1,7 @@
 ﻿using Microsoft.OData.Edm;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace QRest.AspNetCore.OData
+namespace QRest.AspNetCore.OData.Metadata
 {
     static class EdmExtensions
     {

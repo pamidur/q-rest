@@ -16,8 +16,8 @@ namespace QRest.AspNetCore.OData.Tests
         public void Can_Map_Simple_Type()
         {
             var edm =
-                MetadataBuilder.New("TestNS")
-                .Map(typeof(MyEntity))
+                ODataModel.New("TestNS")
+                .MapSet(typeof(MyEntity),"TestSet")
                 .Build();
 
             var sb = new StringBuilder();

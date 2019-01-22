@@ -31,9 +31,9 @@ namespace QRest.AspNetCore.OData
 
             var strings = new List<string>();
 
-            foreach (var c in clauses)            
+            foreach (var c in clauses)
                 if (request.Query.TryGetValue(c, out var strs))
-                    strings.Add($"{c}={strs.First()}");    
+                    strings.Add($"{c}={strs.First()}");
 
             ICharStream stream = CharStreams.fromstring(string.Join("&", strings));
             ITokenSource lexer = new ODataGrammarLexer(stream);
@@ -47,7 +47,8 @@ namespace QRest.AspNetCore.OData
 
             var container = (ODataTermContainer)exp;
 
-            var result = new ODataQueryStructure ($"{request.Scheme}://{request.Host}") {
+            var result = new ODataQueryStructure($"{request.Scheme}://{request.Host}")
+            {
                 Data = new RootTerm(container.Data)
             };
 
@@ -60,26 +61,7 @@ namespace QRest.AspNetCore.OData
         public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, Type source)
         {
             var odataquery = (ODataQueryStructure)query;
-
-            var result = new Dictionary<string, object>();
-
-            if (_options != null)
-            {
-                var edmType = source.Name;
-
-                var elem = GetQueryElementType(source);
-                if (elem != null) edmType = elem.Name + "Set";
-
-                result.Add("@odata.context", $"{odataquery.Host}{_options.MetadataPath.ToString()}/$metadata#{edmType}");
-            }
-
-            if (odataquery.Count!=null && results.TryGetValue(odataquery.Count, out var count))
-                result.Add("@odata.count", count);
-
-            if (odataquery.Data != null && results.TryGetValue(odataquery.Data, out var data))
-                result.Add("value", data);
-
-            return new ODataQueryResult(result);
+            return new ODataQueryResult(odataquery, results, _options?.MetadataPath);
         }
 
         private static Type GetQueryElementType(Type typeInfo)

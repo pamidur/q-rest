@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Newtonsoft.Json;
-using System;
+using QRest.Core.Terms;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -11,26 +11,49 @@ namespace QRest.AspNetCore.OData
 {
     internal class ODataQueryResult : ActionResult
     {
-        private readonly object _value;
+        private readonly ODataQueryStructure _query;
+        private readonly IReadOnlyDictionary<RootTerm, object> _results;
+        private readonly string _metadataUrl;
 
-        public ODataQueryResult(object value)
+        public ODataQueryResult(ODataQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, string metadataUrl= null)
         {
-            _value = value;
-        }
-
-        public override void ExecuteResult(ActionContext context)
-        {
-            base.ExecuteResult(context);
+            _query = query;
+            _results = results;
+            _metadataUrl = metadataUrl;
         }
 
         public override async Task ExecuteResultAsync(ActionContext context)
-        {
-            context.HttpContext.Response.ContentType = "application/json; odata.metadata=minimal";
+        {            
+            context.HttpContext.Response.ContentType = "application/json; odata.metadata=minimal; charset=utf-8";
 
             var ser = JsonSerializer.Create();
+            var response = CreateResponse(context);
 
-            using (var sw = new StreamWriter(context.HttpContext.Response.Body))
-                ser.Serialize(sw, _value);
+            using (var sw = new StreamWriter(context.HttpContext.Response.Body, Encoding.UTF8))
+                ser.Serialize(sw, response);
+        }
+
+        private object CreateResponse(ActionContext context)
+        {
+            var result = new Dictionary<string, object>();
+
+            if (_metadataUrl != null)
+            {
+                var edmType = context.ActionDescriptor.Id;
+
+                if (context.ActionDescriptor is ControllerActionDescriptor cad)
+                    edmType = cad.ControllerName;
+
+                result.Add("@odata.context", $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{_metadataUrl}/$metadata#{edmType}");
+            }
+
+            if (_query.Count != null && _results.TryGetValue(_query.Count, out var count))
+                result.Add("@odata.count", count);
+
+            if (_query.Data != null && _results.TryGetValue(_query.Data, out var data))
+                result.Add("value", data);
+
+            return result;
         }
     }
 }

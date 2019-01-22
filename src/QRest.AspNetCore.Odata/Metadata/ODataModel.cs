@@ -1,38 +1,37 @@
 ﻿using Microsoft.OData.Edm;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
-namespace QRest.AspNetCore.OData
+namespace QRest.AspNetCore.OData.Metadata
 {
-    public class MetadataBuilder
+    public class ODataModel
     {
         private readonly string _namespace;
-        private readonly EdmModel _model;
         private readonly EdmEntityContainer _container;
 
-        private MetadataBuilder(string @namespace)
+        public EdmModel Edm { get; }
+        public IDictionary<string, IEdmEntityContainerElement> UrlMap { get; } = new Dictionary<string, IEdmEntityContainerElement>();
+
+        private ODataModel(string @namespace)
         {
             _namespace = @namespace;
-            _model = new EdmModel();
-            _container = _model.AddEntityContainer(_namespace, "Container");
+            Edm = new EdmModel();
+            _container = Edm.AddEntityContainer(_namespace, "Container");
         }
 
-        public static MetadataBuilder New(string @namespace)
+        public static ODataModel New(string @namespace)
         {
-            return new MetadataBuilder(@namespace);
+            return new ODataModel(@namespace);
         }
 
-        public MetadataBuilder Map(Type type)
+        public ODataModel MapSet(Type type, string setName, string url)
         {
             var edmType = MapType(type);
 
-            _container.AddEntitySet(type.Name + "Set", (IEdmEntityType) edmType);
+            var set = _container.AddEntitySet(setName, (IEdmEntityType) edmType);
+            UrlMap.Add(url, set);
             return this;
-        }
-
-        public IEdmModel Build()
-        {
-            return _model;
         }
 
         private IEdmType MapType(Type type)
@@ -48,12 +47,12 @@ namespace QRest.AspNetCore.OData
 
         private IEdmType MapClass(Type type)
         {
-            var entityType = _model.AddEntityType(_namespace, type.Name);
+            var entityType = Edm.AddEntityType(_namespace, type.Name);
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance))
             {
                 var propTypeRef = MapType(prop.PropertyType).MakeReference();
-                entityType.AddStructuralProperty(prop.Name, propTypeRef);
+                var propref = entityType.AddStructuralProperty(prop.Name, propTypeRef);               
             }
 
             return entityType;

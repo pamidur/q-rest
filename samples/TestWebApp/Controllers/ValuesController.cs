@@ -15,7 +15,6 @@ namespace TestWebApp.Controllers
         //[BsonId]
         //[BsonRepresentation(BsonType.ObjectId)]
         //[JsonConverter(typeof(ObjectIdConverter))]
-        //public ObjectId Id { get; set; }
         public string Text { get; set; }
         public int Number { get; set; }
         //public DateTime Datetime { get; set; }
@@ -51,8 +50,18 @@ namespace TestWebApp.Controllers
         private readonly IMongoQueryable<Entity> _source;
         private IQueryable<Entity> _data = new List<Entity>
             {
-                new Entity { Number = 1, Text = "CCC", /*Sub = new SubEntity { Text = "SubText" } */},
-                new Entity { Number = 2, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 21, Text = "CCC", /*Sub = new SubEntity { Text = "SubText" } */},
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity {  Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity {  Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
             }.AsQueryable();
 
 
@@ -67,7 +76,7 @@ namespace TestWebApp.Controllers
         }
 
         // GET api/values
-        [HttpGet("{query?}")]
+        [HttpGet("Data/{query?}")]
         public ActionResult Get(Query<IQueryable<Entity>> query)
         {
             if (!ModelState.IsValid)
@@ -77,7 +86,7 @@ namespace TestWebApp.Controllers
 
             //var result = query.Apply(_source);
 
-            var aresult = query.ToActionResult(_source);
+            var aresult = query.ToActionResult(_data);
             return aresult;
         }
     }

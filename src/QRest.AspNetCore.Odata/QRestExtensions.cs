@@ -5,13 +5,30 @@ using QRest.AspNetCore;
 using QRest.AspNetCore.Contracts;
 using QRest.AspNetCore.OData;
 using System;
+using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    class MyCtor
+    {
+        public ActionResult Metadata()
+        {
+            return new OkObjectResult(new { test = 1 });
+        }
+    }
+
     internal class ODataAppConvention : IApplicationModelConvention
     {
         public void Apply(ApplicationModel application)
         {
+            //var c = new ControllerModel(typeof(MyCtor).GetTypeInfo(), new object[] { });
+            //var action = new ActionModel(typeof(MyCtor).GetMethod(nameof(MyCtor.Metadata)),new object[] { });
+
+            //c.Actions.Add(new ActionModel(action));
+
+
+            //application.Controllers.Add(c);
+
             application.ApiExplorer.IsVisible = true;
         }
     }
