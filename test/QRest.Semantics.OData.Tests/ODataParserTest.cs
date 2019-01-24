@@ -56,7 +56,7 @@ namespace QRest.OData.Tests
         [Theory]
         [InlineData("value=-where(:-$.a-eq(-$.b))-each(:-map(-$.f1,-$.f2))", @"$filter = a eq b&$count=false&$select=f1,f2")]
         [InlineData("value=-where(:-$.a-eq(-$.b))-each(:-map(-$.f1,-$.f2));count=-where(:-$.a-eq(-$.b))-count", @"$filter = a eq b&$count=true&$select=f1,f2")]
-        public void ShouldParseeach(string expected, string input)
+        public void ShouldParseEach(string expected, string input)
         {
             ITerm exp = Parse(input);
             Assert.Equal(expected, exp.SharedView);
@@ -68,6 +68,13 @@ namespace QRest.OData.Tests
         {
             ITerm exp = Parse(input);
             Assert.Equal(expected, exp.SharedView);
+        }
+
+        [Fact]
+        public void ShouldParseLambda()
+        {
+            ITerm exp = Parse(@"$filter = Contacts/any(c: c/Email eq 'test@gmail.com' or c eq 'test1@gmail.com')"); 
+            Assert.Equal("value=-where(:-oneof(-$.Email-eq('test@gmail.com'),-$-eq('test1@gmail.com')))", exp.SharedView);
         }
 
 
