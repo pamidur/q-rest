@@ -56,6 +56,12 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitFilter([NotNull] ODataGrammarParser.FilterContext context);
 	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.lambda"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLambda([NotNull] ODataGrammarParser.LambdaContext context);
+	/// <summary>
 	/// Visit a parse tree produced by <see cref="ODataGrammarParser.select"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -174,6 +180,13 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitComparatorExpression([NotNull] ODataGrammarParser.ComparatorExpressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>lambdaCallExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLambdaCallExpression([NotNull] ODataGrammarParser.LambdaCallExpressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>funcCallExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
 	/// </summary>
@@ -204,4 +217,10 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitFunctionParams([NotNull] ODataGrammarParser.FunctionParamsContext context);
+	/// <summary>
+	/// Visit a parse tree produced by <see cref="ODataGrammarParser.lambdaName"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitLambdaName([NotNull] ODataGrammarParser.LambdaNameContext context);
 }

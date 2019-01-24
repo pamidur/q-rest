@@ -19,6 +19,8 @@ queryOption :
 
 filter : DOLLAR 'filter' EQPARAM filterexpr=expression ;
 
+lambda : fld=IDENTIFIER '/' lambdaName LPAREN lid=IDENTIFIER ':' laExpr=expression  RPAREN ;
+
 select: DOLLAR 'select' EQPARAM selectItem ( COMMA selectItem )* ;
 
 selectItem : IDENTIFIER ;
@@ -38,11 +40,12 @@ skip : DOLLAR 'skip' EQPARAM INT ;
 expression
  : LPAREN expression RPAREN                       #parenExpression
  | NOT expression                                 #notExpression
+ | lambda					  #lambdaCallExpression
  | left=expression op=comparator right=expression #comparatorExpression
  | left=expression op=binary right=expression     #binaryExpression
- | DATETIME										  #datetimeExpression
+ | DATETIME					  #datetimeExpression
  | bool                                           #boolExpression
- | IDENTIFIER                                     #identifierExpression
+ | (prefix=IDENTIFIER '/')? val=IDENTIFIER        #identifierExpression
  | DECIMAL                                        #decimalExpression
  | INT                                            #intExpression
  | STRINGLITERAL                                  #stringExpression
@@ -65,6 +68,7 @@ functionParams
  :   expression (COMMA expression)*
  ;
 
+lambdaName : 'any' | 'all' ;
 DATETIME   : DIGIT4 '-' DIGIT2 '-' DIGIT2 'T' DIGIT2 ':' DIGIT2 ':' DIGIT2 ('.' [0-9]+)? ( 'Z' | ('+'|'-') DIGIT2 ':' DIGIT2 ) ;
 EQPARAM	   : '=' ;
 DOLLAR     : '$' ;

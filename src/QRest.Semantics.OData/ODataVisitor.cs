@@ -18,6 +18,8 @@ namespace QRest.OData
 {
     public class ODataVisitor : ODataGrammarBaseVisitor<SequenceTerm>
     {
+        private string _currentContext = string.Empty;
+
         public override SequenceTerm VisitParse([NotNull] ParseContext context)
         {
             if (context.children.Count < 2)
@@ -128,11 +130,17 @@ namespace QRest.OData
 
         public override SequenceTerm VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context)
         {
-            return new SequenceTerm
-            (
-                new MethodTerm(new RootOperation()),
-                new PropertyTerm(context.GetText())
-            );
+            if (string.IsNullOrEmpty(_currentContext) || (context.prefix?.Text?.Equals(_currentContext) ?? false))
+                return new SequenceTerm
+                (
+                    new MethodTerm(new RootOperation()),
+                    new PropertyTerm(context.val.Text)
+                );
+            else
+                return new SequenceTerm
+                (
+                    new MethodTerm(new RootOperation())
+                );
         }
 
         public override SequenceTerm VisitParenExpression([NotNull] ODataGrammarParser.ParenExpressionContext context)
@@ -278,6 +286,21 @@ namespace QRest.OData
 
 
         }
+
+        public override SequenceTerm VisitLambda([NotNull] LambdaContext context)
+        {
+            var prevContext = _currentContext;
+            var fld = context.fld;
+            var name = context.lambdaName().GetText();
+            _currentContext = context.lid.Text;
+            var result = Visit(context.laExpr);
+            _currentContext = prevContext;
+
+            return result;
+        }
+
+
+
 
         private MethodTerm GetFuncTerm(string funcName)
         {
