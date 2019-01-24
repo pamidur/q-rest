@@ -10,10 +10,10 @@ namespace QRest.Core.Terms
         public IOperation Operation { get; }
         public IReadOnlyList<SequenceTerm> Arguments { get; }
 
-        public MethodTerm(IOperation operation, IReadOnlyList<SequenceTerm> terms = null)
+        public MethodTerm(IOperation operation, params SequenceTerm[] terms)
         {
             Operation = operation;
-            Arguments = terms ?? new List<SequenceTerm>();
+            Arguments = terms;
 
             SharedView = GetView(t => t.SharedView);
             DebugView = GetView(t => t.DebugView);
@@ -31,6 +31,6 @@ namespace QRest.Core.Terms
         public string DebugView { get; }
         public string KeyView { get; }
 
-        public ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => (SequenceTerm)a.Clone()).ToList());
+        public ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => (SequenceTerm)a.Clone()).ToArray());
     }
 }

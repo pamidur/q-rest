@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using Newtonsoft.Json;
 using QRest.AspNetCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +13,11 @@ namespace TestWebApp.Controllers
     [BsonIgnoreExtraElements]
     public class Entity
     {
-        //[BsonId]
-        //[BsonRepresentation(BsonType.ObjectId)]
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         //[JsonConverter(typeof(ObjectIdConverter))]
+        public string Id { get; set; }
+
         public string Text { get; set; }
         public int Number { get; set; }
         //public DateTime Datetime { get; set; }
