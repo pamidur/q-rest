@@ -131,8 +131,8 @@ namespace QRest.Core
           select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc => new SequenceTerm(acc.ToArray()));
 
         internal Parser<List<SequenceTerm>> BuildCallArgumentsParser() => Read.Ref(() =>
-            from parameters in Read.Contained(Read.XDelimitedBy(CallChain, ArgumentDelimiter), CallOpenBracket, CallCloseBracket)
-            select parameters.Where(r => r != null)?.ToList() ?? new List<SequenceTerm>()
+            from parameters in Read.Contained(Read.XDelimitedBy(CallChain, ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)
+            select parameters.GetOrDefault()?.Where(r => r != null)?.ToList() ?? new List<SequenceTerm>()
             );
 
         internal Parser<LambdaTerm> BuildLambdaParser() =>

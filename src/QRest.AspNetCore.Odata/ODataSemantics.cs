@@ -1,7 +1,6 @@
 ﻿using Antlr4.Runtime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using QRest.AspNetCore.Contracts;
 using QRest.Core.Terms;
 using QRest.OData;
@@ -16,13 +15,6 @@ namespace QRest.AspNetCore.OData
     {
         private static readonly Type _queryableIface = typeof(IQueryable<>);
         private static readonly string _queryableIfaceName = $"{_queryableIface.Namespace}.{_queryableIface.Name}";
-
-        private ODataOptions _options;
-
-        public ODataSemantics(IOptions<ODataOptions> options)
-        {
-            _options = options.Value;
-        }
 
         public IQueryStructure ReadQueryStructure(IReadOnlyList<string> values, HttpRequest request)
         {
@@ -57,10 +49,10 @@ namespace QRest.AspNetCore.OData
             return result;
         }
 
-        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
+        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, Type source)
         {
             var odataquery = (ODataQueryStructure)query;
-            return new ODataQueryResult(odataquery, results, _options?.MetadataPath);
+            return new ODataQueryResult(odataquery, results);
         }
     }
 }

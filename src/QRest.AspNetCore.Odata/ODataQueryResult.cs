@@ -13,17 +13,15 @@ namespace QRest.AspNetCore.OData
     {
         private readonly ODataQueryStructure _query;
         private readonly IReadOnlyDictionary<RootTerm, object> _results;
-        private readonly string _metadataUrl;
 
-        public ODataQueryResult(ODataQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, string metadataUrl= null)
+        public ODataQueryResult(ODataQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
         {
             _query = query;
             _results = results;
-            _metadataUrl = metadataUrl;
         }
 
         public override Task ExecuteResultAsync(ActionContext context)
-        {            
+        {
             context.HttpContext.Response.ContentType = "application/json; odata.metadata=minimal; charset=utf-8";
 
             var ser = JsonSerializer.Create();
@@ -39,12 +37,16 @@ namespace QRest.AspNetCore.OData
         {
             var builder = (IModelBuilder)context.HttpContext.RequestServices.GetService(typeof(IModelBuilder));
 
+            var meta = (ODataMetadataMiddleware)context.HttpContext.RequestServices.GetService(typeof(ODataMetadataMiddleware));
+
             var result = new Dictionary<string, object>();
 
-            if (_metadataUrl != null)
+            if (meta.IsInUse)
             {
+                var metaurl = meta.GetMetaUrl(context.HttpContext);
                 var edmType = builder.GetEdmName(context.ActionDescriptor);
-                result.Add("@odata.context", $"{context.HttpContext.Request.Scheme}://{context.HttpContext.Request.Host}{_metadataUrl}/$metadata#{edmType}");
+                if (edmType != null)
+                    result.Add("@odata.context", $"{metaurl}#{edmType}");
             }
 
             if (_query.Count != null && _results.TryGetValue(_query.Count, out var count))

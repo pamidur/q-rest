@@ -36,9 +36,11 @@ namespace Microsoft.Extensions.DependencyInjection
 
     public static class QRestExtensions
     {
-        public static QRestConfiguration UseODataSemantics(this QRestConfiguration qrest, Action<ODataOptions> options)
+        public static QRestConfiguration UseODataSemantics(this QRestConfiguration qrest, Action<ODataOptions> options = null)
         {
             qrest.Services.Configure<MvcOptions>(mvc => mvc.Conventions.Add(new ODataAppConvention()));
+
+            if(options!=null)
             qrest.Services.Configure<ODataOptions>(options);
 
             qrest.Services.AddTransient<ISemantics, ODataSemantics>();
@@ -50,6 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IApplicationBuilder UseODataMetadata(this IApplicationBuilder app)
         {
+            app.ApplicationServices.GetService<ODataMetadataMiddleware>().IsInUse = true;
             app.UseMiddleware<ODataMetadataMiddleware>();
             return app;
         }

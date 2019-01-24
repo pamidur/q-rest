@@ -27,6 +27,9 @@ namespace QRest.AspNetCore.OData.Metadata
 
         public ODataModel MapSet(Type type, string setName, string url)
         {
+            if (Registry.ContainsKey(url))
+                return this;
+
             var edmType = MapType(type);
 
             var set = _container.AddEntitySet(setName, (IEdmEntityType) edmType);
@@ -47,6 +50,11 @@ namespace QRest.AspNetCore.OData.Metadata
 
         private IEdmType MapClass(Type type)
         {
+            var existing = Schema.FindDeclaredType($"{_namespace}.{type.Name}")?.AsActualType();
+
+            if (existing != null)
+                return existing;
+
             var entityType = Schema.AddEntityType(_namespace, type.Name);
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance))

@@ -11,9 +11,9 @@ namespace QRest.Core.Operations
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
 
-            var compareArgs = assembler.Convert(context, arguments[0]);
+            var (Left, Right) = assembler.Convert(context, arguments[0]);
 
-            return PickExpression(compareArgs.Left, compareArgs.Right);
+            return PickExpression(Left, Right);
         }
 
         protected abstract Expression PickExpression(Expression a, Expression b);
