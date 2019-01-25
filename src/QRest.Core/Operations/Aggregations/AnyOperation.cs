@@ -7,9 +7,9 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Aggregations
 {
-    public class AllOperation : OperationBase
+    public class AnyOperation : OperationBase
     {
-        public override string Key { get; } = "all";
+        public override string Key { get; } = "any";
 
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
@@ -29,7 +29,7 @@ namespace QRest.Core.Operations.Aggregations
             if (arguments.Count > 1)
                 throw new ExpressionCreationException();
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.All), new Type[] { context.GetQueryElementType() }, args.ToArray());
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Any), new Type[] { context.GetQueryElementType() }, args.ToArray());
 
             return assembler.SetName(exp,Key);
         }      
