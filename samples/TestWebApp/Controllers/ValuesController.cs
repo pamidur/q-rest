@@ -25,6 +25,11 @@ namespace TestWebApp.Controllers
 
         //public SubEntity Sub { get; set; }
 
+        public IQueryable<string> Emails { get; set; } = new string[] { }.AsQueryable();
+
+        public IQueryable<SubEntity> Contacts { get; set; } = new SubEntity[] { }.AsQueryable();
+
+
         public override string ToString()
         {
             return $"{Text} {Number}";
@@ -62,6 +67,9 @@ namespace TestWebApp.Controllers
                 new Entity { Number = 110, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
                 new Entity {  Number = 121, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
                 new Entity {  Number = 132, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
+                new Entity {  Number = 133, Text = "EEE", Emails = new[]{"test1@gmail.com", "test2@gmail.com" }.AsQueryable() },
+                new Entity {  Number = 134, Text = "EEE", Contacts= new List<SubEntity>{ new SubEntity { Text = "qwerty" } , new SubEntity { Text = "qwerty22" }}.AsQueryable() },
+
             }.AsQueryable();
 
 
