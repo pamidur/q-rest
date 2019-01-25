@@ -290,17 +290,31 @@ namespace QRest.OData
         public override SequenceTerm VisitLambda([NotNull] LambdaContext context)
         {
             var prevContext = _currentContext;
-            var fld = context.fld;
-            var name = context.lambdaName().GetText();
+
+            var field = new SequenceTerm
+                (
+                    new MethodTerm(new RootOperation()),
+                    new PropertyTerm(context.fld.Text)
+                );
+
             _currentContext = context.lid.Text;
             var result = Visit(context.laExpr);
             _currentContext = prevContext;
 
-            return result;
+            var l = new LambdaTerm(result);
+
+            var lname = context.lambdaName().GetText();
+
+            var laname = new SequenceTerm(field,
+                  new MethodTerm(OperationsMap.Any,new SequenceTerm[] {
+                  new SequenceTerm(l) })
+                );
+
+            return laname;
         }
 
 
-
+      
 
         private MethodTerm GetFuncTerm(string funcName)
         {

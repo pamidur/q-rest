@@ -74,7 +74,7 @@ namespace QRest.OData.Tests
         public void ShouldParseLambda()
         {
             ITerm exp = Parse(@"$filter = Contacts/any(c: c/Email eq 'test@gmail.com' or c eq 'test1@gmail.com')"); 
-            Assert.Equal("value=-where(:-oneof(-$.Email-eq('test@gmail.com'),-$-eq('test1@gmail.com')))", exp.SharedView);
+            Assert.Equal("value=-where(:-$.Contacts-oneof(-$.Email-eq('test@gmail.com'),-$-eq('test1@gmail.com')))", exp.SharedView);
         }
 
 
