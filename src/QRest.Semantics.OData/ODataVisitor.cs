@@ -301,20 +301,19 @@ namespace QRest.OData
             var result = Visit(context.laExpr);
             _currentContext = prevContext;
 
-            var l = new LambdaTerm(result);
+            var lname = context.lambdaName().GetText().Equals("any") ? OperationsMap.Any : OperationsMap.All;
 
-            var lname = context.lambdaName().GetText();
-
-            var laname = new SequenceTerm(field,
-                  new MethodTerm(OperationsMap.Any,new SequenceTerm[] {
-                  new SequenceTerm(l) })
+            var lTerm = new SequenceTerm
+                (
+                    field,
+                    new MethodTerm(lname, new[] { new LambdaTerm(result) })
                 );
 
-            return laname;
+            return lTerm;
         }
 
 
-      
+
 
         private MethodTerm GetFuncTerm(string funcName)
         {

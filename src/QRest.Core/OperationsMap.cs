@@ -14,6 +14,8 @@ namespace QRest.Core
         private static readonly IDictionary<string, IOperation> _lookup = new Dictionary<string, IOperation>();
         
         public static readonly IOperation Any = RegisterOperation(new AnyOperation());
+        public static readonly IOperation All = RegisterOperation(new AllOperation());
+
         public static readonly IOperation Count = RegisterOperation(new CountOperation());
         public static readonly IOperation First = RegisterOperation(new FirstOperation());
         public static readonly IOperation Sum = RegisterOperation(new SumOperation());

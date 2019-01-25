@@ -70,11 +70,13 @@ namespace QRest.OData.Tests
             Assert.Equal(expected, exp.SharedView);
         }
 
-        [Fact]
-        public void ShouldParseLambda()
+        [Theory]
+        [InlineData("value=-where(:-$.Contacts-any(:-every(-$.Email-eq('test@gmail.com'),-$-eq('test1@gmail.com'))))", @"$filter = Contacts/any(c: c/Email eq 'test@gmail.com' and c eq 'test1@gmail.com')")]
+        [InlineData("value=-where(:-$.Contacts-all(:-oneof(-$.Email-eq('test@gmail.com'),-$-eq('test1@gmail.com'))))", @"$filter = Contacts/all(c: c/Email eq 'test@gmail.com' or c eq 'test1@gmail.com')")]
+        public void ShouldParseLambda(string expected, string input)
         {
-            ITerm exp = Parse(@"$filter = Contacts/any(c: c/Email eq 'test@gmail.com' or c eq 'test1@gmail.com')"); 
-            Assert.Equal("value=-where(:-$.Contacts-oneof(-$.Email-eq('test@gmail.com'),-$-eq('test1@gmail.com')))", exp.SharedView);
+            ITerm exp = Parse(input); 
+            Assert.Equal(expected, exp.SharedView);
         }
 
 
