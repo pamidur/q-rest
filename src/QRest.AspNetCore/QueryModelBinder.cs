@@ -26,14 +26,14 @@ namespace QRest.AspNetCore
             try
             {
                 var queryStructure = _semantics.ReadQueryStructure(bindingContext.ValueProvider.GetValue(bindingContext.ModelName).ToArray(), bindingContext.HttpContext.Request);
-                var query = Activator.CreateInstance(bindingContext.ModelType, queryStructure, _compiler);
+                var query = new Query(queryStructure, _compiler);
 
                 bindingContext.Result = ModelBindingResult.Success(query);
                 return Task.CompletedTask;
             }
             catch(InvalidSemanticsException se)
             {
-                bindingContext.ModelState.AddModelError(bindingContext.ModelName, $"{se.Message} at position {se.Position}. Excpected: {string.Join(",", se.Expectations)}"/*  se, bindingContext.ModelMetadata*/);
+                bindingContext.ModelState.AddModelError(bindingContext.ModelName, $"{se.Message} at position {se.Position}. Expected: {string.Join(",", se.Expectations)}"/*  se, bindingContext.ModelMetadata*/);
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;
             }            

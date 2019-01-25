@@ -82,7 +82,7 @@ namespace QRest.OData
         public override SequenceTerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var select = new MethodTerm(new EachOperation(), new[] { new LambdaTerm(new MethodTerm(new MapOperation(), selectArgs.ToList())) });
+            var select = new MethodTerm(new EachOperation(), new[] { new LambdaTerm(new MethodTerm(new MapOperation(), selectArgs.ToArray())) });
             return select.AsSequence();
         }
 
@@ -159,7 +159,7 @@ namespace QRest.OData
             var right = Visit(context.right);
 
             var op = (MethodTerm)VisitBinary(context.op).Root;
-            return new MethodTerm(op.Operation, new List<SequenceTerm> { left, right }).AsSequence();
+            return new MethodTerm(op.Operation, left, right).AsSequence();
         }
 
         public override SequenceTerm VisitTerminal(ITerminalNode node)
@@ -209,7 +209,7 @@ namespace QRest.OData
             var funcRoot = parameters.First();
             var func = GetFuncTerm(context.func.Text);
 
-            return new SequenceTerm(funcRoot.Concat(new[] { new MethodTerm(func.Operation, parameters.Skip(1).ToList()) }).ToArray());
+            return new SequenceTerm(funcRoot.Concat(new[] { new MethodTerm(func.Operation, parameters.Skip(1).ToArray()) }).ToArray());
         }
 
         public override SequenceTerm VisitFunctionParams([NotNull] FunctionParamsContext context)

@@ -9,7 +9,6 @@ namespace QRest.Core.Terms
     {
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
-        public SequenceTerm(SequenceTerm sequence) : this(sequence.ToArray()) { }
         public SequenceTerm(params ITerm[] terms)
         {
             Add(terms);
@@ -29,8 +28,13 @@ namespace QRest.Core.Terms
 
         protected void Add(ITerm term)
         {
-            if (!(term is LambdaTerm) && term is SequenceTerm s)
+            if (term is SequenceTerm s)
+            {
+                if (term.GetType() != typeof(SequenceTerm))
+                    throw new System.InvalidOperationException("This sequence cannot be liniarized.");
+
                 Add((IEnumerable<ITerm>)s);
+            }
             else if (term != null)
                 _sequence.AddLast(term);
         }

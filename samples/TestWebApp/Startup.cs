@@ -21,11 +21,7 @@ namespace TestWebApp
         {
             services
                 .AddQRest()
-                .UseODataSemantics(odata =>
-                {
-                    odata.MetadataPath = "/api";
-                    odata.Namespace = "MyTest";
-                })
+                .UseODataSemantics()
                 //.UseNativeSemantics(sem =>
                 //{
                 //    sem.UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers;
@@ -51,8 +47,6 @@ namespace TestWebApp
             app.Use(async (context, next) =>
             {
                 Console.WriteLine($"{context.Request.Path}{context.Request.QueryString}");
-                //context.Response.StatusCode = 401;
-
                 await next.Invoke();
             });
 

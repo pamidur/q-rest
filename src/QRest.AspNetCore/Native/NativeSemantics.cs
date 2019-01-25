@@ -47,7 +47,7 @@ namespace QRest.AspNetCore.Native
             throw new InvalidSemanticsException($"Unknown operation '{name}'");
         }
 
-        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
+        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, Type source)
         {
             var result = results[query.Data];
             return new OkObjectResult(result);

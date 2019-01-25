@@ -16,11 +16,15 @@ namespace QRest.AspNetCore.OData
     internal class ODataMetadataMiddleware : IMiddleware
     {
         private readonly ODataOptions _options;
+        private readonly string _serviceRoot;
         private readonly Lazy<ODataModel> _model;
+
+        public bool IsInUse { get; set; }
 
         public ODataMetadataMiddleware(IModelBuilder modelBuilder, IOptions<ODataOptions> options)
         {
             _options = options.Value;
+            _serviceRoot = _options.ServiceRoot.ToString().Trim('/');
             _model = new Lazy<ODataModel>(modelBuilder.Build);
         }
 
@@ -40,10 +44,11 @@ namespace QRest.AspNetCore.OData
         private Task ApiList(HttpContext context)
         {
             var urlMap = _model.Value.Registry.Select(u => new { name = u.Value.Name, kind = u.Value.ContainerElementKind.ToString(), url = u.Key });
+            var metaurl = GetMetaUrl(context);
 
             var result = new Dictionary<string, object>
             {
-                { "@odata.context", $"{context.Request.Scheme}://{context.Request.Host}{_options.MetadataPath}/$metadata" },
+                { "@odata.context", metaurl },
                 { "value", urlMap }
             };
 
@@ -55,6 +60,14 @@ namespace QRest.AspNetCore.OData
                 ser.Serialize(sw, result);
 
             return Task.CompletedTask;
+        }
+
+        public string GetMetaUrl(HttpContext context)
+        {
+            var metaurl = $"{context.Request.Scheme}://{context.Request.Host}/{_serviceRoot}";
+            metaurl = $"{metaurl.TrimEnd('/')}/$metadata";
+
+            return metaurl;
         }
 
         private Task ApiMetadata(HttpContext context)
@@ -69,14 +82,14 @@ namespace QRest.AspNetCore.OData
 
         private bool IsMetadataRequest(HttpContext context)
         {
-            return context.Request.Method == "GET" && context.Request.Path == _options.MetadataPath + "/$metadata";
+            return context.Request.Method == "GET" && context.Request.Path == _serviceRoot + "/$metadata";
         }
 
         private bool IsListRequest(HttpContext context)
         {
             return context.Request.Method == "GET" && (
-                context.Request.Path == _options.MetadataPath ||
-                context.Request.Path == _options.MetadataPath + "/");
+                context.Request.Path == _serviceRoot ||
+                context.Request.Path == _serviceRoot + "/");
         }
     }
 }

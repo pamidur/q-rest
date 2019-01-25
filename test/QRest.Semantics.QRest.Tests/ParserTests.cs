@@ -90,10 +90,22 @@ namespace QRest.Semantics.QRest.Tests
             Assert.Empty(actual.Value.Arguments);
         }
 
-        [Fact(DisplayName = "Parsed Method Without Params")]
-        public void MethodWithoutParams()
+        [Fact(DisplayName = "Parsed Method Without Params With Brakets")]
+        public void MethodWithoutParamsBrakets()
         {
             var actual = _parser.Call.TryParse($"-{_testUniversalOperationName}()");
+
+            Assert.Empty(actual.Expectations);
+            Assert.True(actual.WasSuccessful);
+            Assert.Equal(_testUniversalOperationName, actual.Value.Operation.Key);
+            Assert.Empty(actual.Value.Arguments);
+        }
+
+
+        [Fact(DisplayName = "Parsed Method Without Params w/o Brakets")]
+        public void MethodWithoutParams()
+        {
+            var actual = _parser.Call.TryParse($"-{_testUniversalOperationName}");
 
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
