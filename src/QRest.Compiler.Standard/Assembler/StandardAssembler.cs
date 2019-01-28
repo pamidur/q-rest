@@ -1,6 +1,6 @@
 ﻿using QRest.Compiler.Standard.Expressions;
 using QRest.Compiler.Standard.StringParsing;
-using QRest.Core;
+using QRest.Core.Exceptions;
 using QRest.Core.Extensions;
 using QRest.Core.Operations;
 using QRest.Core.Terms;
@@ -70,6 +70,9 @@ namespace QRest.Compiler.Standard.Assembler
             (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
             AssembleMethod(MethodTerm m, ParameterExpression root, Expression ctx)
         {
+            if (IsNonQueryCollection(ctx.Type, out var elementType))
+                ctx = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { elementType }, ctx);
+
             var args = m.Arguments.Select(a => AssembleTerm(a, root, ctx)).ToArray();
 
             var constants = args.SelectMany(a => a.Constants).ToArray();
@@ -98,7 +101,8 @@ namespace QRest.Compiler.Standard.Assembler
             return (NamedExpression.Create(ctx, n.Name), null, null);
         }
 
-        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleSequence(SequenceTerm s, ParameterExpression root, Expression ctx)
+        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
+            AssembleSequence(SequenceTerm s, ParameterExpression root, Expression ctx)
         {
             var result = base.AssembleSequence(s, root, ctx);
 
@@ -114,7 +118,9 @@ namespace QRest.Compiler.Standard.Assembler
             (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
             AssembleLambda(LambdaTerm l, ParameterExpression root, Expression ctx)
         {
-            var elementType = ctx.GetQueryElementType();
+            if (!ctx.Type.TryGetQueryableElement(out var elementType))
+                throw new TermTreeCompilationException($"Cannot compile lambda '{l.SharedView}' against non-collection type '{ctx.Type}'.");
+
             var rootarg = Expression.Parameter(elementType, "e");
 
             var sequence = base.AssembleSequence(l, rootarg, rootarg);
@@ -123,6 +129,7 @@ namespace QRest.Compiler.Standard.Assembler
             return (resultLambda, sequence.Constants, sequence.Parameters);
         }
 
+
         protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleRoot(RootTerm r, ParameterExpression root, Expression ctx)
         {
             var sequence = base.AssembleSequence(r, root, root);
@@ -130,5 +137,30 @@ namespace QRest.Compiler.Standard.Assembler
             var resultLambda = Expression.Lambda(sequence.Expression, root);
             return (resultLambda, sequence.Constants, sequence.Parameters);
         }
+
+        private bool IsNonQueryCollection(Type ctx, out Type elementType)
+        {
+            elementType = null;
+
+            if (ctx == typeof(string))
+                return false;
+
+            if (ctx.IsArray)
+            {
+                elementType = ctx.GetElementType();
+                return true;
+            }
+
+            if (ctx.TryGetQueryableElement(out elementType))
+                return false;
+
+            if (ctx.TryGetEnumerableElement(out elementType))
+                return true;
+            
+            return false;
+        }
+
+        
+
     }
 }

@@ -69,7 +69,7 @@ namespace QRest.Core
         internal Parser<ITerm> Property;
         internal Parser<LambdaTerm> Lambda;
         internal Parser<SequenceTerm> RootProperty;
-        internal Parser<ITerm> ChainRoot;
+        internal Parser<SequenceTerm> ChainRoot;
         internal Parser<ConstantTerm> Constant;
         internal Parser<ConstantTerm> ArrayConstant;
         internal Parser<ConstantTerm> NumberConstant;
@@ -121,14 +121,14 @@ namespace QRest.Core
           from seq in CallChain
           select new RootTerm(seq);
 
-        internal Parser<ITerm> BuildChainRootParser() =>
+        internal Parser<SequenceTerm> BuildChainRootParser() =>
           from root in Call.XOr<ITerm>(Lambda).XOr(Constant)
           select root.AsSequence();
 
         internal Parser<SequenceTerm> BuildCallChainParser() =>
           from root in ChainRoot.XOr(RootProperty)
           from chunks in SubProperty.XOr(Call).XOr(Name).XMany()
-          select chunks.Aggregate(new List<ITerm> { root }, (c1, c2) => { c1.Add(c2); return c1; }, acc => new SequenceTerm(acc.ToArray()));
+          select chunks.Aggregate(root, (c1, c2) => c1.Append(c2));
 
         internal Parser<List<SequenceTerm>> BuildCallArgumentsParser() => Read.Ref(() =>
             from parameters in Read.Contained(Read.XDelimitedBy(CallChain, ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)

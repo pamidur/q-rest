@@ -26,6 +26,14 @@ namespace QRest.Core.Terms
         public virtual string KeyView { get; protected set; }
         public virtual string DebugView { get; protected set; }
 
+        public SequenceTerm Append(params ITerm[] terms)
+        {
+            var clone = (SequenceTerm)Clone();
+            clone.Add(terms);
+
+            return clone;
+        }
+
         protected void Add(ITerm term)
         {
             if (term is SequenceTerm s)

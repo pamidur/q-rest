@@ -1,5 +1,5 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Extensions;
+using QRest.Core.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,16 +7,16 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Aggregations
 {
-    public class FirstOperation : OperationBase
+    public class FirstOperation : QueryOperationBase
     {
         public override string Key { get; } = "first";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 0)
-                throw new ExpressionCreationException();
+                throw new TermTreeCompilationException($"Method '{Key}' expects to have no parameters.");
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.FirstOrDefault), new Type[] { context.GetQueryElementType() }, context);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.FirstOrDefault), new Type[] { element }, context);
 
             return assembler.SetName(exp, Key);
         }

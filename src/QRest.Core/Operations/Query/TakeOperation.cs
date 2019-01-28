@@ -1,5 +1,4 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +6,11 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
 {
-    public class TakeOperation : OperationBase
-    {
+    public class TakeOperation : QueryOperationBase
+    {      
         public override string Key { get; } = "take";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();
@@ -19,7 +18,7 @@ namespace QRest.Core.Operations.Query
             if (!assembler.TryConvert(arguments[0], typeof(int), out var argument))
                 throw new ExpressionCreationException($"Cannot cast {arguments[0].Type} to Int32");
 
-            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Take), new Type[] { context.GetQueryElementType() }, context, argument);
+            var exp = Expression.Call(typeof(Queryable), nameof(Queryable.Take), new Type[] { element }, context, argument);
 
             return assembler.SetName(exp, "data");
         }
