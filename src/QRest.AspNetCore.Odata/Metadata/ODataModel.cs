@@ -55,8 +55,10 @@ namespace QRest.AspNetCore.OData.Metadata
 
         private IEdmType MapCollection(Type type)
         {
-            var element = GetCollectionElementType(type);
-            var edmType = MapType(element, true);
+            if (!type.TryGetCollectionElement(out var element))
+                throw new NotSupportedException();
+
+            var edmType = MapType(element.type, true);
             return EdmCoreModel.GetCollection(edmType.MakeReference()).Definition;
         }
 
@@ -100,23 +102,6 @@ namespace QRest.AspNetCore.OData.Metadata
 
 
             throw new NotImplementedException();
-        }
-
-        private Type GetCollectionElementType(Type ctx)
-        {
-            if (ctx == typeof(string))
-                return null;
-
-            if (ctx.IsArray)
-                return ctx.GetElementType();
-
-            if (ctx.TryGetQueryableElement(out var elementType))
-                return elementType;
-
-            if (ctx.TryGetEnumerableElement(out elementType))
-                return elementType;
-
-            throw new NotSupportedException();
         }
     }
 }

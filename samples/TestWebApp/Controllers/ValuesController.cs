@@ -25,7 +25,7 @@ namespace TestWebApp.Controllers
 
         public SubEntity Sub { get; set; }
 
-        public string[] Emails { get; set; } = new string[] { };
+        public string[] Emails { get; set; }
 
         public IEnumerable<SubEntity> Contacts { get; set; } = new List<SubEntity> { };
 

@@ -11,7 +11,7 @@ namespace QRest.Core.Operations.Query
     {
         public override string Key { get; } = "skip";        
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, bool queryable, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 1)
                 throw new ExpressionCreationException();

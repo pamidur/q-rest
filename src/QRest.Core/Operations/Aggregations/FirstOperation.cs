@@ -11,7 +11,7 @@ namespace QRest.Core.Operations.Aggregations
     {
         public override string Key { get; } = "first";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, bool queryable, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             if (arguments.Count != 0)
                 throw new TermTreeCompilationException($"Method '{Key}' expects to have no parameters.");

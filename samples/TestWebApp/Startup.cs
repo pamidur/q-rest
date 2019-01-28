@@ -22,11 +22,11 @@ namespace TestWebApp
         {
             services
                 .AddQRest()
-                .UseODataSemantics()
-                //.UseNativeSemantics(sem =>
-                //{
-                //    sem.UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers;
-                //})
+                //.UseODataSemantics()
+                .UseNativeSemantics(sem =>
+                {
+                    sem.UseDefferedConstantParsing = DefferedConstantParsing.StringsAndNumbers;
+                })
                 .UseStandardCompiler(cpl =>
                 {
                     cpl.UseCompilerCache = false;
@@ -52,7 +52,7 @@ namespace TestWebApp
             });
 
 
-            app.UseODataMetadata();
+            //app.UseODataMetadata();
             app.UseMvc();
         }
     }

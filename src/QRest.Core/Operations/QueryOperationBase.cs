@@ -11,12 +11,12 @@ namespace QRest.Core.Operations
     {
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
-            if (!context.Type.TryGetQueryableElement(out var element))
+            if (!context.Type.TryGetCollectionElement(out var element))
                 throw new TermTreeCompilationException($"Cannot execute '{Key}' method on non-collection type '{context.Type}'.");
 
-            return CreateExpression(root, context, element, arguments, assembler);
+            return CreateExpression(root, context, element.type, element.queryable, arguments, assembler);
         }
 
-        protected abstract Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler);
+        protected abstract Expression CreateExpression(ParameterExpression root, Expression context, Type element, bool quearyable, IReadOnlyList<Expression> arguments, IAssemblerContext assembler);
     }
 }

@@ -9,7 +9,7 @@ namespace QRest.Core.Extensions
     {
         private static readonly Type _queryableIface = typeof(IQueryable<>);
         private static readonly Type _enumerableIface = typeof(IEnumerable<>);
-                     
+
         public static Expression ReduceTo(this Expression expression, ExpressionType[] expressionTypes)
         {
             while (expression.CanReduce && !expressionTypes.Contains(expression.NodeType))
@@ -18,11 +18,39 @@ namespace QRest.Core.Extensions
             return expression;
         }
 
-        public static bool TryGetQueryableElement(this Type type, out Type element) 
+        public static bool TryGetQueryableElement(this Type type, out Type element)
             => TryGetGenericElement(type, _queryableIface, out element);
 
         public static bool TryGetEnumerableElement(this Type type, out Type element)
             => TryGetGenericElement(type, _enumerableIface, out element);
+
+        public static bool TryGetCollectionElement(this Type ctx, out (Type type, bool queryable) result)
+        {
+            result = default;
+
+            if (ctx == typeof(string))
+                return false;
+
+            if (ctx.IsArray)
+            {
+                result = (ctx.GetElementType(), false);
+                return true;
+            }
+
+            if (ctx.TryGetQueryableElement(out var element))
+            {
+                result = (element, true);
+                return true;
+            }
+
+            if (ctx.TryGetEnumerableElement(out element))
+            {
+                result = (element, false);
+                return true;
+            }
+
+            return false;
+        }
 
         public static bool TryGetGenericElement(this Type type, Type genericInterface, out Type element)
         {

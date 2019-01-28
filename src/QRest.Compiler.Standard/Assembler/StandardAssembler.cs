@@ -70,8 +70,8 @@ namespace QRest.Compiler.Standard.Assembler
             (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
             AssembleMethod(MethodTerm m, ParameterExpression root, Expression ctx)
         {
-            if (IsNonQueryCollection(ctx.Type, out var elementType))
-                ctx = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { elementType }, ctx);
+            //if (IsNonQueryCollection(ctx.Type, out var elementType))
+            //    ctx = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { elementType }, ctx);
 
             var args = m.Arguments.Select(a => AssembleTerm(a, root, ctx)).ToArray();
 
@@ -87,7 +87,7 @@ namespace QRest.Compiler.Standard.Assembler
                 if (testexp is ProxyExpression proxy)
                     testexp = proxy.OriginalExpression;
 
-                if (testexp is MethodCallExpression call && call.Method.Name == "Select" && call.Method.DeclaringType == typeof(Queryable))
+                if (testexp is MethodCallExpression call && call.Method.Name == nameof(Queryable.Select) && call.Method.DeclaringType == typeof(Queryable))
                     exp = TerminationExpression.Create(exp);
             }
 
@@ -118,10 +118,10 @@ namespace QRest.Compiler.Standard.Assembler
             (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
             AssembleLambda(LambdaTerm l, ParameterExpression root, Expression ctx)
         {
-            if (!ctx.Type.TryGetQueryableElement(out var elementType))
+            if(!ctx.Type.TryGetCollectionElement(out var element))
                 throw new TermTreeCompilationException($"Cannot compile lambda '{l.SharedView}' against non-collection type '{ctx.Type}'.");
 
-            var rootarg = Expression.Parameter(elementType, "e");
+            var rootarg = Expression.Parameter(element.type, "e");
 
             var sequence = base.AssembleSequence(l, rootarg, rootarg);
 
@@ -136,31 +136,6 @@ namespace QRest.Compiler.Standard.Assembler
 
             var resultLambda = Expression.Lambda(sequence.Expression, root);
             return (resultLambda, sequence.Constants, sequence.Parameters);
-        }
-
-        private bool IsNonQueryCollection(Type ctx, out Type elementType)
-        {
-            elementType = null;
-
-            if (ctx == typeof(string))
-                return false;
-
-            if (ctx.IsArray)
-            {
-                elementType = ctx.GetElementType();
-                return true;
-            }
-
-            if (ctx.TryGetQueryableElement(out elementType))
-                return false;
-
-            if (ctx.TryGetEnumerableElement(out elementType))
-                return true;
-            
-            return false;
-        }
-
-        
-
+        }  
     }
 }

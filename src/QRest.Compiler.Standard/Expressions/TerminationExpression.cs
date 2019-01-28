@@ -33,8 +33,8 @@ namespace QRest.Compiler.Standard.Expressions
             if (expression.NodeType == ExpressionNodeType)
                 return expression;
 
-            if (expression.Type.TryGetQueryableElement(out var element))
-                return new TerminationExpression(expression, element);
+            if (expression.Type.TryGetCollectionElement(out var element) && element.queryable)
+                return new TerminationExpression(expression, element.type);
 
             return expression;
         }
