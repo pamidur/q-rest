@@ -1,5 +1,7 @@
 ﻿using Microsoft.OData.Edm;
+using QRest.Core.Extensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -30,37 +32,47 @@ namespace QRest.AspNetCore.OData.Metadata
             if (Registry.ContainsKey(url))
                 return this;
 
-            var edmType = MapType(type);
+            var edmType = MapClass(type);
 
-            var set = _container.AddEntitySet(setName, (IEdmEntityType) edmType);
+            var set = _container.AddEntitySet(setName, (IEdmEntityType)edmType);
             Registry.Add(url, set);
             return this;
         }
 
-        private IEdmType MapType(Type type)
+        private IEdmType MapType(Type type, bool complex)
         {
-            if (type.IsPrimitive || type == typeof(string))
+            if (type.IsPrimitive || type == typeof(string) || type.IsValueType)
                 return MapPrimitive(type);
 
-            if (type.IsClass)            
-                return MapClass(type);             
+            if (typeof(IEnumerable).IsAssignableFrom(type))
+                return MapCollection(type);
+
+            if (type.IsClass)
+                return MapClass(type/*,complex*/);
 
             throw new NotSupportedException();
         }
 
-        private IEdmType MapClass(Type type)
+        private IEdmType MapCollection(Type type)
+        {
+            var element = GetCollectionElementType(type);
+            var edmType = MapType(element, true);
+            return EdmCoreModel.GetCollection(edmType.MakeReference()).Definition;
+        }
+
+        private IEdmType MapClass(Type type, bool complex = false)
         {
             var existing = Schema.FindDeclaredType($"{_namespace}.{type.Name}")?.AsActualType();
 
             if (existing != null)
                 return existing;
 
-            var entityType = Schema.AddEntityType(_namespace, type.Name);
+            var entityType = complex ? (EdmStructuredType)Schema.AddComplexType(_namespace, type.Name) : Schema.AddEntityType(_namespace, type.Name);
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance))
             {
-                var propTypeRef = MapType(prop.PropertyType).MakeReference();
-                var propref = entityType.AddStructuralProperty(prop.Name, propTypeRef);               
+                var propTypeRef = MapType(prop.PropertyType, true).MakeReference();
+                var propref = entityType.AddStructuralProperty(prop.Name, propTypeRef);
             }
 
             return entityType;
@@ -83,7 +95,28 @@ namespace QRest.AspNetCore.OData.Metadata
                 case TypeCode.String: return EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.String);
             }
 
+
+            if (type == typeof(DateTimeOffset)) return EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.DateTimeOffset);
+
+
             throw new NotImplementedException();
+        }
+
+        private Type GetCollectionElementType(Type ctx)
+        {
+            if (ctx == typeof(string))
+                return null;
+
+            if (ctx.IsArray)
+                return ctx.GetElementType();
+
+            if (ctx.TryGetQueryableElement(out var elementType))
+                return elementType;
+
+            if (ctx.TryGetEnumerableElement(out elementType))
+                return elementType;
+
+            throw new NotSupportedException();
         }
     }
 }

@@ -11,6 +11,8 @@ namespace QRest.AspNetCore.OData.Metadata
             {
                 case IEdmEntityType resolvedType: return new EdmEntityTypeReference(resolvedType, nullable);
                 case IEdmPrimitiveType resolvedType: return new EdmPrimitiveTypeReference(resolvedType, nullable);
+                case IEdmCollectionType resolvedType: return new EdmCollectionTypeReference(resolvedType);
+                case IEdmComplexType resolvedType: return new EdmComplexTypeReference(resolvedType, nullable);
             }
 
             throw new NotSupportedException();

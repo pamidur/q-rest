@@ -4,6 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using QRest.AspNetCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,9 +21,9 @@ namespace TestWebApp.Controllers
         public string Text { get; set; }
         public int Number { get; set; }
         //public DateTime Datetime { get; set; }
-        //public DateTimeOffset Datetimeoffset { get; set; }
+        public DateTimeOffset Datetimeoffset { get; set; } = DateTimeOffset.Now;
 
-        //public SubEntity Sub { get; set; }
+        public SubEntity Sub { get; set; }
 
         public string[] Emails { get; set; } = new string[] { };
 
