@@ -110,6 +110,55 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitSkip([NotNull] ODataGrammarParser.SkipContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>boolExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>intExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>identifierExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>gdExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitGdExpression([NotNull] ODataGrammarParser.GdExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>notExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNotExpression([NotNull] ODataGrammarParser.NotExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>parenExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitParenExpression([NotNull] ODataGrammarParser.ParenExpressionContext context);
+	/// <summary>
+	/// Visit a parse tree produced by the <c>funcCallExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitFuncCallExpression([NotNull] ODataGrammarParser.FuncCallExpressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>binaryExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
 	/// </summary>
@@ -131,47 +180,12 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitStringExpression([NotNull] ODataGrammarParser.StringExpressionContext context);
 	/// <summary>
-	/// Visit a parse tree produced by the <c>boolExpression</c>
-	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitBoolExpression([NotNull] ODataGrammarParser.BoolExpressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>intExpression</c>
-	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context);
-	/// <summary>
 	/// Visit a parse tree produced by the <c>datetimeExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitDatetimeExpression([NotNull] ODataGrammarParser.DatetimeExpressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>identifierExpression</c>
-	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitIdentifierExpression([NotNull] ODataGrammarParser.IdentifierExpressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>notExpression</c>
-	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitNotExpression([NotNull] ODataGrammarParser.NotExpressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>parenExpression</c>
-	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitParenExpression([NotNull] ODataGrammarParser.ParenExpressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by the <c>comparatorExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
@@ -186,13 +200,6 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <param name="context">The parse tree.</param>
 	/// <return>The visitor result.</return>
 	Result VisitLambdaCallExpression([NotNull] ODataGrammarParser.LambdaCallExpressionContext context);
-	/// <summary>
-	/// Visit a parse tree produced by the <c>funcCallExpression</c>
-	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	/// <return>The visitor result.</return>
-	Result VisitFuncCallExpression([NotNull] ODataGrammarParser.FuncCallExpressionContext context);
 	/// <summary>
 	/// Visit a parse tree produced by <see cref="ODataGrammarParser.comparator"/>.
 	/// </summary>

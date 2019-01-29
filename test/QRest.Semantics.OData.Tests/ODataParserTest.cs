@@ -44,10 +44,20 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("value=-where(:-$.a-eq('12/22/2019 21:02:00 +00:00'))", @"$filter = a eq 2019-12-22T21:02:00.3434Z")]
-        [InlineData("value=-where(:-$.a-eq('12/22/2019 21:02:00 +02:00'))", @"$filter = a eq 2019-12-22T21:02:00.34346767+02:00")]
-        [InlineData("value=-where(:-$.a-eq('12/22/2019 21:02:00 -03:00'))", @"$filter = a eq 2019-12-22T21:02:00-03:00")]
+        [InlineData("value=-where(:-$.a-eq('2019-12-22T21:02:00.3434Z'))", @"$filter = a eq 2019-12-22T21:02:00.3434Z")]
+        [InlineData("value=-where(:-$.a-eq('2019-12-22T21:02:00.34346767+02:00'))", @"$filter = a eq 2019-12-22T21:02:00.34346767+02:00")]
+        [InlineData("value=-where(:-$.a-eq('2019-12-22T21:02:00-03:00'))", @"$filter = a eq 2019-12-22T21:02:00-03:00")]
         public void ShouldParseDateTimeOffset(string expected, string input)
+        {
+            ITerm exp = Parse(input);
+            Assert.Equal(expected, exp.SharedView);
+        }
+
+        [Theory]
+        [InlineData("value=-where(:-$.a-eq('AF41F4AE-4FD2-4505-8FEF-CD7612C948D7'))", @"$filter = a eq {AF41F4AE-4FD2-4505-8FEF-CD7612C948D7}")]
+        [InlineData("value=-where(:-$.a-eq('AF41F4AE-4FD2-4505-8FEF-CD7612C948D7'))", @"$filter = a eq AF41F4AE-4FD2-4505-8FEF-CD7612C948D7")]
+        [InlineData("value=-where(:-$.a-eq('AF41F4AE-4FD2-4505-8FEF-CD7612C948D7'))", @"$filter = a eq (AF41F4AE-4FD2-4505-8FEF-CD7612C948D7)")]
+        public void ShouldParseGuid(string expected, string input)
         {
             ITerm exp = Parse(input);
             Assert.Equal(expected, exp.SharedView);

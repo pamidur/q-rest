@@ -285,6 +285,12 @@ namespace QRest.OData
             return dt.AsSequence();
         }
 
+        public override SequenceTerm VisitGdExpression([NotNull] GdExpressionContext context)
+        {
+            var dt = new ConstantTerm(context.GetText());
+            return dt.AsSequence();
+        }
+
         public override SequenceTerm VisitLambda([NotNull] LambdaContext context)
         {
             var prevContext = _currentContext;
