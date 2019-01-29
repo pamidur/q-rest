@@ -12,11 +12,11 @@ namespace QRest.Core.Operations.Query
         public ReverseOrderExpression(Expression expression) : base(expression, ReverseOrderNodeType) { }
     }
 
-    public class OrderOperation : OperationBase
+    public class OrderOperation : QueryOperationBase
     {
         public override string Key { get; } = "order";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, Type collectionType, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {
             var exp = context;
 
@@ -43,11 +43,11 @@ namespace QRest.Core.Operations.Query
                         method = nameof(Queryable.ThenByDescending);
                 }
 
-                exp = Expression.Call(typeof(Queryable), method, new Type[] { lambda.Parameters[0].Type, lambda.ReturnType }, exp, lambda);
+                exp = Expression.Call(collectionType, method, new Type[] { lambda.Parameters[0].Type, lambda.ReturnType }, exp, lambda);
             }
 
             return assembler.SetName(exp, "data");
-        }
+        }        
     }
 
     public class ReverseOrderOperation : OperationBase

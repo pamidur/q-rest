@@ -9,11 +9,9 @@ namespace QRest.Core.Operations.Aggregations
     {
         public override string Key { get; } = "all";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, bool queryable, LambdaExpression argument, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, Type collection, LambdaExpression argument, IAssemblerContext assembler)
         {          
-            var host = queryable ? typeof(Queryable) : typeof(Enumerable);
-
-            var exp = (Expression) Expression.Call(host, nameof(Queryable.All), new Type[] { element }, new[] { context, argument });
+            var exp = (Expression) Expression.Call(collection, nameof(Queryable.All), new Type[] { element }, new[] { context, argument });
             exp = Expression.AndAlso(Expression.NotEqual(context, Expression.Constant(null, context.Type)), exp);
 
             return assembler.SetName(exp, Key);

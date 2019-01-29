@@ -73,8 +73,10 @@ namespace QRest.AspNetCore.OData.Metadata
 
             foreach (var prop in type.GetProperties(BindingFlags.Public | BindingFlags.GetProperty | BindingFlags.Instance))
             {
-                var propTypeRef = MapType(prop.PropertyType, true).MakeReference();
-                var propref = entityType.AddStructuralProperty(prop.Name, propTypeRef);
+                var nullable = !prop.PropertyType.IsValueType || (Nullable.GetUnderlyingType(prop.PropertyType) != null);
+
+                var propTypeRef = MapType(prop.PropertyType, true).MakeReference(nullable);
+                var propref = entityType.AddStructuralProperty(prop.Name, propTypeRef);               
             }
 
             return entityType;
