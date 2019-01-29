@@ -40,10 +40,11 @@ skip : DOLLAR 'skip' EQPARAM INT ;
 expression
  : LPAREN expression RPAREN                       #parenExpression
  | NOT expression                                 #notExpression
- | lambda					  #lambdaCallExpression
+ | lambda										#lambdaCallExpression
  | left=expression op=comparator right=expression #comparatorExpression
  | left=expression op=binary right=expression     #binaryExpression
- | DATETIME					  #datetimeExpression
+ | GD											#gdExpression
+ | DATETIME										#datetimeExpression
  | bool                                           #boolExpression
  | (prefix=IDENTIFIER '/')? val=IDENTIFIER        #identifierExpression
  | DECIMAL                                        #decimalExpression
@@ -68,7 +69,13 @@ functionParams
  :   expression (COMMA expression)*
  ;
 
+fragment BLOCK
+ : [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9] [A-Fa-f0-9]
+ ;
+
+
 lambdaName : 'any' | 'all' ;
+GD			:  BLOCK BLOCK '-' BLOCK '-' BLOCK '-' BLOCK '-' BLOCK BLOCK BLOCK  ;
 DATETIME   : DIGIT4 '-' DIGIT2 '-' DIGIT2 'T' DIGIT2 ':' DIGIT2 ':' DIGIT2 ('.' [0-9]+)? ( 'Z' | ('+'|'-') DIGIT2 ':' DIGIT2 ) ;
 EQPARAM	   : '=' ;
 DOLLAR     : '$' ;
