@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using QRest.Compiler.Standard.Assembler;
+using QRest.Compiler.Standard.StringParsing;
 using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using System;
@@ -16,10 +17,12 @@ namespace QRest.Compiler.Standard
         private static readonly ConcurrentDictionary<string, ConstantExpression> _cache = new ConcurrentDictionary<string, ConstantExpression>();
 
         private readonly StandardCompilerOptions _options;
+        private readonly IStringParsingBehavior _stringParsingBehavior;
 
-        public StandardCompiler(IOptions<StandardCompilerOptions> options = null)
+        public StandardCompiler(IStringParsingBehavior stringParsingBehavior = null, IOptions<StandardCompilerOptions> options = null)
         {
             _options = options?.Value ?? new StandardCompilerOptions();
+            _stringParsingBehavior = stringParsingBehavior ?? ParseStringsToClrTypes.Instance;
         }
 
         public Func<TRoot, object> Compile<TRoot>(RootTerm sequence)
@@ -46,7 +49,7 @@ namespace QRest.Compiler.Standard
             }
             else
             {
-                var ctx = new StandardAssembler(_options.AllowUncompletedQueries, _options.StringParsing);
+                var ctx = new StandardAssembler(_options.AllowUncompletedQueries, _stringParsingBehavior);
                 var (lambda, consts) = ctx.Assemble(rootTerm, root, typeof(object));
 
                 constants = consts;

@@ -52,8 +52,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IApplicationBuilder UseODataMetadata(this IApplicationBuilder app)
         {
-            app.ApplicationServices.GetService<ODataMetadataMiddleware>().IsInUse = true;
-            app.UseMiddleware<ODataMetadataMiddleware>();
+            var middleware = app.ApplicationServices.GetService<ODataMetadataMiddleware>();
+            if (middleware != null)
+            {
+                middleware.IsInUse = true;
+                app.UseMiddleware<ODataMetadataMiddleware>();
+            }
             return app;
         }
     }

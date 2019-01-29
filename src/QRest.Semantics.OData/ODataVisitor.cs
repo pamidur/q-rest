@@ -281,10 +281,8 @@ namespace QRest.OData
 
         public override SequenceTerm VisitDatetimeExpression([NotNull] DatetimeExpressionContext context)
         {
-            var dt = new ConstantTerm(DateTimeOffset.Parse(context.GetText()));
+            var dt = new ConstantTerm(context.GetText());
             return dt.AsSequence();
-
-
         }
 
         public override SequenceTerm VisitLambda([NotNull] LambdaContext context)

@@ -101,6 +101,7 @@ namespace QRest.AspNetCore.OData.Metadata
 
 
             if (type == typeof(DateTimeOffset)) return EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.DateTimeOffset);
+            if (type == typeof(Guid)) return EdmCoreModel.Instance.GetPrimitiveType(EdmPrimitiveTypeKind.Guid);
 
 
             throw new NotImplementedException();

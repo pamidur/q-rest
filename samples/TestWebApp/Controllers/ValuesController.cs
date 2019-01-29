@@ -20,7 +20,9 @@ namespace TestWebApp.Controllers
 
         public string Text { get; set; }
         public int Number { get; set; }
-        //public DateTime Datetime { get; set; }
+        public DateTime DatetimeUnspec { get; set; } = new DateTime(new Random().Next(1970, 2018),new Random().Next(1,12),new Random().Next(1,28));
+        public DateTime DatetimeLocal { get; set; } = DateTime.Now;
+        public DateTime DatetimeUtc { get; set; } = DateTime.UtcNow;
         public DateTimeOffset Datetimeoffset { get; set; } = DateTimeOffset.Now;
 
         public SubEntity Sub { get; set; }
@@ -53,7 +55,7 @@ namespace TestWebApp.Controllers
     {
         private readonly IMongoCollection<Entity> collection;
         private readonly IMongoQueryable<Entity> _source;
-        private IQueryable<Entity> _data = new List<Entity>
+        private static IQueryable<Entity> _data = new List<Entity>
             {
                 new Entity { Number = 21, Text = "CCC", /*Sub = new SubEntity { Text = "SubText" } */},
                 new Entity { Number = 32, Text = "AAA",/* Sub = new SubEntity { Text = "SubText2" }*/ },
@@ -78,6 +80,7 @@ namespace TestWebApp.Controllers
         {
             var client = new MongoClient(new MongoClientSettings() { Server = new MongoServerAddress("localhost", 27017) });
             collection = client.GetDatabase("test").GetCollection<Entity>("entities");
+            //collection.InsertMany(_data);
             _source = collection.AsQueryable();
         }
 
@@ -101,10 +104,14 @@ namespace TestWebApp.Controllers
                 return BadRequest(ModelState);
             }
 
-            _source.Select(s => s.Emails.Count());
-
             var aresult = query.ToActionResult(_source);
             return aresult;
+        }
+
+        [HttpGet("testdate/{dateTime}")]
+        public IActionResult TestDate(DateTime? dateTime)
+        {
+            return Ok(dateTime?.Kind.ToString());
         }
     }
 }

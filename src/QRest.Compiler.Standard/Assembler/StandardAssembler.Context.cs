@@ -69,6 +69,11 @@ namespace QRest.Compiler.Standard.Assembler
                 result = Expression.Convert(expression, target);
                 return true;
             }
+            //else if (expression.Type == typeof(DateTime) && target == typeof(DateTimeOffset))
+            //{
+            //    result = Expression.Convert(expression, target);
+            //    return true;
+            //}
             else if (expression.Type == typeof(string))
             {
                 result = _stringParsingBehavior.Parse(expression, target);

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using QRest.AspNetCore.OData.Converters;
 using QRest.AspNetCore.OData.Metadata;
 using QRest.Core.Terms;
 using System.Collections.Generic;
@@ -11,8 +12,16 @@ namespace QRest.AspNetCore.OData
 {
     internal class ODataQueryResult : ActionResult
     {
+        private static readonly JsonSerializer _serializer;
         private readonly ODataQueryStructure _query;
         private readonly IReadOnlyDictionary<RootTerm, object> _results;
+
+        static ODataQueryResult()
+        {
+            _serializer = JsonSerializer.Create(new JsonSerializerSettings { Converters = new List<JsonConverter> {
+                new DateTimeOffsetConverter()
+            } });
+        }
 
         public ODataQueryResult(ODataQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
         {
@@ -23,12 +32,11 @@ namespace QRest.AspNetCore.OData
         public override Task ExecuteResultAsync(ActionContext context)
         {
             context.HttpContext.Response.ContentType = "application/json; odata.metadata=minimal; charset=utf-8";
-
-            var ser = JsonSerializer.Create();
+            
             var response = CreateResponse(context);
 
             using (var sw = new StreamWriter(context.HttpContext.Response.Body, Encoding.UTF8))
-                ser.Serialize(sw, response);
+                _serializer.Serialize(sw, response);
 
             return Task.CompletedTask;
         }

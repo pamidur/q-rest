@@ -12,8 +12,6 @@ namespace QRest.Core.Operations.Aggregations
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, Type collection, LambdaExpression argument, IAssemblerContext assembler)
         {
             var exp = (Expression)Expression.Call(collection, nameof(Queryable.Any), new Type[] { element }, new[] { context, argument });
-            exp = Expression.AndAlso(Expression.NotEqual(context, Expression.Constant(null, context.Type)), exp);
-
             return assembler.SetName(exp, Key);
         }
     }
