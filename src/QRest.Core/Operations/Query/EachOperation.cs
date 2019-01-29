@@ -9,9 +9,9 @@ namespace QRest.Core.Operations.Query
     {
         public override string Key { get; } = "each";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, Type collection, LambdaExpression argument, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssemblerContext assembler)
         {
-            var exp = Expression.Call(collection, nameof(Queryable.Select)
+            var exp = Expression.Call(QueryableType, nameof(Queryable.Select)
                 , new Type[] { element, argument.ReturnType }, context, argument);
 
             return assembler.SetName(exp, "data");

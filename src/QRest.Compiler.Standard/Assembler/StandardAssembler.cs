@@ -5,6 +5,7 @@ using QRest.Core.Extensions;
 using QRest.Core.Operations;
 using QRest.Core.Terms;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -70,8 +71,8 @@ namespace QRest.Compiler.Standard.Assembler
             (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters)
             AssembleMethod(MethodTerm m, ParameterExpression root, Expression ctx)
         {
-            //if (IsNonQueryCollection(ctx.Type, out var elementType))
-            //    ctx = Expression.Call(typeof(Queryable), nameof(Queryable.AsQueryable), new[] { elementType }, ctx);
+            if (ctx.Type == typeof(DateTime))
+                ctx = Expression.Convert(ctx, typeof(DateTime), TypeConverters.DateTimeToUtc);
 
             var args = m.Arguments.Select(a => AssembleTerm(a, root, ctx)).ToArray();
 
@@ -137,5 +138,5 @@ namespace QRest.Compiler.Standard.Assembler
             var resultLambda = Expression.Lambda(sequence.Expression, root);
             return (resultLambda, sequence.Constants, sequence.Parameters);
         }  
-    }
+    }    
 }

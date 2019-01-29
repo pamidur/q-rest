@@ -20,7 +20,7 @@ namespace QRest.AspNetCore.OData.Converters
             var dt = (DateTime)value;
 
             if (dt.Kind == DateTimeKind.Unspecified)
-                dt = DateTime.SpecifyKind(dt, DateTimeKind.Local);
+                dt = DateTime.SpecifyKind(dt, DateTimeKind.Utc);
 
             writer.WriteValue(new DateTimeOffset(dt));
         }

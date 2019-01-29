@@ -56,6 +56,7 @@ namespace QRest.Compiler.Standard.Assembler
             else
                 throw new ExpressionCreationException($"Cannot cast {leftType.Name} and {rightType.Name} either way.");
         }
+        
 
         public virtual bool TryConvert(Expression expression, Type target, out Expression result)
         {
