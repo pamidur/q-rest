@@ -1120,6 +1120,7 @@ public partial class ODataGrammarParser : Parser {
 		public ITerminalNode LT() { return GetToken(ODataGrammarParser.LT, 0); }
 		public ITerminalNode LE() { return GetToken(ODataGrammarParser.LE, 0); }
 		public ITerminalNode EQ() { return GetToken(ODataGrammarParser.EQ, 0); }
+		public ITerminalNode NE() { return GetToken(ODataGrammarParser.NE, 0); }
 		public ComparatorContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
@@ -1142,7 +1143,7 @@ public partial class ODataGrammarParser : Parser {
 			{
 			State = 154;
 			_la = TokenStream.LA(1);
-			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ))) != 0)) ) {
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << GT) | (1L << GE) | (1L << LT) | (1L << LE) | (1L << EQ) | (1L << NE))) != 0)) ) {
 			ErrorHandler.RecoverInline(this);
 			}
 			else {
@@ -1407,7 +1408,7 @@ public partial class ODataGrammarParser : Parser {
 		'\x14', '\x2', '\x3', '\x1C', '\x15', '\x2', '\x4', '\x6', '\b', '\n', 
 		'\f', '\xE', '\x10', '\x12', '\x14', '\x16', '\x18', '\x1A', '\x1C', '\x1E', 
 		' ', '\"', '$', '&', '\x2', '\a', '\x3', '\x2', '\t', '\n', '\x3', '\x2', 
-		'\x1B', '\x1F', '\x3', '\x2', '\x16', '\x17', '\x3', '\x2', '\x19', '\x1A', 
+		'\x1B', ' ', '\x3', '\x2', '\x16', '\x17', '\x3', '\x2', '\x19', '\x1A', 
 		'\x3', '\x2', '\r', '\xE', '\x2', '\xB0', '\x2', ',', '\x3', '\x2', '\x2', 
 		'\x2', '\x4', '.', '\x3', '\x2', '\x2', '\x2', '\x6', '<', '\x3', '\x2', 
 		'\x2', '\x2', '\b', '>', '\x3', '\x2', '\x2', '\x2', '\n', '\x43', '\x3', 

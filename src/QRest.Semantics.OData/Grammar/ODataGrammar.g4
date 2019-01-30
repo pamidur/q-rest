@@ -54,7 +54,7 @@ expression
  ;
 
 comparator
- : GT | GE | LT | LE | EQ
+ : GT | GE | LT | LE | EQ | NE
  ;
 
 binary

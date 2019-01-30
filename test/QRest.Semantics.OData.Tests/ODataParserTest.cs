@@ -54,6 +54,14 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
+        [InlineData("value=-where(:-$.a-ne('2019-12-22T21:02:00.3434Z'))", @"$filter = a ne 2019-12-22T21:02:00.3434Z")]
+        public void ShouldParseNotEqual(string expected, string input)
+        {
+            ITerm exp = Parse(input);
+            Assert.Equal(expected, exp.SharedView);
+        }
+
+        [Theory]
         [InlineData("value=-where(:-$.a-eq('AF41F4AE-4FD2-4505-8FEF-CD7612C948D7'))", @"$filter = a eq {AF41F4AE-4FD2-4505-8FEF-CD7612C948D7}")]
         [InlineData("value=-where(:-$.a-eq('AF41F4AE-4FD2-4505-8FEF-CD7612C948D7'))", @"$filter = a eq AF41F4AE-4FD2-4505-8FEF-CD7612C948D7")]
         [InlineData("value=-where(:-$.a-eq('AF41F4AE-4FD2-4505-8FEF-CD7612C948D7'))", @"$filter = a eq (AF41F4AE-4FD2-4505-8FEF-CD7612C948D7)")]
