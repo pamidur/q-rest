@@ -7,8 +7,10 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Aggregations
 {
-    public class CountOperation : QueryOperationBase
+    public sealed class CountOperation : QueryOperationBase
     {
+        internal CountOperation() { }
+
         public override string Key { get; } = "count";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)

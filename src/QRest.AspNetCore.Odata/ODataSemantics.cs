@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QRest.AspNetCore.Contracts;
-using QRest.Core.Terms;
+using QRest.Core.Contracts;
 using QRest.OData;
 using QRest.Semantics.OData;
 using System;
@@ -40,16 +40,16 @@ namespace QRest.AspNetCore.OData
 
             var result = new ODataQueryStructure()
             {
-                Data = new RootTerm(container.Data)
+                Data = container.Data
             };
 
             if (container.Count != null)
-                result.Count = new RootTerm(container.Count);
+                result.Count = container.Count;
 
             return result;
         }
 
-        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, Type source)
+        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<ITerm, object> results, Type source)
         {
             var odataquery = (ODataQueryStructure)query;
             return new ODataQueryResult(odataquery, results);

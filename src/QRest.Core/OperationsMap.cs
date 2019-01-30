@@ -32,14 +32,14 @@ namespace QRest.Core
         public static readonly IOperation Every = RegisterOperation(new EveryOperation());
         public static readonly IOperation OneOf = RegisterOperation(new OneOfOperation());
 
-        public static readonly IOperation Each = RegisterOperation(new EachOperation());
+        public static readonly IOperation Map = RegisterOperation(new MapOperation());
         public static readonly IOperation Skip = RegisterOperation(new SkipOperation());
         public static readonly IOperation Take = RegisterOperation(new TakeOperation());
         public static readonly IOperation Where = RegisterOperation(new WhereOperation());
         public static readonly IOperation Order = RegisterOperation(new OrderOperation());
         public static readonly IOperation Reverse = RegisterOperation(new ReverseOrderOperation());
 
-        public static readonly IOperation Map = RegisterOperation(new MapOperation());
+        public static readonly IOperation New = RegisterOperation(new NewOperation());
         public static readonly IOperation Context = RegisterOperation(new ContextOperation());
         public static readonly IOperation Root = RegisterOperation(new RootOperation());
 

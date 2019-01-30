@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace QRest.Core.Terms
 {
-    public class ConstantTerm : ITerm
+    public sealed class ConstantTerm : ITerm
     {
         public object Value { get; }
 

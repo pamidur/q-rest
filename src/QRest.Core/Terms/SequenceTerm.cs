@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace QRest.Core.Terms
 {
-    public class SequenceTerm : IEnumerable<ITerm>, ITerm
+    public sealed class SequenceTerm : IEnumerable<ITerm>, ITerm
     {
         private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
 
@@ -22,9 +22,9 @@ namespace QRest.Core.Terms
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
 
-        public virtual string SharedView { get; protected set; }
-        public virtual string KeyView { get; protected set; }
-        public virtual string DebugView { get; protected set; }
+        public string SharedView { get; }
+        public string KeyView { get;  }
+        public string DebugView { get;  }
 
         public SequenceTerm Append(params ITerm[] terms)
         {
@@ -34,7 +34,7 @@ namespace QRest.Core.Terms
             return clone;
         }
 
-        protected void Add(ITerm term)
+        private void Add(ITerm term)
         {
             if (term is SequenceTerm s)
             {
@@ -47,7 +47,7 @@ namespace QRest.Core.Terms
                 _sequence.AddLast(term);
         }
 
-        protected void Add(IEnumerable<ITerm> terms)
+        private void Add(IEnumerable<ITerm> terms)
         {
             foreach (var term in terms.Where(t => t != null))
                 Add(term);
@@ -63,7 +63,7 @@ namespace QRest.Core.Terms
             return _sequence.GetEnumerator();
         }
 
-        public virtual ITerm Clone() => new SequenceTerm(_sequence.Select(t => t.Clone()).ToArray());
+        public ITerm Clone() => new SequenceTerm(_sequence.Select(t => t.Clone()).ToArray());
 
         public override string ToString() => SharedView;
     }

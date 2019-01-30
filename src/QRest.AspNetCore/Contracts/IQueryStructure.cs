@@ -1,11 +1,11 @@
-﻿using QRest.Core.Terms;
+﻿using QRest.Core.Contracts;
 using System.Collections.Generic;
 
 namespace QRest.AspNetCore.Contracts
 {
     public interface IQueryStructure
     {
-        RootTerm Data { get; }
-        IReadOnlyList<RootTerm> GetAll();
+        ITerm Data { get; }
+        IReadOnlyList<ITerm> GetAll();
     }
 }

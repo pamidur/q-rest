@@ -2,8 +2,10 @@
 
 namespace QRest.Core.Operations.Boolean
 {
-    public class LessThanOperation : CompareOperationBase
+    public sealed class LessThanOperation : CompareOperationBase
     {
+        internal LessThanOperation() { }
+
         public override string Key { get; } = "lt";
 
         protected override Expression PickExpression(Expression a, Expression b)=>

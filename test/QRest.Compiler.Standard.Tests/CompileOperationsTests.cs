@@ -1,5 +1,4 @@
 ﻿using QRest.Core;
-using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using System;
 using System.Dynamic;
@@ -20,15 +19,11 @@ namespace QRest.Compiler.Standard.Tests
         [Fact(DisplayName = "Can compile NEW Operation")]
         public void New()
         {
-            var tree = new RootTerm(new[]
-            {
-                new MethodTerm(OperationsMap.Map,new []
-                {
-                    new PropertyTerm(nameof(CompileTestClass.IntProperty)).AsSequence(),
-                    new PropertyTerm(nameof(CompileTestClass.StringProperty)).AsSequence(),
-                    new ITerm[]{ new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName")}.AsSequence(),
-                })
-            });
+            var tree = new MethodTerm(OperationsMap.New,
+                    new PropertyTerm(nameof(CompileTestClass.IntProperty)),
+                    new PropertyTerm(nameof(CompileTestClass.StringProperty)),
+                    new SequenceTerm(new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName"))
+                );
 
             var data = new CompileTestClass { IntProperty = 1, StringProperty = "MyText", DateTimeProperty = DateTime.Now };
             var compiled = _compiler.Compile<CompileTestClass>(tree);
@@ -44,19 +39,13 @@ namespace QRest.Compiler.Standard.Tests
         [Fact(DisplayName = "Can compile SELECT Operation")]
         public void Select()
         {
-            var tree = new RootTerm(new[]
-            {
-                new MethodTerm(OperationsMap.Each, new[]{
-                    new LambdaTerm(new[]{
-                        new MethodTerm(OperationsMap.Map,new[]
-                        {
-                            new PropertyTerm(nameof(CompileTestClass.IntProperty)).AsSequence(),
-                            new PropertyTerm(nameof(CompileTestClass.StringProperty)).AsSequence(),
-                            new ITerm[]{ new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName")}.AsSequence(),
-                        })
-                    })
-                })
-            });
+            var tree = new MethodTerm(OperationsMap.Map,
+                    new LambdaTerm(
+                        new MethodTerm(OperationsMap.New,
+                            new PropertyTerm(nameof(CompileTestClass.IntProperty)),
+                            new PropertyTerm(nameof(CompileTestClass.StringProperty)),
+                            new SequenceTerm(new PropertyTerm(nameof(CompileTestClass.StringProperty)), new NameTerm("NewName"))
+                    )));
 
             var data = new[]
             {

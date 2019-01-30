@@ -5,9 +5,11 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
 {
-    public class EachOperation : LambdaOperationBase
+    public sealed class MapOperation : LambdaOperationBase
     {
-        public override string Key { get; } = "each";
+        internal MapOperation() { }
+
+        public override string Key { get; } = "map";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssemblerContext assembler)
         {

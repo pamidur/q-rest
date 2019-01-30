@@ -121,7 +121,7 @@ namespace QRest.Semantics.QRest.Tests
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
 
-            var method = (MethodTerm) actual.Value.Root;
+            var method = (MethodTerm) actual.Value.Term;
 
             Assert.Equal(_testUniversalOperationName, method.Operation.Key);
             Assert.Empty(method.Arguments);

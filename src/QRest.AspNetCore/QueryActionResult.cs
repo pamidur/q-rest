@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QRest.AspNetCore.Contracts;
 using QRest.AspNetCore.Native;
-using QRest.Core.Terms;
+using QRest.Core.Contracts;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +18,7 @@ namespace QRest.AspNetCore
 
     public class QueryActionResult<T> : QueryActionResult
     {
-        internal QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<RootTerm, object> results) : base(structure, results)
+        internal QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<ITerm, object> results) : base(structure, results)
         {
         }
 
@@ -44,9 +44,9 @@ namespace QRest.AspNetCore
     public abstract class QueryActionResult : ActionResult
     {
         protected readonly IQueryStructure _structure;
-        protected readonly IReadOnlyDictionary<RootTerm, object> _results;
+        protected readonly IReadOnlyDictionary<ITerm, object> _results;
 
-        internal QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<RootTerm, object> results)
+        internal QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<ITerm, object> results)
         {
             _structure = structure;
             _results = results;
@@ -54,7 +54,7 @@ namespace QRest.AspNetCore
 
         public static QueryActionResult<T> From<T>(Query query, T source)
         {
-            var results = new Dictionary<RootTerm, object>();
+            var results = new Dictionary<ITerm, object>();
 
             foreach (var lambda in query.Structure.GetAll().Where(q => q != null))
                 results[lambda] = query.Compiller.Compile<T>(lambda)(source);

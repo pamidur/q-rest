@@ -6,8 +6,10 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
 {
-    public class SkipOperation : QueryOperationBase
+    public sealed class SkipOperation : QueryOperationBase
     {
+        internal SkipOperation() { }
+
         public override string Key { get; } = "skip";        
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)

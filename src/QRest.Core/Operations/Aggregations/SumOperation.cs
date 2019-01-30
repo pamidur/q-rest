@@ -7,9 +7,11 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Aggregations
 {
-    public class SumOperation : QueryOperationBase
+    public sealed class SumOperation : QueryOperationBase
     {
-        public override string Key { get; } = "sum";        
+        internal SumOperation() { }
+
+        public override string Key { get; } = "sum";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
         {

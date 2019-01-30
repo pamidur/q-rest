@@ -13,26 +13,29 @@ namespace QRest.Compiler.Standard
 {
     public class StandardCompiler : ICompiler
     {
-        private static readonly ConstantsCollector _constantsCollector = new ConstantsCollector();
+        private static readonly ConstantsCollectingVisitor _constantsCollector = new ConstantsCollectingVisitor();
         private static readonly ConcurrentDictionary<string, ConstantExpression> _cache = new ConcurrentDictionary<string, ConstantExpression>();
 
         private readonly StandardCompilerOptions _options;
         private readonly IStringParsingBehavior _stringParsingBehavior;
+        private readonly AssemblingVisitor _assembler;
 
         public StandardCompiler(IStringParsingBehavior stringParsingBehavior = null, IOptions<StandardCompilerOptions> options = null)
         {
             _options = options?.Value ?? new StandardCompilerOptions();
             _stringParsingBehavior = stringParsingBehavior ?? ParseStringsToClrTypes.Instance;
+
+            _assembler = new AssemblingVisitor(_options.AllowUncompletedQueries);
         }
 
-        public Func<TRoot, object> Compile<TRoot>(RootTerm sequence)
+        public Func<TRoot, object> Compile<TRoot>(ITerm sequence)
         {
             var exp = Assemble<TRoot>(sequence);
             var compiled = exp.Compile();
             return (TRoot root) => compiled(root);
         }
 
-        public Expression<Func<TRoot, object>> Assemble<TRoot>(RootTerm rootTerm)
+        public Expression<Func<TRoot, object>> Assemble<TRoot>(ITerm rootTerm)
         {
             ConstantExpression compiled = null;
             IReadOnlyList<ConstantExpression> constants = null;
@@ -49,8 +52,7 @@ namespace QRest.Compiler.Standard
             }
             else
             {
-                var ctx = new StandardAssembler(_options.AllowUncompletedQueries, _stringParsingBehavior);
-                var (lambda, consts) = ctx.Assemble(rootTerm, root, typeof(object));
+                var (lambda, consts) = _assembler.Assemble(rootTerm, root, typeof(object));
 
                 constants = consts;
                 compiled = Expression.Constant(lambda.Compile());

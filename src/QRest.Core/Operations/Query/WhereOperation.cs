@@ -5,8 +5,10 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
 {
-    public class WhereOperation : LambdaOperationBase
+    public sealed class WhereOperation : LambdaOperationBase
     {
+        internal WhereOperation() { }
+
         public override string Key { get; } = "where";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssemblerContext assembler)

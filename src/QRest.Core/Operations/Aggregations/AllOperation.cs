@@ -5,13 +5,15 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Aggregations
 {
-    public class AllOperation : LambdaOperationBase
+    public sealed class AllOperation : LambdaOperationBase
     {
+        internal AllOperation() { }
+
         public override string Key { get; } = "all";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssemblerContext assembler)
-        {          
-            var exp = (Expression) Expression.Call(QueryableType, nameof(Queryable.All), new Type[] { element }, new[] { context, argument });
+        {
+            var exp = (Expression)Expression.Call(QueryableType, nameof(Queryable.All), new Type[] { element }, new[] { context, argument });
             return assembler.SetName(exp, Key);
         }
     }

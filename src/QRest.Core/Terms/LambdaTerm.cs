@@ -1,19 +1,23 @@
 ﻿using QRest.Core.Contracts;
-using System.Linq;
 
 namespace QRest.Core.Terms
 {
-    public class LambdaTerm : SequenceTerm
+    public sealed class LambdaTerm : ITerm
     {
-        public LambdaTerm(params ITerm[] terms) : base(terms)
-        {
-            DebugView = $":{base.DebugView}";
-            KeyView = $":{base.KeyView}";
-            SharedView = $":{base.SharedView}";
+        public LambdaTerm(ITerm term)
+        {            
+            Term = term;
+
+            DebugView = $":{term.DebugView}";
+            KeyView = $":{term.KeyView}";
+            SharedView = $":{term.SharedView}";
         }
 
-        public LambdaTerm(SequenceTerm sequence) : this(sequence.ToArray()) { }
+        public ITerm Term { get; }
 
-        public override ITerm Clone() => new LambdaTerm(base.Clone().AsSequence());
+        public string DebugView { get; }
+        public string SharedView { get; }
+        public string KeyView { get; }
+        public ITerm Clone() => new LambdaTerm(Term.Clone());
     }
 }
