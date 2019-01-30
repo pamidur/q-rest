@@ -1,4 +1,5 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core;
+using QRest.Core.Contracts;
 using QRest.Core.Terms;
 using System.Collections.Generic;
 using System.Linq.Expressions;

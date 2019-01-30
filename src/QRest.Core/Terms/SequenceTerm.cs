@@ -1,4 +1,5 @@
 ﻿using QRest.Core.Contracts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace QRest.Core.Terms
 
         public SequenceTerm(params ITerm[] terms)
         {
-            Add(terms);
+            AddTerms(terms);
 
             SharedView = $"{string.Join("", _sequence.Select(t => t.SharedView))}";
             KeyView = string.Join("", _sequence.Select(t => t.KeyView));
@@ -29,29 +30,35 @@ namespace QRest.Core.Terms
         public SequenceTerm Append(params ITerm[] terms)
         {
             var clone = (SequenceTerm)Clone();
-            clone.Add(terms);
+            clone.AddTerms(terms);
 
             return clone;
         }
 
-        private void Add(ITerm term)
+        private void AddTerm(ITerm term)
         {
             if (term is SequenceTerm s)
-            {
-                if (term.GetType() != typeof(SequenceTerm))
-                    throw new System.InvalidOperationException("This sequence cannot be liniarized.");
-
-                Add((IEnumerable<ITerm>)s);
-            }
+                AddTerms(s);
             else if (term != null)
-                _sequence.AddLast(term);
+                CheckAndAddLast(term);                
         }
 
-        private void Add(IEnumerable<ITerm> terms)
+        private void AddTerms(IEnumerable<ITerm> terms)
         {
             foreach (var term in terms.Where(t => t != null))
-                Add(term);
+                AddTerm(term);
         }
+
+        private void CheckAndAddLast(ITerm term)
+        {
+            if ((term is ConstantTerm || term is LambdaTerm) && _sequence.Count != 0)
+                throw new InvalidOperationException($"Cannot chain '{term.GetType().Name}' is the middle of sequence.");
+
+            if ((term is NameTerm) && _sequence.Count == 0)
+                throw new InvalidOperationException($"Cannot start sequence with '{term.GetType().Name}'.");
+
+            _sequence.AddLast(term);
+        }        
 
         public IEnumerator<ITerm> GetEnumerator()
         {

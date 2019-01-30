@@ -15,9 +15,11 @@ namespace Microsoft.Extensions.DependencyInjection
             return new QRestConfiguration(services);
         }
 
-        public static QRestConfiguration UseNativeSemantics(this QRestConfiguration config, Action<NativeSemanticsOptions> options)
+        public static QRestConfiguration UseNativeSemantics(this QRestConfiguration config, Action<NativeSemanticsOptions> options = null)
         {
-            config.Services.Configure(options);
+            if (options != null)
+                config.Services.Configure(options);
+
             config.Services.AddSingleton<ISemantics, NativeSemantics>();
 
             return config;

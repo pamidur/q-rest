@@ -1,7 +1,8 @@
 ﻿using QRest.Core.Contracts;
 using QRest.Core.Exceptions;
+using QRest.Core.Terms;
 
-namespace QRest.Core.Terms
+namespace QRest.Core
 {
     public abstract class TermVisitor<T>
     {

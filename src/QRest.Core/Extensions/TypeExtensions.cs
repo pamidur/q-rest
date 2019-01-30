@@ -1,22 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace QRest.Core.Extensions
 {
-    public static class ExpressionExtensions
+    public static class TypeExtensions
     {
         private static readonly Type _queryableIface = typeof(IQueryable<>);
         private static readonly Type _enumerableIface = typeof(IEnumerable<>);
-
-        public static Expression ReduceTo(this Expression expression, ExpressionType[] expressionTypes)
-        {
-            while (expression.CanReduce && !expressionTypes.Contains(expression.NodeType))
-                expression = expression.Reduce();
-
-            return expression;
-        }
 
         public static bool TryGetQueryableElement(this Type type, out Type element)
             => TryGetGenericElement(type, _queryableIface, out element);

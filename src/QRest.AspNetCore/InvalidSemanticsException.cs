@@ -1,6 +1,8 @@
-﻿namespace QRest.Core.Exceptions
+﻿using System;
+
+namespace QRest.AspNetCore
 {
-    public class InvalidSemanticsException : TermTreeParsingException
+    public class InvalidSemanticsException : Exception
     {
         public InvalidSemanticsException(string message) : base(message)
         {

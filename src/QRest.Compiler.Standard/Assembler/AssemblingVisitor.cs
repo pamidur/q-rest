@@ -1,5 +1,6 @@
 ﻿using QRest.Compiler.Standard.Expressions;
 using QRest.Compiler.Standard.StringParsing;
+using QRest.Core;
 using QRest.Core.Contracts;
 using QRest.Core.Exceptions;
 using QRest.Core.Extensions;
@@ -138,19 +139,5 @@ namespace QRest.Compiler.Standard.Assembler
 
             return assembler;
         }
-
-
-        //protected override AssemblerContext VisitRoot(RootTerm r, AssemblerContext assembler)
-        //{
-        //    var sequence = Visit(r, assembler.Root, assembler.Root);
-
-        //    var resultLambda = Expression.Lambda(sequence.Context, assembler.Root);
-
-        //    assembler.Context = resultLambda;
-        //    assembler.Constants.AddRange(sequence.Constants);
-        //    assembler.Parameters.AddRange(sequence.Parameters);
-
-        //    return assembler;
-        //}
     }
 }
