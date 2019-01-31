@@ -2,7 +2,7 @@
 
 namespace QRest.Core.Terms
 {
-    public class NameTerm : ITerm
+    public sealed class NameTerm : ITerm
     {
         public string Name { get; }
 

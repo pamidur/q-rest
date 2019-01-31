@@ -1,12 +1,12 @@
 ﻿using QRest.AspNetCore.Contracts;
-using QRest.Core.Terms;
+using QRest.Core.Contracts;
 using System.Collections.Generic;
 
 namespace QRest.AspNetCore.Native
 {
     class NativeQueryStructure : IQueryStructure
     {
-        public RootTerm Data { get; set; }
-        public IReadOnlyList<RootTerm> GetAll() => new[] { Data };
+        public ITerm Data { get; set; }
+        public IReadOnlyList<ITerm> GetAll() => new[] { Data };
     }
 }

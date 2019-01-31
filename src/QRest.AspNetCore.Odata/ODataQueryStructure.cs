@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using QRest.AspNetCore.Contracts;
-using QRest.Core.Terms;
+using QRest.Core.Contracts;
 
 namespace QRest.AspNetCore.OData
 {
     public class ODataQueryStructure : IQueryStructure
     {
-        public RootTerm Data { get; set; }
-        public RootTerm Count { get; set; }
+        public ITerm Data { get; set; }
+        public ITerm Count { get; set; }
 
-        public IReadOnlyList<RootTerm> GetAll() => new[] { Data, Count };
+        public IReadOnlyList<ITerm> GetAll() => new[] { Data, Count };
     }
 }

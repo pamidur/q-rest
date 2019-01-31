@@ -10,10 +10,7 @@ namespace QRest.Compiler.Standard.Assembler
     {
         protected virtual (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleTerm(ITerm term, ParameterExpression root, Expression ctx)
         {
-            var constants = new List<ConstantExpression>();
-            var parameters = new List<ParameterExpression>();
-
-            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) result = default;
+            (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) result;
 
             switch (term)
             {
@@ -32,9 +29,6 @@ namespace QRest.Compiler.Standard.Assembler
                 case LambdaTerm l:
                     result = AssembleLambda(l, root, ctx);
                     break;
-                case RootTerm r:
-                    result = AssembleRoot(r, root, ctx);
-                    break;
                 case SequenceTerm s:
                     result = AssembleSequence(s, root, ctx);
                     break;
@@ -43,13 +37,7 @@ namespace QRest.Compiler.Standard.Assembler
                     break;
             }
 
-            ctx = result.Expression;
-            if (result.Constants != null && result.Constants.Count != 0)
-                constants.AddRange(result.Constants);
-            if (result.Parameters != null && result.Parameters.Count != 0)
-                parameters.AddRange(result.Parameters);
-
-            return (ctx, constants, parameters);
+            return (result.Expression, result.Constants ?? new ConstantExpression[] { }, result.Parameters ?? new ParameterExpression[] { });
         }
 
         protected virtual
@@ -78,7 +66,6 @@ namespace QRest.Compiler.Standard.Assembler
 
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleName(NameTerm n, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleLambda(LambdaTerm l, ParameterExpression root, Expression ctx);
-        protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleRoot(RootTerm r, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleMethod(MethodTerm m, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleProperty(PropertyTerm p, ParameterExpression root, Expression ctx);
         protected abstract (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleConstant(ConstantTerm c, ParameterExpression root, Expression ctx);

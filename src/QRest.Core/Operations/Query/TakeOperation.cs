@@ -6,8 +6,10 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Query
 {
-    public class TakeOperation : QueryOperationBase
-    {      
+    public sealed class TakeOperation : QueryOperationBase
+    {
+        internal TakeOperation() { }
+
         public override string Key { get; } = "take";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)

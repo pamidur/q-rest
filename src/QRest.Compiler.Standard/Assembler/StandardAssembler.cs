@@ -1,5 +1,6 @@
 ﻿using QRest.Compiler.Standard.Expressions;
 using QRest.Compiler.Standard.StringParsing;
+using QRest.Core.Contracts;
 using QRest.Core.Exceptions;
 using QRest.Core.Extensions;
 using QRest.Core.Operations;
@@ -26,9 +27,9 @@ namespace QRest.Compiler.Standard.Assembler
         }
 
         public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
-            Assemble(RootTerm sequence, ParameterExpression root, Type expectedType = null)
+            Assemble(ITerm sequence, ParameterExpression root, Type expectedType = null)
         {
-            var assembled = AssembleSequence(sequence, root, root);
+            var assembled = AssembleTerm(sequence, root, root);
 
             var expression = assembled.Expression;
 
@@ -124,19 +125,10 @@ namespace QRest.Compiler.Standard.Assembler
 
             var rootarg = Expression.Parameter(element.type, "e");
 
-            var sequence = base.AssembleSequence(l, rootarg, rootarg);
+            var sequence = base.AssembleTerm(l.Term, rootarg, rootarg);
 
             var resultLambda = Expression.Lambda(sequence.Expression, rootarg);
             return (resultLambda, sequence.Constants, sequence.Parameters);
-        }
-
-
-        protected override (Expression Expression, IReadOnlyList<ConstantExpression> Constants, IReadOnlyList<ParameterExpression> Parameters) AssembleRoot(RootTerm r, ParameterExpression root, Expression ctx)
-        {
-            var sequence = base.AssembleSequence(r, root, root);
-
-            var resultLambda = Expression.Lambda(sequence.Expression, root);
-            return (resultLambda, sequence.Constants, sequence.Parameters);
-        }  
+        } 
     }    
 }

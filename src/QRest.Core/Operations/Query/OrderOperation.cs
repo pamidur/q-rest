@@ -12,8 +12,10 @@ namespace QRest.Core.Operations.Query
         public ReverseOrderExpression(Expression expression) : base(expression, ReverseOrderNodeType) { }
     }
 
-    public class OrderOperation : QueryOperationBase
+    public sealed class OrderOperation : QueryOperationBase
     {
+        internal OrderOperation() { }
+
         public override string Key { get; } = "order";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
@@ -50,8 +52,10 @@ namespace QRest.Core.Operations.Query
         }        
     }
 
-    public class ReverseOrderOperation : OperationBase
+    public sealed class ReverseOrderOperation : OperationBase
     {
+        internal ReverseOrderOperation() { }
+
         public override string Key { get; } = "desc";
 
         public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)

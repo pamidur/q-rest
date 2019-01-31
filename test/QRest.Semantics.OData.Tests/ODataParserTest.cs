@@ -72,8 +72,8 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("value=-where(:-$.a-eq(-$.b))-each(:-map(-$.f1,-$.f2))", @"$filter = a eq b&$count=false&$select=f1,f2")]
-        [InlineData("value=-where(:-$.a-eq(-$.b))-each(:-map(-$.f1,-$.f2));count=-where(:-$.a-eq(-$.b))-count", @"$filter = a eq b&$count=true&$select=f1,f2")]
+        [InlineData("value=-where(:-$.a-eq(-$.b))-map(:-new(-$.f1,-$.f2))", @"$filter = a eq b&$count=false&$select=f1,f2")]
+        [InlineData("value=-where(:-$.a-eq(-$.b))-map(:-new(-$.f1,-$.f2));count=-where(:-$.a-eq(-$.b))-count", @"$filter = a eq b&$count=true&$select=f1,f2")]
         public void ShouldParseEach(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -81,7 +81,7 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("value=-skip('1')-take('1')-each(:-map(-$.f1,-$.f2))", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
+        [InlineData("value=-skip('1')-take('1')-map(:-new(-$.f1,-$.f2))", @"$count=false&$select=f1,f2&$skip=1&$top=1")]
         public void ShouldParseTopSkip(string expected, string input)
         {
             ITerm exp = Parse(input);

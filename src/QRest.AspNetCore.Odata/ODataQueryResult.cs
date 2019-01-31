@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using QRest.AspNetCore.OData.Converters;
 using QRest.AspNetCore.OData.Metadata;
-using QRest.Core.Terms;
+using QRest.Core.Contracts;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -14,7 +14,7 @@ namespace QRest.AspNetCore.OData
     {
         private static readonly JsonSerializer _serializer;
         private readonly ODataQueryStructure _query;
-        private readonly IReadOnlyDictionary<RootTerm, object> _results;
+        private readonly IReadOnlyDictionary<ITerm, object> _results;
 
         static ODataQueryResult()
         {
@@ -23,7 +23,7 @@ namespace QRest.AspNetCore.OData
             } });
         }
 
-        public ODataQueryResult(ODataQueryStructure query, IReadOnlyDictionary<RootTerm, object> results)
+        public ODataQueryResult(ODataQueryStructure query, IReadOnlyDictionary<ITerm, object> results)
         {
             _query = query;
             _results = results;

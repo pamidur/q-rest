@@ -5,8 +5,10 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Aggregations
 {
-    public class AnyOperation : LambdaOperationBase
+    public sealed class AnyOperation : LambdaOperationBase
     {
+        internal AnyOperation() { }
+
         public override string Key { get; } = "any";
 
         protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssemblerContext assembler)

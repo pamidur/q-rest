@@ -1,14 +1,13 @@
 ﻿using QRest.Core.Contracts;
-using QRest.Core.Terms;
 
 namespace QRest.Semantics.OData
 {
-    public class ODataTermContainer : SequenceTerm
+    public class ODataTermContainer : ITerm
     {
         public ITerm Data { get; set; }
         public ITerm Count { get; set; }
 
-        public override string SharedView
+        public string SharedView
         {
             get
             {
@@ -19,6 +18,15 @@ namespace QRest.Semantics.OData
 
                 return result;
             }
+        }
+
+        public string DebugView => SharedView;
+
+        public string KeyView => SharedView;
+
+        public ITerm Clone()
+        {
+            throw new System.NotSupportedException();
         }
     }
 }

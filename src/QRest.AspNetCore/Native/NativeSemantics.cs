@@ -5,7 +5,6 @@ using QRest.AspNetCore.Contracts;
 using QRest.Core;
 using QRest.Core.Contracts;
 using QRest.Core.Exceptions;
-using QRest.Core.Operations;
 using QRest.Core.Terms;
 using Sprache;
 using System;
@@ -16,19 +15,19 @@ namespace QRest.AspNetCore.Native
 {
     public class NativeSemantics : ISemantics
     {
-        private static readonly NativeQueryStructure _default = new NativeQueryStructure { Data = new RootTerm(new MethodTerm(new RootOperation()).AsSequence()) };
+        private static readonly NativeQueryStructure _default = new NativeQueryStructure { Data = new MethodTerm(OperationsMap.Root) };
 
-        private readonly Lazy<Parser<RootTerm>> _parser;
+        private readonly Lazy<Parser<ITerm>> _parser;
 
         private readonly NativeSemanticsOptions _opts;
 
         public NativeSemantics(IOptions<NativeSemanticsOptions> option = null)
         {
-            _parser = new Lazy<Parser<RootTerm>>(() => PrepareParser());
+            _parser = new Lazy<Parser<ITerm>>(() => PrepareParser());
             _opts = option?.Value ?? new NativeSemanticsOptions();
         }
 
-        private Parser<RootTerm> PrepareParser()
+        private Parser<ITerm> PrepareParser()
         {
             var opNames = OperationsMap.GetRegisteredOperationNames()
                 .Concat(_opts.CustomOperations.Keys).ToArray();
@@ -47,7 +46,7 @@ namespace QRest.AspNetCore.Native
             throw new InvalidSemanticsException($"Unknown operation '{name}'");
         }
 
-        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<RootTerm, object> results, Type source)
+        public ActionResult WriteQueryResponse(IQueryStructure query, IReadOnlyDictionary<ITerm, object> results, Type source)
         {
             var result = results[query.Data];
             return new OkObjectResult(result);
