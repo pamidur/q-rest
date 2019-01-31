@@ -31,6 +31,7 @@ namespace QRest.AspNetCore.OData
             ITokenStream tokens = new CommonTokenStream(lexer);
 
             var parser = new ODataGrammarParser(tokens);
+            parser.AddErrorListener(new ODataParserErrorListener());
             var context = parser.parse();
 
             var vis = new ODataVisitor();

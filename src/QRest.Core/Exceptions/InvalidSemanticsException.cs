@@ -6,7 +6,7 @@
         {
         }
 
-        public string[] Expectations { get; set; }
+        public string[] Expectations { get; set; } = new string[] { };
         public int Position { get; set; }
     }
 }
