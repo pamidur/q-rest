@@ -29,7 +29,8 @@ namespace QRest.AspNetCore
             }
             catch(InvalidSemanticsException se)
             {
-                bindingContext.ModelState.AddModelError(bindingContext.ModelName, $"{se.Message} at position {se.Position}. Expected: {string.Join(",", se.Expectations)}"/*  se, bindingContext.ModelMetadata*/);
+                var expected = se.Expectations.Any() ? $"Expected : { string.Join(",", se.Expectations)}" : string.Empty;
+                bindingContext.ModelState.AddModelError(bindingContext.ModelName, $"{se.Message} at position {se.Position}. {expected}"/*  se, bindingContext.ModelMetadata*/);
                 bindingContext.Result = ModelBindingResult.Failed();
                 return Task.CompletedTask;
             }            
