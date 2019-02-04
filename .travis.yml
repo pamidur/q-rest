@@ -1,9 +1,10 @@
 language: csharp
-mono: latest
+#mono: latest
+mono: none
 dotnet: 2.1.402
 env:
   global:
-    - FrameworkPathOverride="$(dirname $(which mono))/../lib/mono/4.5/"
+#    - FrameworkPathOverride="$(dirname $(which mono))/../lib/mono/4.5/"
     - NUGETURL=https://api.nuget.org/v3/index.json
     - VERSION=${TRAVIS_TAG:-0.0.0-dev}
     - MODE=Release
