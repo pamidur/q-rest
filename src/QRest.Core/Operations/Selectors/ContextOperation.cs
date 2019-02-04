@@ -1,4 +1,4 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core.Compilation;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -10,7 +10,7 @@ namespace QRest.Core.Operations.Selectors
 
         public override string Key { get; } = "$$";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             return context;
         }

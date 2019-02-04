@@ -21,7 +21,6 @@
 
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\QRest.AspNetCore.Odata\QRest.AspNetCore.OData.csproj" />
     <ProjectReference Include="..\..\src\QRest.AspNetCore\QRest.AspNetCore.csproj" />
   </ItemGroup>
 

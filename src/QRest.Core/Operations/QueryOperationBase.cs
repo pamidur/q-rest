@@ -1,6 +1,4 @@
-﻿using QRest.Core.Contracts;
-using QRest.Core.Exceptions;
-using QRest.Core.Extensions;
+﻿using QRest.Core.Compilation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,10 +14,10 @@ namespace QRest.Core.Operations
         private static readonly MethodInfo _nonNullCollectionMethod = typeof(QueryOperationBase).GetMethod(nameof(NonNullCollection));
         protected static readonly Type QueryableType = typeof(Queryable);
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (!context.Type.TryGetCollectionElement(out var element))
-                throw new TermTreeCompilationException($"Cannot execute '{Key}' method on non-collection type '{context.Type}'.");
+                throw new CompilationException($"Cannot execute '{Key}' method on non-collection type '{context.Type}'.");
             
             var type = _queryableCollection.MakeGenericType(element.type);
             context = Expression.Convert(context, type, _nonNullCollectionMethod.MakeGenericMethod(element.type));
@@ -27,7 +25,7 @@ namespace QRest.Core.Operations
             return CreateExpression(root, context, element.type, arguments, assembler);
         }       
 
-        protected abstract Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler);
+        protected abstract Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler);
 
         public static IQueryable<T> NonNullCollection<T>(IEnumerable<T> collection)
         {

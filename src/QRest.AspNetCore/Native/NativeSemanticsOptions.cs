@@ -1,9 +1,5 @@
-﻿using QRest.AspNetCore;
-using QRest.AspNetCore.Contracts;
-using QRest.AspNetCore.Native;
-using QRest.Compiler.Standard;
-using QRest.Core;
-using QRest.Core.Contracts;
+﻿using QRest.Core.Operations;
+using QRest.Core.Parsing;
 using System.Collections.Generic;
 
 namespace QRest.AspNetCore.Native

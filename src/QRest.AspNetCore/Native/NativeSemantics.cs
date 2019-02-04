@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using QRest.AspNetCore.Contracts;
-using QRest.Core;
-using QRest.Core.Contracts;
-using QRest.Core.Exceptions;
 using QRest.Core.Terms;
 using Sprache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QRest.Core.Operations;
+using QRest.Core.Parsing;
 
 namespace QRest.AspNetCore.Native
 {

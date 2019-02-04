@@ -2,8 +2,6 @@
 using QRest.AspNetCore;
 using QRest.AspNetCore.Contracts;
 using QRest.AspNetCore.Native;
-using QRest.Compiler.Standard;
-using QRest.Core.Contracts;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -25,10 +23,12 @@ namespace Microsoft.Extensions.DependencyInjection
             return config;
         }
 
-        public static QRestConfiguration UseStandardCompiler(this QRestConfiguration config, Action<StandardCompilerOptions> options)
+        public static QRestConfiguration UseStandardCompiler(this QRestConfiguration config, Action<NativeCompilerOptions> options = null)
         {
-            config.Services.Configure(options);
-            config.Services.AddSingleton<ICompiler, StandardCompiler>();
+            if (options != null)
+                config.Services.Configure(options);
+
+            config.Services.AddSingleton<ICompiler, NativeCompiler>();
 
             return config;
         }

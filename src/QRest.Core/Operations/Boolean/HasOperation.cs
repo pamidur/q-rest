@@ -1,4 +1,4 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core.Compilation;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -11,17 +11,17 @@ namespace QRest.Core.Operations.Boolean
 
         public override string Key { get; } = "has";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 1)
-                throw new ExpressionCreationException();
+                throw new CompilationException("Expected 1 parameter");
 
             if (context.Type == typeof(string))
             {
                 return Expression.Call(context, nameof(String.Contains), new Type[] { }, arguments[0]);
             }
 
-            throw new ExpressionCreationException();
+            throw new CompilationException("Expected string context");
         }
     }
 }

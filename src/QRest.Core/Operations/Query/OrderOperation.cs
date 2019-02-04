@@ -1,4 +1,5 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core.Compilation;
+using QRest.Core.Compilation.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "order";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             var exp = context;
 
@@ -58,10 +59,10 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "desc";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 0)
-                throw new ExpressionCreationException();
+                throw new CompilationException("Expected 0 parameters");
 
             return new ReverseOrderExpression(context);
         }

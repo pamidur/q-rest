@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QRest.AspNetCore.Contracts;
 using QRest.AspNetCore.Native;
-using QRest.Core.Contracts;
+using QRest.Core.Terms;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

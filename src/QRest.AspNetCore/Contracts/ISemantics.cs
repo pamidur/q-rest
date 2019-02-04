@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using QRest.Core.Contracts;
+using QRest.Core.Terms;
 using System;
 using System.Collections.Generic;
 

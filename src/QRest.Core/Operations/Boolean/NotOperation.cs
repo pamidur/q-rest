@@ -1,4 +1,4 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core.Compilation;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
@@ -10,10 +10,10 @@ namespace QRest.Core.Operations.Boolean
 
         public override string Key { get; } = "not";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 0)
-                throw new ExpressionCreationException();
+                throw new CompilationException("Expected 0 parameters");
 
             return Expression.Not(context);
         }

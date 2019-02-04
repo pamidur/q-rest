@@ -1,5 +1,4 @@
-﻿using QRest.Core.Contracts;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace QRest.Core.Terms
 {

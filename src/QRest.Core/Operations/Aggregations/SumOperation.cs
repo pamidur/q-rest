@@ -1,5 +1,4 @@
-﻿using QRest.Core.Contracts;
-using QRest.Core.Exceptions;
+﻿using QRest.Core.Compilation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +12,10 @@ namespace QRest.Core.Operations.Aggregations
 
         public override string Key { get; } = "sum";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssemblerContext assembler)
+        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 0)
-                throw new TermTreeCompilationException($"Method '{Key}' expects to have no parameters.");
+                throw new CompilationException($"Method '{Key}' expects to have no parameters.");
 
             var exp = Expression.Call(QueryableType, nameof(Queryable.Sum), new Type[] { }, context);
 

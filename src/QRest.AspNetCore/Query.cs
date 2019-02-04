@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using QRest.AspNetCore.Contracts;
-using QRest.Core.Contracts;
 
 namespace QRest.AspNetCore
 {

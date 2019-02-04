@@ -1,6 +1,4 @@
-﻿using QRest.Core.Contracts;
-
-namespace QRest.Core.Terms
+﻿namespace QRest.Core.Terms
 {
     public sealed class PropertyTerm : ITerm
     {

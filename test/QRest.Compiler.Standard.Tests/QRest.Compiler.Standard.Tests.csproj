@@ -15,8 +15,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\QRest.Compiler.Standard\QRest.Compiler.Standard.csproj" />
-  </ItemGroup>
-
 </Project>
