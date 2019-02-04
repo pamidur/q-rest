@@ -6,11 +6,9 @@
 
 Package | Release | Pre-release
 --- | --- | ---
-**Core** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Core.svg)](https://www.nuget.org/packages/QRest.Core)
-**Semantics.MethodChain** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Semantics.MethodChain.svg)](https://www.nuget.org/packages/QRest.Semantics.MethodChain)
-**Semantics.OData** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Semantics.OData.svg)](https://www.nuget.org/packages/QRest.Semantics.OData)
-**Compiler.Standard** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Compiler.Standard.svg)](https://www.nuget.org/packages/QRest.Compiler.Standard)
-**AspNetCore** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.AspNetCore.svg)](https://www.nuget.org/packages/QRest.AspNetCore)
+**QRest.Core** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Core.svg)](https://www.nuget.org/packages/QRest.Core)
+**QRest.AspNetCore** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.AspNetCore.svg)](https://www.nuget.org/packages/QRest.AspNetCore)
+**QRest.Semantics.OData** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Semantics.OData.svg)](https://www.nuget.org/packages/QRest.Semantics.OData)
 
 
 ## HowTo
