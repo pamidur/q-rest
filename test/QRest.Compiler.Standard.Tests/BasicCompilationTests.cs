@@ -1,4 +1,6 @@
 using QRest.Core;
+using QRest.Core.Compilation;
+using QRest.Core.Operations;
 using QRest.Core.Terms;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +15,11 @@ namespace QRest.Compiler.Standard.Tests
 
     public class BasicCompilationTests
     {
-        private readonly StandardCompiler _compiler;
+        private readonly TermCompiler _compiler;
 
         public BasicCompilationTests()
         {
-            _compiler = new StandardCompiler();
+            _compiler = TermCompiler.Default;
         }
 
         [Fact]

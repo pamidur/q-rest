@@ -1,6 +1,6 @@
 ﻿using Moq;
-using QRest.Core;
-using QRest.Core.Contracts;
+using QRest.Core.Operations;
+using QRest.Core.Parsing;
 using QRest.Core.Terms;
 using Sprache;
 using Xunit;

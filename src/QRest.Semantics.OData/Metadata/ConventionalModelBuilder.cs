@@ -10,9 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QRest.AspNetCore.OData.Metadata
+namespace QRest.Semantics.OData.Metadata
 {
-    public class ConventionalModelBuilder : IModelBuilder
+    public class ConventionalModelBuilder : IEdmBuilder
     {
         private readonly IApiDescriptionGroupCollectionProvider _provider;
         private readonly ODataOptions _options;

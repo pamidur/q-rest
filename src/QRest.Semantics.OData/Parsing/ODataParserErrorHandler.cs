@@ -1,8 +1,8 @@
 ﻿using Antlr4.Runtime;
-using QRest.Core.Exceptions;
+using QRest.AspNetCore;
 using System.IO;
 
-namespace QRest.AspNetCore.OData
+namespace QRest.Semantics.OData.Parsing
 {
     public class ODataParserErrorListener : BaseErrorListener
     {

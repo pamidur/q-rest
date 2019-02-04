@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using QRest.AspNetCore;
 using QRest.AspNetCore.Contracts;
-using QRest.AspNetCore.OData;
-using QRest.AspNetCore.OData.Metadata;
+using QRest.Semantics.OData;
+using QRest.Semantics.OData.Metadata;
+using QRest.Semantics.OData.Semantics;
 using System;
-using System.Reflection;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -22,14 +22,6 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public void Apply(ApplicationModel application)
         {
-            //var c = new ControllerModel(typeof(MyCtor).GetTypeInfo(), new object[] { });
-            //var action = new ActionModel(typeof(MyCtor).GetMethod(nameof(MyCtor.Metadata)),new object[] { });
-
-            //c.Actions.Add(new ActionModel(action));
-
-
-            //application.Controllers.Add(c);
-
             application.ApiExplorer.IsVisible = true;
         }
     }
@@ -44,7 +36,7 @@ namespace Microsoft.Extensions.DependencyInjection
             qrest.Services.Configure<ODataOptions>(options);
 
             qrest.Services.AddTransient<ISemantics, ODataSemantics>();
-            qrest.Services.AddTransient<IModelBuilder, ConventionalModelBuilder>();
+            qrest.Services.AddTransient<IEdmBuilder, ConventionalModelBuilder>();
             qrest.Services.AddSingleton<ODataMetadataMiddleware>();
 
             return qrest;

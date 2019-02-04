@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace QRest.AspNetCore.OData.Converters
+namespace QRest.Semantics.OData.Semantics
 {
     internal class DateTimeOffsetConverter : JsonConverter
     {

@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm.Csdl;
 using Newtonsoft.Json;
-using QRest.AspNetCore.OData.Metadata;
+using QRest.Semantics.OData.Metadata;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 
-namespace QRest.AspNetCore.OData
+namespace QRest.Semantics.OData
 {
     internal class ODataMetadataMiddleware : IMiddleware
     {
@@ -21,7 +21,7 @@ namespace QRest.AspNetCore.OData
 
         public bool IsInUse { get; set; }
 
-        public ODataMetadataMiddleware(IModelBuilder modelBuilder, IOptions<ODataOptions> options)
+        public ODataMetadataMiddleware(IEdmBuilder modelBuilder, IOptions<ODataOptions> options)
         {
             _options = options.Value;
             _serviceRoot = _options.ServiceRoot.ToString().Trim('/');

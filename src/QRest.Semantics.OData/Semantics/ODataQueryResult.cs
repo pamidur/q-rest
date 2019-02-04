@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using QRest.AspNetCore.OData.Converters;
-using QRest.AspNetCore.OData.Metadata;
-using QRest.Core.Contracts;
+using QRest.Core.Terms;
+using QRest.Semantics.OData.Metadata;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace QRest.AspNetCore.OData
+namespace QRest.Semantics.OData.Semantics
 {
     internal class ODataQueryResult : ActionResult
     {
@@ -43,7 +42,7 @@ namespace QRest.AspNetCore.OData
 
         private object CreateResponse(ActionContext context)
         {
-            var builder = (IModelBuilder)context.HttpContext.RequestServices.GetService(typeof(IModelBuilder));
+            var builder = (IEdmBuilder)context.HttpContext.RequestServices.GetService(typeof(IEdmBuilder));
 
             var meta = (ODataMetadataMiddleware)context.HttpContext.RequestServices.GetService(typeof(ODataMetadataMiddleware));
 

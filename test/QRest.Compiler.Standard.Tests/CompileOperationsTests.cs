@@ -1,4 +1,6 @@
 ﻿using QRest.Core;
+using QRest.Core.Compilation;
+using QRest.Core.Operations;
 using QRest.Core.Terms;
 using System;
 using System.Dynamic;
@@ -9,11 +11,11 @@ namespace QRest.Compiler.Standard.Tests
 {
     public class CompileOperationsTests
     {
-        private readonly StandardCompiler _compiler;
+        private readonly TermCompiler _compiler;
 
         public CompileOperationsTests()
         {
-            _compiler = new StandardCompiler();
+            _compiler = TermCompiler.Default;
         }
 
         [Fact(DisplayName = "Can compile NEW Operation")]

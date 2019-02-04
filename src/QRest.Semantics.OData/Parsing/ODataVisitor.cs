@@ -1,17 +1,15 @@
 ﻿using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
-using QRest.Core;
-using QRest.Core.Contracts;
+using QRest.Core.Operations;
 using QRest.Core.Operations.Aggregations;
 using QRest.Core.Operations.Query;
 using QRest.Core.Terms;
-using QRest.Semantics.OData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using static ODataGrammarParser;
 
-namespace QRest.OData
+namespace QRest.Semantics.OData.Parsing
 {
     public class ODataVisitor : ODataGrammarBaseVisitor<ITerm>
     {

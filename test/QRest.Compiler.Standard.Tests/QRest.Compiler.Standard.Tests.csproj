@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\QRest.Core\QRest.Core.csproj" />
+  </ItemGroup>
+
 </Project>

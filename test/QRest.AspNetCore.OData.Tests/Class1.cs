@@ -1,4 +1,4 @@
-﻿using QRest.AspNetCore.OData.Metadata;
+﻿using QRest.Semantics.OData.Metadata;
 using System.Text;
 using System.Xml;
 using Xunit;

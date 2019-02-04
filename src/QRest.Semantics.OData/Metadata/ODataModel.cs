@@ -1,11 +1,11 @@
 ﻿using Microsoft.OData.Edm;
-using QRest.Core.Extensions;
+using QRest.Core.Compilation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace QRest.AspNetCore.OData.Metadata
+namespace QRest.Semantics.OData.Metadata
 {
     public class ODataModel
     {

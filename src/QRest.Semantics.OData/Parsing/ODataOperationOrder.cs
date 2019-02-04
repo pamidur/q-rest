@@ -3,7 +3,7 @@ using QRest.Core.Operations.Query;
 using System;
 using System.Collections.Generic;
 
-namespace QRest.Semantics.OData
+namespace QRest.Semantics.OData.Parsing
 {
     public class ODataOperationOrder : IComparer<Type>
     {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using QRest.AspNetCore.Contracts;
-using QRest.Core.Contracts;
+using QRest.Core.Terms;
 
-namespace QRest.AspNetCore.OData
+namespace QRest.Semantics.OData.Semantics
 {
     public class ODataQueryStructure : IQueryStructure
     {

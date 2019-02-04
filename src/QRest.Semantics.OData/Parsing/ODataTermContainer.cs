@@ -1,6 +1,6 @@
-﻿using QRest.Core.Contracts;
+﻿using QRest.Core.Terms;
 
-namespace QRest.Semantics.OData
+namespace QRest.Semantics.OData.Parsing
 {
     public class ODataTermContainer : ITerm
     {

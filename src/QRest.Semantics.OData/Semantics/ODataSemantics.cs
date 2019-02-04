@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QRest.AspNetCore.Contracts;
-using QRest.Core.Contracts;
-using QRest.OData;
-using QRest.Semantics.OData;
+using QRest.Core.Terms;
+using QRest.Semantics.OData.Parsing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace QRest.AspNetCore.OData
+namespace QRest.Semantics.OData.Semantics
 {
     public class ODataSemantics : ISemantics
     {

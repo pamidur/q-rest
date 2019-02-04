@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Abstractions;
 
-namespace QRest.AspNetCore.OData.Metadata
+namespace QRest.Semantics.OData.Metadata
 {
-    public interface IModelBuilder
+    public interface IEdmBuilder
     {
         ODataModel Build();
         string GetEdmName(ActionDescriptor actionDescriptor);

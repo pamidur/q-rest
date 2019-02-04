@@ -22,8 +22,8 @@ namespace TestWebApp
         {
             services
                 .AddQRest()
-                //.UseODataSemantics()
-                .UseNativeSemantics()
+                .UseODataSemantics()
+                //.UseNativeSemantics()
                 .UseStandardCompiler(cpl =>
                 {
                     cpl.UseCompilerCache = false;
@@ -49,7 +49,7 @@ namespace TestWebApp
             });
 
 
-            //app.UseODataMetadata();
+            app.UseODataMetadata();
             app.UseMvc();
         }
     }

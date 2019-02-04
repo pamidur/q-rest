@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <Description>OData chain semantics for data queries over HTTP.</Description>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -12,10 +13,12 @@
 
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.7.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="7.5.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\QRest.Core\QRest.Core.csproj" />
+    <ProjectReference Include="..\QRest.AspNetCore\QRest.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

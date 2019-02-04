@@ -45,7 +45,7 @@ namespace QRest.Core.Compilation.TypeConverters
             return result != null;
         }
 
-        public void RegisterConverter<TI, TO>(Func<TI, IFormatProvider, TO> converter, bool required = false)
+        public void RegisterConverter<TI, TO>(Func<TI, IFormatProvider, TO> converter)
         {
             _converters[(typeof(TI), typeof(TO))] = (e, f) => Expression.Invoke(Expression.Constant(converter), e, Expression.Constant(f, typeof(IFormatProvider)));
         }

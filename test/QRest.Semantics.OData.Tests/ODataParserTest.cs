@@ -1,5 +1,6 @@
 using Antlr4.Runtime;
-using QRest.Core.Contracts;
+using QRest.Core.Terms;
+using QRest.Semantics.OData.Parsing;
 using Xunit;
 
 namespace QRest.OData.Tests

@@ -1,7 +1,7 @@
 ﻿using Microsoft.OData.Edm;
 using System;
 
-namespace QRest.AspNetCore.OData.Metadata
+namespace QRest.Semantics.OData.Metadata
 {
     static class EdmExtensions
     {
