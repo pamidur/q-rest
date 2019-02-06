@@ -119,7 +119,7 @@ namespace QRest.OData.Tests
             var parser = new ODataGrammarParser(tokens);
             var context = parser.parse();
 
-            var vis = new ODataVisitor();
+            var vis = new ODataVisitor(new ODataOperationMap());
             var exp = vis.Visit(context);
             return exp;
         }
