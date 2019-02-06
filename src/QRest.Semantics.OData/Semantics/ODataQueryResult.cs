@@ -17,9 +17,13 @@ namespace QRest.Semantics.OData.Semantics
 
         static ODataQueryResult()
         {
-            _serializer = JsonSerializer.Create(new JsonSerializerSettings { Converters = new List<JsonConverter> {
-                new DateTimeOffsetConverter()
-            } });
+            _serializer = JsonSerializer.Create(
+                new JsonSerializerSettings {
+                    Converters = new List<JsonConverter> {
+                        new DateTimeOffsetConverter()
+                    },
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore                    
+                });
         }
 
         public ODataQueryResult(ODataQueryStructure query, IReadOnlyDictionary<ITerm, object> results)

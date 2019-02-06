@@ -1,25 +1,31 @@
-﻿using QRest.Core.Operations.Aggregations;
+﻿using QRest.Core.Operations;
+using QRest.Core.Operations.Aggregations;
 using QRest.Core.Operations.Query;
 using System;
 using System.Collections.Generic;
 
 namespace QRest.Semantics.OData.Parsing
 {
-    public class ODataOperationOrder : IComparer<Type>
+    public class ODataOperationOrder : IComparer<IOperation>
     {
-        public static IDictionary<Type, int> OperationOrder = new Dictionary<Type, int>
-        {
-            {typeof(WhereOperation), 0 },
-            {typeof(CountOperation), 1 },
-            {typeof(OrderOperation), 2 },
-            {typeof(SkipOperation), 3 },
-            {typeof(TakeOperation), 4 },
-            {typeof(MapOperation), 5 }
-        };
+        private readonly Dictionary<IOperation, int> _order;
 
-        public int Compare(Type x, Type y)
+        public ODataOperationOrder(ODataOperationMap operations)
         {
-            return OperationOrder[x] - OperationOrder[y];
+            _order = new Dictionary<IOperation, int>
+            {
+                {operations.Where, 0 },
+                {operations.Count, 1 },
+                {operations.Order, 2 },
+                {operations.Skip, 3 },
+                {operations.Top, 4 },
+                {operations.Select, 5 }
+            };
+        }        
+
+        public int Compare(IOperation x, IOperation y)
+        {
+            return _order[x] - _order[y];
         }
     }
 }

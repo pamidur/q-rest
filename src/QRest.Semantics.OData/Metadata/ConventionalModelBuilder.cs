@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Options;
 using System;
@@ -56,7 +55,7 @@ namespace QRest.Semantics.OData.Metadata
                     .Where(a => a is IActionHttpMethodProvider provider && provider.HttpMethods.Contains("GET"))
                     .OfType<IRouteTemplateProvider>().FirstOrDefault();
 
-                if (route != null && !route.Template.StartsWith("{"))
+                if (route != null && route.Template != null && !route.Template.StartsWith("{"))
                     name += $"_{cad.ActionName}";
             }
 
@@ -88,16 +87,16 @@ namespace QRest.Semantics.OData.Metadata
         {
             var template = TemplateParser.Parse(api.RelativePath);
 
-            var pathSegments = template.Segments.Where(s => s.Parts.All(p => !p.IsParameter || !api.ParameterDescriptions.First(pd=>pd.ParameterDescriptor.Name == p.Name).IsRequired)).ToList();
+            var pathSegments = template.Segments.Where(s => s.Parts.All(p => !p.IsParameter || !api.ParameterDescriptions.First(pd => pd.ParameterDescriptor.Name == p.Name).IsRequired)).ToList();
 
             if (template.Segments.Count != pathSegments.Count)
                 return default;
 
-            var pathChunks = ToStringChunks(pathSegments);            
+            var pathChunks = ToStringChunks(pathSegments);
 
-            for (int i = 0; i < _rootChunks.Length; i++)            
-                if(_rootChunks[i]!=pathChunks[i])
-                    return default;           
+            for (int i = 0; i < _rootChunks.Length; i++)
+                if (_rootChunks[i] != pathChunks[i])
+                    return default;
 
             return string.Join("/", pathChunks.Skip(_rootChunks.Length));
         }

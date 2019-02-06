@@ -1,6 +1,7 @@
 ﻿using Antlr4.Runtime;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using QRest.AspNetCore.Contracts;
 using QRest.Core.Terms;
 using QRest.Semantics.OData.Parsing;
@@ -12,8 +13,14 @@ namespace QRest.Semantics.OData.Semantics
 {
     public class ODataSemantics : ISemantics
     {
+        public ODataSemantics(IOptions<ODataOptions> options)
+        {
+            _options = options?.Value ?? ODataOptions.Default;
+        }
+
         private static readonly Type _queryableIface = typeof(IQueryable<>);
         private static readonly string _queryableIfaceName = $"{_queryableIface.Namespace}.{_queryableIface.Name}";
+        private readonly ODataOptions _options;
 
         public IQueryStructure ReadQueryStructure(IReadOnlyList<string> values, HttpRequest request)
         {
@@ -33,7 +40,7 @@ namespace QRest.Semantics.OData.Semantics
             parser.AddErrorListener(new ODataParserErrorListener());
             var context = parser.parse();
 
-            var vis = new ODataVisitor();
+            var vis = new ODataVisitor(_options.Operations);
             var exp = vis.Visit(context);
 
             var container = (ODataTermContainer)exp;

@@ -14,6 +14,12 @@ namespace QRest.Semantics.OData.Parsing
     public class ODataVisitor : ODataGrammarBaseVisitor<ITerm>
     {
         private string _currentContext = string.Empty;
+        private readonly ODataOperationMap _operations;
+
+        public ODataVisitor(ODataOperationMap operations)
+        {
+            _operations = operations;
+        }
 
         public override ITerm VisitParse([NotNull] ParseContext context)
         {
@@ -28,7 +34,7 @@ namespace QRest.Semantics.OData.Parsing
             var operationLambdas = context.children.OfType<QueryOptionContext>().Select(c => Visit(c));
 
             var sortedLambdas = operationLambdas.Where(c => c != null)
-                .OrderBy(c => ((MethodTerm)c).Operation.GetType(), new ODataOperationOrder()).ToList();
+                .OrderBy(c => ((MethodTerm)c).Operation, new ODataOperationOrder(_operations)).ToList();
 
             return BuildTerms(sortedLambdas);
         }
@@ -70,14 +76,14 @@ namespace QRest.Semantics.OData.Parsing
         {
             var filterExpression = Visit(context.filterexpr);
 
-            var termFilter = new MethodTerm(OperationsMap.Where, new[] { new LambdaTerm(filterExpression) });
+            var termFilter = new MethodTerm(_operations.Where, new[] { new LambdaTerm(filterExpression) });
             return termFilter;
         }
 
         public override ITerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var select = new MethodTerm(OperationsMap.Map, new[] { new LambdaTerm( new MethodTerm(OperationsMap.New, selectArgs.ToArray())) });
+            var select = new MethodTerm(_operations.Select, new[] { new LambdaTerm( new MethodTerm(OperationsMap.New, selectArgs.ToArray())) });
             return select;
         }
 
@@ -222,7 +228,7 @@ namespace QRest.Semantics.OData.Parsing
         public override ITerm VisitCount([NotNull] CountContext context)
         {
             if (context.decexpr.GetText().Equals("true", StringComparison.OrdinalIgnoreCase))
-                return new MethodTerm(OperationsMap.Count);
+                return new MethodTerm(_operations.Count);
             else return null;
         }
 
@@ -230,7 +236,7 @@ namespace QRest.Semantics.OData.Parsing
         {
             var args = context.children.OfType<OrderbyItemContext>().Select(c => Visit(c)).ToList();
 
-            return new MethodTerm(OperationsMap.Order, args.Select(a => new LambdaTerm(a)).ToArray());
+            return new MethodTerm(_operations.Order, args.Select(a => new LambdaTerm(a)).ToArray());
         }
 
         public override ITerm VisitOrderbyItem([NotNull] OrderbyItemContext context)
@@ -267,14 +273,14 @@ namespace QRest.Semantics.OData.Parsing
         public override ITerm VisitSkip([NotNull] SkipContext context)
         {
             if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
-                return new MethodTerm(OperationsMap.Skip, new[] { new ConstantTerm(value) });
+                return new MethodTerm(_operations.Skip, new[] { new ConstantTerm(value) });
             else return null;
         }
 
         public override ITerm VisitTop([NotNull] TopContext context)
         {
             if (int.TryParse(context.INT().GetText(), out var value) && value > 0)
-                return new MethodTerm(OperationsMap.Take, new[] { new ConstantTerm(value) });
+                return new MethodTerm(_operations.Top, new[] { new ConstantTerm(value) });
             else return null;
         }
 

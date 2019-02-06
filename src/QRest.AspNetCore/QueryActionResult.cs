@@ -18,7 +18,7 @@ namespace QRest.AspNetCore
 
     public class QueryActionResult<T> : QueryActionResult
     {
-        internal QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<ITerm, object> results) : base(structure, results)
+        public QueryActionResult(IQueryStructure structure, IReadOnlyDictionary<ITerm, object> results) : base(structure, results)
         {
         }
 

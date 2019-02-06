@@ -41,6 +41,10 @@ namespace QRest.Semantics.OData.Metadata
 
         private IEdmType MapType(Type type, bool complex)
         {
+            var nullable = Nullable.GetUnderlyingType(type);
+            if (nullable != null)
+                return MapType(nullable, complex);
+
             if (type.IsPrimitive || type == typeof(string) || type.IsValueType)
                 return MapPrimitive(type);
 
@@ -50,16 +54,30 @@ namespace QRest.Semantics.OData.Metadata
             if (type.IsClass)
                 return MapClass(type/*,complex*/);
 
-            throw new NotSupportedException();
+            return MapOpenType(type);
+
+            //throw new NotSupportedException();
         }
 
         private IEdmType MapCollection(Type type)
         {
+            if (type.IsDictionary())
+                return MapOpenType(type);
+
             if (!type.TryGetCollectionElement(out var element))
                 throw new NotSupportedException();
 
+            if (element.type == type)
+                return MapOpenType(type);
+
             var edmType = MapType(element.type, true);
             return EdmCoreModel.GetCollection(edmType.MakeReference()).Definition;
+        }
+
+        private IEdmType MapOpenType(Type type)
+        {
+            var entityType = Schema.AddEntityType(_namespace, type.Name,null, false,true);
+            return entityType;
         }
 
         private IEdmType MapClass(Type type, bool complex = false)
