@@ -2,4 +2,15 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Product>QRest</Product>
+    <Authors>QRest Contributors</Authors>
+    <PackageProjectUrl>https://github.com/pamidur/q-rest</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/pamidur/q-rest/master/logo.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/pamidur/q-rest</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>odata query serialization linq over web http</PackageTags>
+</PropertyGroup>
+
 </Project>
