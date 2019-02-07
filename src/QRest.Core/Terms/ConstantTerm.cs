@@ -11,7 +11,7 @@ namespace QRest.Core.Terms
             Value = value;
 
             SharedView = $"'{new TypeConverter().ConvertToInvariantString(Value)}'";
-            KeyView = $"[{Value.GetType()}]";
+            KeyView = $"[{Value?.GetType() ?? typeof(object)}]";
             DebugView = SharedView;
         }
 

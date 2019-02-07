@@ -51,6 +51,7 @@ expression
  | INT                                            #intExpression
  | STRINGLITERAL                                  #stringExpression
  | func=IDENTIFIER LPAREN functionParams RPAREN   #funcCallExpression
+ | NULL						  #nullExpression
  ;
 
 comparator
@@ -87,6 +88,7 @@ OR         : 'OR' | 'or' ;
 NOT        : 'NOT' | '!' | '<>' | 'not' ;
 TRUE       : 'TRUE' | 'true' ;
 FALSE      : 'FALSE' | 'false' ;
+NULL	   : 'NULL' | 'null' ;
 GT         : 'gt' | 'GT' ;
 GE         : 'ge' | 'GE' ;
 LT         : 'lt' | 'LT' ;

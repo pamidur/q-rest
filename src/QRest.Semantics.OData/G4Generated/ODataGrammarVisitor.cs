@@ -180,6 +180,13 @@ public interface IODataGrammarVisitor<Result> : IParseTreeVisitor<Result> {
 	/// <return>The visitor result.</return>
 	Result VisitStringExpression([NotNull] ODataGrammarParser.StringExpressionContext context);
 	/// <summary>
+	/// Visit a parse tree produced by the <c>nullExpression</c>
+	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	/// <return>The visitor result.</return>
+	Result VisitNullExpression([NotNull] ODataGrammarParser.NullExpressionContext context);
+	/// <summary>
 	/// Visit a parse tree produced by the <c>datetimeExpression</c>
 	/// labeled alternative in <see cref="ODataGrammarParser.expression"/>.
 	/// </summary>

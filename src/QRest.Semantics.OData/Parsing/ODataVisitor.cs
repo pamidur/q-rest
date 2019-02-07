@@ -319,8 +319,10 @@ namespace QRest.Semantics.OData.Parsing
             return lTerm;
         }
 
-
-
+        public override ITerm VisitNullExpression([NotNull] NullExpressionContext context)
+        {
+            return new ConstantTerm(null);
+        }
 
         private MethodTerm GetFuncTerm(string funcName)
         {
