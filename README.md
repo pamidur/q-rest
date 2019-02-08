@@ -31,7 +31,7 @@ public ActionResult Get(Query query)
 
 #### Execute ##
 ```
-GET http://localhost:5000/api/data/:where(Text-eq(`123`))-take(10)
+GET http://localhost:5000/api/data/-where(:Text-eq(`123`))-take(10)
 ```
 
 See more on supported method in [wiki](https://github.com/pamidur/q-rest/wiki/Method-Chain-Semantics)
