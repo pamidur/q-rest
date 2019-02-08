@@ -32,6 +32,8 @@ namespace QRest.Core.Parsing
         internal static readonly Parser<char> NameIndicator = Read.Char('@');
 
 
+        internal static readonly Parser<IEnumerable<char>> NullConstantString = Read.String("null").Token();
+
         internal static readonly Parser<IEnumerable<char>> TrueConstantString = Read.String("true").Token();
         internal static readonly Parser<IEnumerable<char>> FalseConstantString = Read.String("false").Token();
 
@@ -53,6 +55,7 @@ namespace QRest.Core.Parsing
         internal Parser<ConstantTerm> NumberConstant;
         internal Parser<ConstantTerm> StringConstant;
         internal Parser<ConstantTerm> BoolConstant;
+        internal Parser<ConstantTerm> NullConstant;
         internal Parser<NameTerm> Name;
         internal Parser<string> MemberName;
 
@@ -71,6 +74,7 @@ namespace QRest.Core.Parsing
             MemberName = BuildMemberNameParser().Named("Member Name");
 
             BoolConstant = BuildBoolConstantParser().Named("Boolean Constant");
+            NullConstant = BuildNullConstantParser().Named("Null Constant");
             StringConstant = BuildStringConstantParser().Named("String Constant");
             NumberConstant = BuildNumberConstantParser().Named("Number Constant");
             ArrayConstant = BuildArrayConstantParser().Named("Array Constant");
@@ -161,6 +165,7 @@ namespace QRest.Core.Parsing
                 StringConstant,
                 NumberConstant,
                 BoolConstant,
+                NullConstant,
                 ArrayConstant
             }.Aggregate((p1, p2) => p1.Or(p2));
 
@@ -181,6 +186,10 @@ namespace QRest.Core.Parsing
         internal Parser<ConstantTerm> BuildBoolConstantParser() =>
             from str in TrueConstantString.XOr(FalseConstantString).Text()
             select new ConstantTerm(ParseConstant<bool>(str));
+
+        internal Parser<ConstantTerm> BuildNullConstantParser() =>
+            from str in NullConstantString.Text()
+            select new ConstantTerm(null);
 
         protected Parser<NameTerm> BuildNameTermParser() =>
             from at in NameIndicator
