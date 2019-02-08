@@ -113,14 +113,14 @@ namespace QRest.OData.Tests
         public void ShouldParseBool()
         {
             ITerm exp = Parse(@"$filter = a eq false");
-            Assert.Equal("value=-where(:-$.a-eq('False'))", exp.SharedView);
+            Assert.Equal("value=-where(:-$.a-eq(false))", exp.SharedView);
         }
 
         [Fact]
         public void ShouldParseNull()
         {
             ITerm exp = Parse(@"$filter = a eq null");
-            Assert.Equal("", exp.SharedView); //todo: fix test
+            Assert.Equal("value=-where(:-$.a-eq(null))", exp.SharedView);
         }
 
         private static ITerm Parse(string input)
