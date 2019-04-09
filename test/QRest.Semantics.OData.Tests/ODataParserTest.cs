@@ -100,9 +100,11 @@ namespace QRest.OData.Tests
 
 
         [Theory]
+        [InlineData("value=-order(:-$.f1-$$)", @"$orderby=f1 asc")]
         [InlineData("value=-order(:-$.f1-$$,:-$.f2-$$)", @"$orderby=f1,f2")]
-        [InlineData("value=-order(:-$.f1-$$,:-$.f2-desc)", @"$orderby=f1 asc,f2 desc" )]
+        [InlineData("value=-order(:-$.f1-$$,:-$.f2-desc)", @"$orderby=f1 asc,f2 desc")]
         [InlineData("value=-order(:-$.f1-$$,:-$.f2-desc);count=-count", @"$orderby=f1 asc,f2 desc&$count=true")]
+        [InlineData("value=-order(:-$.f1-$$);count=-count", @"$orderby=f1 asc&$count=true")]
         public void ShouldParseOrderBy(string expected, string input)
         {
             ITerm exp = Parse(input);
@@ -130,6 +132,8 @@ namespace QRest.OData.Tests
             ITokenStream tokens = new CommonTokenStream(lexer);
 
             var parser = new ODataGrammarParser(tokens);
+            parser.AddErrorListener(new ODataParserErrorListener());
+
             var context = parser.parse();
 
             var vis = new ODataVisitor(new ODataOperationMap());
