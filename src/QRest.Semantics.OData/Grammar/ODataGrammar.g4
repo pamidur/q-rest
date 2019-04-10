@@ -27,7 +27,7 @@ selectItem : IDENTIFIER ;
 
 count : DOLLAR 'count' EQPARAM decexpr=bool ;
 
-orderby : DOLLAR 'orderby' EQPARAM orderbyItem ( COMMA orderbyItem)? ;
+orderby : DOLLAR 'orderby' EQPARAM orderbyItem ( COMMA orderbyItem ) * ;
 
 orderbyItem : IDENTIFIER order? ;
 
