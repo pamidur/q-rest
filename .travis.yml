@@ -1,7 +1,9 @@
 language: csharp
 #mono: latest
 mono: none
-dotnet: 2.2.203
+sudo: required
+dist: xenial
+dotnet: 2.2
 env:
   global:
 #    - FrameworkPathOverride="$(dirname $(which mono))/../lib/mono/4.5/"
