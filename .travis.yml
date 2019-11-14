@@ -20,10 +20,12 @@ script: |
     chmod +x ./codacy
     coverfiles=$(find . -type f -name coverage.opencover.xml)
     for coverfile in $coverfiles; do
-      ./codacy -c "$TRAVIS_COMMIT" -t "$CODACY_PROJECT_TOKEN" -r "$coverfile" -e opencover -p
+    echo $coverfile
+    ./codacy -c "$TRAVIS_COMMIT" -t "$CODACY_PROJECT_TOKEN" -r "$coverfile" -e opencover -p
     done
     if [ -n "$coverfiles" ]; then
-      ./codacy -c "$TRAVIS_COMMIT" -t "$CODACY_PROJECT_TOKEN" -f
+    echo "Submitting.."
+    ./codacy -c "$TRAVIS_COMMIT" -t "$CODACY_PROJECT_TOKEN" -f
     fi
 deploy:
   skip_cleanup: true
