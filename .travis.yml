@@ -14,7 +14,16 @@ script:
   - echo $VERSION
   - dotnet restore ./
   - dotnet build ./ -c $MODE -p:Version=$VERSION -p:InformationalVersion=$VERSION:$TRAVIS_COMMIT
-  - dotnet test ./ -c $MODE --no-build
+  - dotnet test ./ -c $MODE --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='./TestResults/' 
+  - curl -Ls https://github.com/codacy/csharp-codacy-coverage/releases/download/1.0.5/Codacy.CSharpCoverage_linux-x64 --output codacy
+    chmod +x ./codacy
+    coverfiles = find . -type f -name coverage.opencover.xml
+    for coverfile in $coverfiles ; 
+      do ./codacy -c $TRAVIS_COMMIT -t $CODACY_PROJECT_TOKEN -r $coverfile -e opencover -p ;
+    done
+    if [ -n "$coverfiles" ]; then
+      ./codacy -c $TRAVIS_COMMIT -t $CODACY_PROJECT_TOKEN -f
+    fi 
 deploy:
   skip_cleanup: true
   provider: script
