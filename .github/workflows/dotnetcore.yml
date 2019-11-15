@@ -15,7 +15,7 @@ jobs:
     steps:
     - name: Configure
       run: |
-        TAG=${GITHUB_REF#refs/tags/}
+        TAG=$([[ $GITHUB_REF == refs/tags/* ]] && echo ${GITHUB_REF:10} || echo "")
         VERSION=${TAG:-0.0.0-dev}
         echo ::set-env name=TAG::$TAG
         echo ::set-env name=VERSION::$VERSION
