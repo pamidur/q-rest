@@ -28,9 +28,9 @@ jobs:
       with:
         dotnet-version: 2.2.402
     - name: Build
-      run: dotnet build ./ -c $MODE -p:Version=${VERSION} -p:InformationalVersion=$VERSIONFULL
+      run: dotnet build ./ -c $MODE -p:Version=$VERSION -p:InformationalVersion=$VERSIONFULL
     - name: Test
-      run: dotnet test ./ -c $MODE --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='./TestResults/'
+      run: dotnet test ./ -c $MODE --no-build
     - name: Submit coverage
       run: |
         curl -Ls "https://github.com/codacy/csharp-codacy-coverage/releases/download/1.0.5/Codacy.CSharpCoverage_linux-x64" --output codacy
