@@ -16,8 +16,10 @@ jobs:
     steps:
     - name: Configure
       run: |
-        echo ::set-env name=TAG::$(echo ${GITHUB_REF:10})
-        echo ::set-env name=VERSION::$(echo ${TAG:-0.0.0-dev})
+        TAG=${GITHUB_REF#refs/tags/}
+        VERSION=${TAG:-0.0.0-dev}
+        echo ::set-env name=TAG::$TAG
+        echo ::set-env name=VERSION::$VERSION
         echo ::set-env name=VERSIONFULL::$(echo $VERSION:$GITHUB_SHA)
         echo ::set-env name=ISRELEASE::$(test -z "$TAG")
     - name: Checkout
@@ -25,7 +27,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: $SDKVER
+        dotnet-version: ${{ $SDKVER }}
     - name: Build
       run: dotnet build ./ -c $MODE -p:Version=${VERSION} -p:InformationalVersion=$VERSIONFULL
     - name: Test
