@@ -3,7 +3,8 @@
 
 ## Project Status
 [![Build Status](https://travis-ci.org/pamidur/q-rest.svg?branch=master)](https://travis-ci.org/pamidur/q-rest)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0165f92ce2714dd582e8c512e11c9292)](https://www.codacy.com/manual/agulyj/q-rest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pamidur/q-rest&amp;utm_campaign=Badge_Grade)
+[![Quality](https://api.codacy.com/project/badge/Grade/0165f92ce2714dd582e8c512e11c9292)](https://www.codacy.com/manual/agulyj/q-rest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pamidur/q-rest&amp;utm_campaign=Badge_Grade)
+[![Coverage](https://api.codacy.com/project/badge/Coverage/0165f92ce2714dd582e8c512e11c9292)](https://www.codacy.com/manual/agulyj/q-rest?utm_source=github.com&utm_medium=referral&utm_content=pamidur/q-rest&utm_campaign=Badge_Coverage)
 
 Package | Release | Pre-release
 --- | --- | ---

@@ -1,9 +1,8 @@
-name: Build and Deploy
+name: Main
 env:
   NUGETURL: https://api.nuget.org/v3/index.json
   NUGET_TOKEN: ${{ secrets.nuget }}
-  TAG: ${GITHUB_REF:10}
-  VERSION: ${TAG:-0.0.0-dev}
+  SDKVER: 2.2.402
   MODE: Release
   CODACY_TOKEN: ${{ secrets.codacy }}
  
@@ -15,13 +14,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - name: Configure
+      run: echo ::set-env name=TAG::$(echo ${GITHUB_REF:10})
+      run: echo ::set-env name=VERSION::$(echo ${TAG:-0.0.0-dev})
+      run: echo ::set-env name=VERSIONFULL::$(echo $VERSION:$GITHUB_SHA)
+      run: echo ::set-env name=ISRELEASE::$(test -z "$TAG")
+    - name: Checkout
+      uses: actions/checkout@v1
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2.402
+        dotnet-version: $SDKVER
     - name: Build
-      run: dotnet build ./ -c $MODE -p:Version=${VERSION} -p:InformationalVersion=$VERSION:$GITHUB_SHA
+      run: dotnet build ./ -c $MODE -p:Version=${VERSION} -p:InformationalVersion=$VERSIONFULL
     - name: Test
       run: dotnet test ./ -c $MODE --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='./TestResults/'
     - name: Submit coverage
