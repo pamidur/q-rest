@@ -15,10 +15,11 @@ jobs:
 
     steps:
     - name: Configure
-      run: echo ::set-env name=TAG::$(echo ${GITHUB_REF:10})
-      run: echo ::set-env name=VERSION::$(echo ${TAG:-0.0.0-dev})
-      run: echo ::set-env name=VERSIONFULL::$(echo $VERSION:$GITHUB_SHA)
-      run: echo ::set-env name=ISRELEASE::$(test -z "$TAG")
+      run: |
+        echo ::set-env name=TAG::$(echo ${GITHUB_REF:10})
+        echo ::set-env name=VERSION::$(echo ${TAG:-0.0.0-dev})
+        echo ::set-env name=VERSIONFULL::$(echo $VERSION:$GITHUB_SHA)
+        echo ::set-env name=ISRELEASE::$(test -z "$TAG")
     - name: Checkout
       uses: actions/checkout@v1
     - name: Setup .NET Core
