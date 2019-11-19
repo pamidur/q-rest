@@ -33,7 +33,7 @@ jobs:
       run: dotnet test ./ -c $MODE --no-build
     - name: Submit coverage
       run: |
-        curl -Ls "https://github.com/codacy/csharp-codacy-coverage/releases/download/1.0.5/Codacy.CSharpCoverage_linux-x64" --output codacy
+        curl -Ls "https://github.com/codacy/csharp-codacy-coverage/releases/download/1.0.7/Codacy.CSharpCoverage_linux-x64" --output codacy
         chmod +x ./codacy
         coverfiles=$(find . -type f -name coverage.opencover.xml)
         for coverfile in $coverfiles; do
