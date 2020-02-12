@@ -26,12 +26,14 @@ namespace QRest.Core.Compilation.TypeConverters
             result = null;
             var key = (expression.Type, target);
 
-            if (_converters.TryGetValue(key, out var converter))            
-                result = converter(expression, _format);            
-            else if(expression.Type == target)            
-                result = expression;                       
-            else if (target.IsAssignableFrom(expression.Type))            
-                result = Expression.Convert(expression, target);            
+            if (_converters.TryGetValue(key, out var converter))
+                result = converter(expression, _format);
+            else if (expression.Type == target)
+                result = expression;
+            else if (target.IsAssignableFrom(expression.Type))
+                result = Expression.Convert(expression, target);
+            else if (target.IsEnum && target.GetEnumUnderlyingType().IsAssignableFrom(expression.Type))
+                result = Expression.Convert(expression, target);
             else if (expression.Type == typeof(string) && _parseStrings)
             {
                 var parser = StringParser.GetParser(target);
@@ -40,8 +42,8 @@ namespace QRest.Core.Compilation.TypeConverters
                     _converters[key] = parser;
                     result = parser(expression, _format);
                 }
-            }            
-            
+            }
+
             return result != null;
         }
 
