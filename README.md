@@ -6,11 +6,11 @@
 [![Quality](https://api.codacy.com/project/badge/Grade/0165f92ce2714dd582e8c512e11c9292)](https://www.codacy.com/manual/agulyj/q-rest?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pamidur/q-rest&amp;utm_campaign=Badge_Grade)
 [![Coverage](https://api.codacy.com/project/badge/Coverage/0165f92ce2714dd582e8c512e11c9292)](https://www.codacy.com/manual/agulyj/q-rest?utm_source=github.com&utm_medium=referral&utm_content=pamidur/q-rest&utm_campaign=Badge_Coverage)
 
-Package | Release | Pre-release
+Package | Stable | Latest
 --- | --- | ---
-**QRest.Core** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Core.svg)](https://www.nuget.org/packages/QRest.Core)
-**QRest.AspNetCore** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.AspNetCore.svg)](https://www.nuget.org/packages/QRest.AspNetCore)
-**QRest.Semantics.OData** | `n/a` | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Semantics.OData.svg)](https://www.nuget.org/packages/QRest.Semantics.OData)
+**QRest.Core** | [![Nuget](https://img.shields.io/nuget/v/QRest.Core?label=stable)](https://www.nuget.org/packages/QRest.Core) | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Core?label=latest)](https://www.nuget.org/packages/QRest.Core)
+**QRest.AspNetCore** | [![NuGet](https://img.shields.io/nuget/v/QRest.AspNetCore?label=stable)](https://www.nuget.org/packages/QRest.AspNetCore) | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.AspNetCore?label=latest)](https://www.nuget.org/packages/QRest.AspNetCore)
+**QRest.Semantics.OData** | [![NuGet](https://img.shields.io/nuget/vpre/QRest.Semantics.OData?label=stable)](https://www.nuget.org/packages/QRest.Semantics.OData) | [![NuGet Pre Release](https://img.shields.io/nuget/vpre/QRest.Semantics.OData?label=latest)](https://www.nuget.org/packages/QRest.Semantics.OData)
 
 
 ## HowTo
