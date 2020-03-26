@@ -15,7 +15,7 @@ namespace QRest.Core.Operations.Selectors
         {
             var expression = arguments.Any() ? CreateContainer(assembler, arguments) : context;
             return expression;
-        }
+        }        
 
         private static Expression CreateContainer(IAssembler assembler, IReadOnlyList<Expression> arguments)
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QRest.Core.Operations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,8 @@ namespace QRest.Core.Terms
         {
             AddTerms(terms);
 
-            SharedView = $"{string.Join("", _sequence.Select(t => t.SharedView))}";
-            KeyView = string.Join("", _sequence.Select(t => t.KeyView));
+            SharedView = FormatView(_sequence, t=>t.SharedView);
+            KeyView = FormatView(_sequence, t=>t.KeyView);
             DebugView = $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
         }
 
@@ -23,8 +24,8 @@ namespace QRest.Core.Terms
         public bool IsEmpty => !_sequence.Any();
 
         public string SharedView { get; }
-        public string KeyView { get;  }
-        public string DebugView { get;  }
+        public string KeyView { get; }
+        public string DebugView { get; }
 
         public SequenceTerm Append(params ITerm[] terms)
         {
@@ -39,7 +40,7 @@ namespace QRest.Core.Terms
             if (term is SequenceTerm s)
                 AddTerms(s);
             else if (term != null)
-                CheckAndAddLast(term);                
+                CheckAndAddLast(term);
         }
 
         private void AddTerms(IEnumerable<ITerm> terms)
@@ -57,7 +58,7 @@ namespace QRest.Core.Terms
                 throw new InvalidOperationException($"Cannot start sequence with '{term.GetType().Name}'.");
 
             _sequence.AddLast(term);
-        }        
+        }
 
         public IEnumerator<ITerm> GetEnumerator()
         {
@@ -72,5 +73,21 @@ namespace QRest.Core.Terms
         public ITerm Clone() => new SequenceTerm(_sequence.Select(t => t.Clone()).ToArray());
 
         public override string ToString() => SharedView;
+
+        private static string FormatView(ICollection<ITerm> sequence, Func<ITerm, string> selector)
+        {
+            var terms = sequence.ToArray();
+
+            if (terms.Length != 1 && terms[0] is MethodTerm mt && mt.Operation.Key == OperationsMap.Root.Key)
+                terms = terms.Skip(1).ToArray();
+
+            var data = terms.Select(selector).ToArray();
+
+            //remove leading dot for root property
+            if (terms.Length > 0 && terms[0] is PropertyTerm)
+                data[0] = data[0].Substring(1);
+
+            return $"{string.Join("", data)}";
+        }
     }
 }

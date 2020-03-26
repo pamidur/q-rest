@@ -13,7 +13,8 @@ namespace QRest.Core.Parsing
     {
         public static Parser<ITerm> Default { get; }
 
-        static TermParser() => Default = new TermParser(DefferedConstantParsing.StringsAndNumbers, OperationsMap.GetRegisteredOperationNames(), OperationsMap.LookupOperation).Build();
+        static TermParser()
+            => Default = new TermParser(DefferedConstantParsing.StringsAndNumbers, OperationsMap.GetRegisteredOperationNames(), OperationsMap.LookupOperation).Build();
 
         internal static readonly Parser<char> StringDelimiter = Read.Char('\'');
         internal static readonly Parser<char> ArgumentDelimiter = Read.Char(',');
@@ -42,14 +43,14 @@ namespace QRest.Core.Parsing
         private readonly IReadOnlyList<string> _operations;
         private readonly Func<string, IOperation> _selector;
 
-        internal Parser<ITerm> CallChain;
+        internal Parser<ITerm> Sequence;
         internal Parser<MethodTerm> Call;
         internal Parser<ITerm[]> CallArguments;
         internal Parser<ITerm> SubProperty;
         internal Parser<ITerm> Property;
         internal Parser<LambdaTerm> Lambda;
         internal Parser<ITerm> RootProperty;
-        internal Parser<ITerm> ChainRoot;
+        internal Parser<ITerm> SequenceRoot;
         internal Parser<ConstantTerm> Constant;
         internal Parser<ConstantTerm> ArrayConstant;
         internal Parser<ConstantTerm> NumberConstant;
@@ -90,34 +91,34 @@ namespace QRest.Core.Parsing
 
             Name = BuildNameTermParser().Named("Name");
 
-            ChainRoot = BuildChainRootParser();
+            SequenceRoot = BuildSequenceRootParser();
             CallArguments = BuildCallArgumentsParser().Named("Call Arguments");
-            CallChain = BuildCallChainParser();
+            Sequence = BuildSequenceParser();
 
-            return CallChain.End();
+            return Sequence.End();
         }
 
         internal Parser<ITerm> BuildTopLambdaParser() =>
-          from seq in CallChain
+          from seq in Sequence
           select seq;
 
-        internal Parser<ITerm> BuildChainRootParser() =>
+        internal Parser<ITerm> BuildSequenceRootParser() =>
           from root in Call.XOr<ITerm>(Lambda).XOr(Constant)
           select root;
 
-        internal Parser<ITerm> BuildCallChainParser() =>
-          from root in ChainRoot.XOr(RootProperty)
+        internal Parser<ITerm> BuildSequenceParser() =>
+          from root in SequenceRoot.XOr(RootProperty)
           from chunks in SubProperty.XOr(Call).XOr(Name).XMany()
           select chunks.Any() ? new SequenceTerm(new[] { root }.Concat(chunks).ToArray()) : root;
 
         internal Parser<ITerm[]> BuildCallArgumentsParser() => Read.Ref(() =>
-            from parameters in Read.Contained(Read.XDelimitedBy(CallChain, ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)
+            from parameters in Read.Contained(Read.XDelimitedBy(Sequence, ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)
             select parameters.GetOrDefault()?.Where(r => r != null)?.ToArray() ?? new ITerm[] { }
             );
 
         internal Parser<LambdaTerm> BuildLambdaParser() =>
             from semic in LambdaIndicator
-            from seq in CallChain
+            from seq in Sequence
             select new LambdaTerm(seq);
 
         internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationFactoryParser) =>

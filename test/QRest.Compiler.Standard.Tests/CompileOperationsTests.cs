@@ -71,5 +71,43 @@ namespace QRest.Compiler.Standard.Tests
             Assert.Equal("MyText", dynamicResult.NewName);
             Assert.Equal(1, dynamicResult.IntProperty);
         }
+
+        [Fact(DisplayName = "Can compile Context Operation")]
+        public void Context()
+        {
+            var tree = new SequenceTerm(
+                new MethodTerm(OperationsMap.Where,
+                   new LambdaTerm(
+                       new SequenceTerm(
+                            new MethodTerm(OperationsMap.Root),
+                            new PropertyTerm(nameof(CompileTestClass.StringProperty)),
+                            new MethodTerm(OperationsMap.Equal, new ConstantTerm("MyText"))
+                       )
+                   )
+                ),
+                new MethodTerm(OperationsMap.New, new MethodTerm(OperationsMap.Context), 
+                    new SequenceTerm(
+                        new MethodTerm(OperationsMap.Context),
+                        new MethodTerm(OperationsMap.Count)
+                    )
+                )
+            );
+
+            var data = new[]
+            {
+                new CompileTestClass { IntProperty = 1, StringProperty = "MyText", DateTimeProperty = DateTime.Now },
+                new CompileTestClass { IntProperty = 2, StringProperty = "AnotherText", DateTimeProperty = DateTime.Now },
+            }.AsQueryable();
+
+            var compiled = _compiler.Compile<IQueryable<CompileTestClass>>(tree);
+
+            var result = compiled(data);
+
+            Assert.True(result is DynamicObject);
+            dynamic dynamicResult = result;
+
+            Assert.Equal(1, dynamicResult.count);
+            Assert.Equal("MyText", Enumerable.First(dynamicResult.data).StringProperty);
+        }
     }
 }

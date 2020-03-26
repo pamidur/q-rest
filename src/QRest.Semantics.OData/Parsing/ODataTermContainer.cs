@@ -1,4 +1,5 @@
 ﻿using QRest.Core.Terms;
+using System;
 
 namespace QRest.Semantics.OData.Parsing
 {
@@ -7,22 +8,21 @@ namespace QRest.Semantics.OData.Parsing
         public ITerm Data { get; set; }
         public ITerm Count { get; set; }
 
-        public string SharedView
+        public string SharedView => FormatView(t => t.SharedView);
+
+        public string DebugView => FormatView(t=>t.DebugView);
+
+        public string KeyView => FormatView(t => t.KeyView);
+
+        public string FormatView(Func<ITerm, string> selector)
         {
-            get
-            {
-                var result = $"value={Data.SharedView}";
+            var result = $"value={selector(Data)}";
 
-                if (Count != null)
-                    result += $";count={Count.SharedView}";
+            if (Count != null)
+                result += $";count={selector(Count)}";
 
-                return result;
-            }
+            return result;
         }
-
-        public string DebugView => SharedView;
-
-        public string KeyView => SharedView;
 
         public ITerm Clone()
         {

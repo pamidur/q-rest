@@ -41,7 +41,7 @@ namespace QRest.Semantics.OData.Parsing
 
         private ITerm BuildTerms(List<ITerm> sortedLambdas)
         {
-            ITerm dataOut = null;
+            ITerm dataOut = new MethodTerm(OperationsMap.Root);
             ITerm countOut = null;
 
             if (sortedLambdas.Any())
@@ -83,7 +83,7 @@ namespace QRest.Semantics.OData.Parsing
         public override ITerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var select = new MethodTerm(_operations.Select, new[] { new LambdaTerm( new MethodTerm(OperationsMap.New, selectArgs.ToArray())) });
+            var select = new MethodTerm(_operations.Select, new[] { new LambdaTerm(new MethodTerm(OperationsMap.New, selectArgs.ToArray())) });
             return select;
         }
 
@@ -215,7 +215,7 @@ namespace QRest.Semantics.OData.Parsing
 
             return new SequenceTerm(
                 funcRoot
-                ,new MethodTerm(func.Operation, parameters.Skip(1).ToArray())
+                , new MethodTerm(func.Operation, parameters.Skip(1).ToArray())
                 );
         }
 
