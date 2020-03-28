@@ -38,7 +38,24 @@ namespace QRest.Core.Linq
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var param = Visit(node.Arguments).Cast<TermExpression>().Select(te => te.Term).ToArray();
-            return new TermExpression(new SequenceTerm(param[0], new MethodTerm(OperationsMap.Where, param.Skip(1).ToArray())));
+            return new TermExpression(new SequenceTerm(param[0], new MethodTerm(SelectQueryOperation(node), param.Skip(1).ToArray())));
+        }
+
+        protected virtual IOperation SelectQueryOperation(MethodCallExpression node)
+        {
+            if (node.Object != null || !node.Method.IsStatic || node.Method.DeclaringType != typeof(Queryable))
+                throw new NotSupportedException("Only Queryable extension method are supported yet");
+
+            switch (node.Method.Name)
+            {
+                case nameof(Queryable.Where): return OperationsMap.Where;
+                case nameof(Queryable.Select): return OperationsMap.Map;
+                case nameof(Queryable.Skip): return OperationsMap.Skip;
+                case nameof(Queryable.Take): return OperationsMap.Take;
+                case nameof(Queryable.OrderBy): return OperationsMap.Order;
+                case nameof(Queryable.OrderByDescending): return OperationsMap.Order;
+                default: throw new NotSupportedException($"Method {node.Method.Name} not supported.");
+            }
         }
 
         protected override Expression VisitConstant(ConstantExpression node)
@@ -53,7 +70,7 @@ namespace QRest.Core.Linq
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            var source = ((TermExpression) Visit(node.Expression)).Term;
+            var source = ((TermExpression)Visit(node.Expression)).Term;
             return new TermExpression(new SequenceTerm(source, new PropertyTerm(node.Member.Name)));
         }
 
@@ -62,9 +79,22 @@ namespace QRest.Core.Linq
             var left = ((TermExpression)Visit(node.Left)).Term;
             var right = ((TermExpression)Visit(node.Right)).Term;
 
-            return new TermExpression(new SequenceTerm(left, new MethodTerm(OperationsMap.Equal, right)));
+            return new TermExpression(new SequenceTerm(left, new MethodTerm(SelectBooleanOperation(node), right)));
+        }
 
-            return base.VisitBinary(node);
+        protected virtual IOperation SelectBooleanOperation(BinaryExpression node)
+        {
+            switch (node.NodeType)
+            {
+                case ExpressionType.Equal: return OperationsMap.Equal;
+                case ExpressionType.NotEqual: return OperationsMap.NotEqual;
+                case ExpressionType.LessThan: return OperationsMap.LessThan;
+                case ExpressionType.LessThanOrEqual: return OperationsMap.LessThanOrEqual;
+                case ExpressionType.GreaterThan: return OperationsMap.GreaterThan;
+                case ExpressionType.GreaterThanOrEqual: return OperationsMap.GreaterThanOrEqual;
+                case ExpressionType.OrElse: return OperationsMap.OneOf;
+                default: throw new NotSupportedException($"Operation {node.NodeType} is not supported.");
+            }
         }
 
         protected override Expression VisitLambda<T>(Expression<T> node)

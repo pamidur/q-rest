@@ -31,18 +31,15 @@ namespace QRest.Core.Terms
             return clone;
         }
 
-        private void AddTerm(ITerm term)
-        {
-            if (term is SequenceTerm s)
-                AddTerms(s);
-            else if (term != null)
-                CheckAndAddLast(term);
-        }
-
         private void AddTerms(IEnumerable<ITerm> terms)
         {
-            foreach (var term in terms.Where(t => t != null))
-                AddTerm(term);           
+            foreach (var term in terms)
+            {
+                if (term is SequenceTerm s)
+                    AddTerms(s);
+                else if (term != null)
+                    CheckAndAddLast(term);
+            }
         }
 
         private void CheckAndAddLast(ITerm term)

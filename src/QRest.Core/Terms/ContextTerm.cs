@@ -1,6 +1,6 @@
 ﻿namespace QRest.Core.Terms
 {
-    public class ContextTerm : ITerm
+    public sealed class ContextTerm : ITerm
     {
         public static ContextTerm Root => new ContextTerm();
         public static ContextTerm Result => new ContextTerm("");
