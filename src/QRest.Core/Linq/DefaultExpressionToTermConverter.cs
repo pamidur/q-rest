@@ -79,20 +79,21 @@ namespace QRest.Core.Linq
             var left = ((TermExpression)Visit(node.Left)).Term;
             var right = ((TermExpression)Visit(node.Right)).Term;
 
-            return new TermExpression(new SequenceTerm(left, new MethodTerm(SelectBooleanOperation(node), right)));
+            return new TermExpression(SelectBooleanOperation(node, left, right));
         }
 
-        protected virtual IOperation SelectBooleanOperation(BinaryExpression node)
+        protected virtual ITerm SelectBooleanOperation(BinaryExpression node, ITerm left, ITerm right)
         {
             switch (node.NodeType)
             {
-                case ExpressionType.Equal: return OperationsMap.Equal;
-                case ExpressionType.NotEqual: return OperationsMap.NotEqual;
-                case ExpressionType.LessThan: return OperationsMap.LessThan;
-                case ExpressionType.LessThanOrEqual: return OperationsMap.LessThanOrEqual;
-                case ExpressionType.GreaterThan: return OperationsMap.GreaterThan;
-                case ExpressionType.GreaterThanOrEqual: return OperationsMap.GreaterThanOrEqual;
-                case ExpressionType.OrElse: return OperationsMap.OneOf;
+                case ExpressionType.Equal: return new SequenceTerm(left, new MethodTerm(OperationsMap.Equal, right));
+                case ExpressionType.NotEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.NotEqual, right));
+                case ExpressionType.LessThan: return new SequenceTerm(left, new MethodTerm(OperationsMap.LessThan, right));
+                case ExpressionType.LessThanOrEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.LessThanOrEqual, right));
+                case ExpressionType.GreaterThan: return new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThan, right));
+                case ExpressionType.GreaterThanOrEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThanOrEqual, right));
+                case ExpressionType.OrElse: return new MethodTerm(OperationsMap.OneOf, left, right);
+                case ExpressionType.AndAlso: return new MethodTerm(OperationsMap.Every, left, right);
                 default: throw new NotSupportedException($"Operation {node.NodeType} is not supported.");
             }
         }
