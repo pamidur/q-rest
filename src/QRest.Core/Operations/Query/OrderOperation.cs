@@ -19,7 +19,7 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "order";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        protected override Expression CreateExpression(Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             var exp = context;
 
@@ -59,7 +59,7 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "desc";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        public override Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 0)
                 throw new CompilationException("Expected 0 parameters");

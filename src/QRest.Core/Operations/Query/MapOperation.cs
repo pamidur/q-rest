@@ -11,7 +11,7 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "map";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssembler assembler)
+        protected override Expression CreateExpression(Expression context, Type element, LambdaExpression argument, IAssembler assembler)
         {
             var exp = Expression.Call(QueryableType, nameof(Queryable.Select)
                 , new Type[] { element, argument.ReturnType }, context, argument);

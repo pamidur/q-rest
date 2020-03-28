@@ -14,7 +14,7 @@ namespace QRest.Core.Operations
         private static readonly MethodInfo _nonNullCollectionMethod = typeof(QueryOperationBase).GetMethod(nameof(NonNullCollection));
         protected static readonly Type QueryableType = typeof(Queryable);
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        public override Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (!context.Type.TryGetCollectionElement(out var element))
                 throw new CompilationException($"Cannot execute '{Key}' method on non-collection type '{context.Type}'.");
@@ -22,10 +22,10 @@ namespace QRest.Core.Operations
             var type = _queryableCollection.MakeGenericType(element.type);
             context = Expression.Convert(context, type, _nonNullCollectionMethod.MakeGenericMethod(element.type));
 
-            return CreateExpression(root, context, element.type, arguments, assembler);
+            return CreateExpression(context, element.type, arguments, assembler);
         }       
 
-        protected abstract Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler);
+        protected abstract Expression CreateExpression(Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler);
 
         public static IQueryable<T> NonNullCollection<T>(IEnumerable<T> collection)
         {

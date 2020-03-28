@@ -48,7 +48,7 @@ namespace QRest.Core.Linq
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            return new TermExpression(new MethodTerm(OperationsMap.Root));
+            return new TermExpression(ContextTerm.Root);
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -93,7 +93,7 @@ namespace QRest.Core.Linq
 
         protected internal virtual Expression VisitRoot()
         {
-            return new TermExpression(new MethodTerm(OperationsMap.Root));
+            return new TermExpression(ContextTerm.Root);
         }
     }
 }

@@ -6,16 +6,16 @@
         {            
             Term = term;
 
-            DebugView = $":{term.DebugView}";
-            KeyView = $":{term.KeyView}";
-            SharedView = $":{term.SharedView}";
+            ViewDebug = $":{term.ViewDebug}";
+            ViewKey = $":{term.ViewKey}";
+            ViewQuery = $":{term.ViewQuery}";
         }
 
         public ITerm Term { get; }
 
-        public string DebugView { get; }
-        public string SharedView { get; }
-        public string KeyView { get; }
+        public string ViewDebug { get; }
+        public string ViewQuery { get; }
+        public string ViewKey { get; }
         public ITerm Clone() => new LambdaTerm(Term.Clone());
     }
 }

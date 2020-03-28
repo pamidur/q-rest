@@ -44,7 +44,7 @@ namespace QRest.Compiler.Standard.Tests
                 new MethodTerm(OperationsMap.Where,
                     new[] {
                         new LambdaTerm(new SequenceTerm(
-                            new MethodTerm(OperationsMap.Root),
+                            ContextTerm.Root,
                             new PropertyTerm(nameof(TestEntity.IntProperty)),
                             new MethodTerm(OperationsMap.Equal, new[]{ new ConstantTerm(1) })
                             )

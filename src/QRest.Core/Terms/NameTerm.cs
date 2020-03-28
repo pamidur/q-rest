@@ -8,14 +8,14 @@
         {
             Name = name;
 
-            SharedView = $"@{Name}";
-            DebugView = SharedView;
-            KeyView = SharedView;
+            ViewQuery = $"@{Name}";
+            ViewDebug = ViewQuery;
+            ViewKey = ViewQuery;
         }
 
-        public string SharedView { get; }
-        public string DebugView { get; }
-        public string KeyView { get; }
+        public string ViewQuery { get; }
+        public string ViewDebug { get; }
+        public string ViewKey { get; }
 
         public ITerm Clone() => new NameTerm(Name);
     }

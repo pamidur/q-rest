@@ -138,8 +138,8 @@ namespace QRest.Semantics.QRest.Tests
 
             var sequence = (SequenceTerm)actual.Value;
 
-            Assert.True(sequence.Root is MethodTerm);
-            Assert.Equal(OperationsMap.Root.Key, ((MethodTerm)sequence.Root).Operation.Key);
+            Assert.True(sequence.Root is ContextTerm);
+            Assert.Equal(ContextTerm.Root.Name, ((ContextTerm)sequence.Root).Name);
             Assert.True(sequence.Last is PropertyTerm);
             Assert.Equal(_testUniversalPropertName, ((PropertyTerm)sequence.Last).Name);
         }

@@ -12,7 +12,7 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "take";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        protected override Expression CreateExpression(Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 1)
                 throw new CompilationException("Expected 1 parameter");

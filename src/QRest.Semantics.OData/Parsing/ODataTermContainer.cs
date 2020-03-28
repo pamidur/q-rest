@@ -8,11 +8,11 @@ namespace QRest.Semantics.OData.Parsing
         public ITerm Data { get; set; }
         public ITerm Count { get; set; }
 
-        public string SharedView => FormatView(t => t.SharedView);
+        public string ViewQuery => FormatView(t => t.ViewQuery);
 
-        public string DebugView => FormatView(t=>t.DebugView);
+        public string ViewDebug => FormatView(t=>t.ViewDebug);
 
-        public string KeyView => FormatView(t => t.KeyView);
+        public string ViewKey => FormatView(t => t.ViewKey);
 
         public string FormatView(Func<ITerm, string> selector)
         {

@@ -4,19 +4,27 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Compilation.Visitors
 {
-    public class ConstantsCollectingVisitor : TermVisitor<List<ConstantExpression>>
+    public readonly struct CollectingVisitorState
+    {
+        public readonly List<ConstantExpression> Constants;
+        public CollectingVisitorState(List<ConstantExpression> initial)
+        {
+            Constants = initial;
+        }
+    }
+    public class ConstantsCollectingVisitor : TermVisitor<CollectingVisitorState>
     {
         public IReadOnlyList<ConstantExpression> Collect(ITerm lambda)
         {
-            var list = Visit(lambda,new List<ConstantExpression>());
-            return list.ToArray();
+            var list = Visit(lambda, new CollectingVisitorState(new List<ConstantExpression>()));
+            return list.Constants.ToArray();
         }
 
-        protected override List<ConstantExpression> VisitConstant(ConstantTerm c, List<ConstantExpression> context)
+        protected override CollectingVisitorState VisitConstant(ConstantTerm c, in CollectingVisitorState state)
         {
             var constant = Expression.Constant(c.Value);
-            context.Add(constant);
-            return context;
+            state.Constants.Add(constant);
+            return state;
         }
     }
 }

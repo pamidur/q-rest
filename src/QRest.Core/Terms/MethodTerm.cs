@@ -15,9 +15,9 @@ namespace QRest.Core.Terms
             Operation = operation;
             Arguments = terms;
 
-            SharedView = GetView(t => t.SharedView);
-            DebugView = GetView(t => t.DebugView);
-            KeyView = GetView(t => t.KeyView);
+            ViewQuery = GetView(t => t.ViewQuery);
+            ViewDebug = GetView(t => t.ViewDebug);
+            ViewKey = GetView(t => t.ViewKey);
         }
 
         private string GetView(Func<ITerm, string> viewSelector)
@@ -27,9 +27,9 @@ namespace QRest.Core.Terms
             return $"-{Operation.Key}{argsLiteral}";
         }
 
-        public string SharedView { get; }
-        public string DebugView { get; }
-        public string KeyView { get; }
+        public string ViewQuery { get; }
+        public string ViewDebug { get; }
+        public string ViewKey { get; }
 
         public ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => a.Clone()).ToArray());
     }

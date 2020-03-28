@@ -79,15 +79,16 @@ namespace QRest.Compiler.Standard.Tests
                 new MethodTerm(OperationsMap.Where,
                    new LambdaTerm(
                        new SequenceTerm(
-                            new MethodTerm(OperationsMap.Root),
-                            new PropertyTerm(nameof(CompileTestClass.StringProperty)),
-                            new MethodTerm(OperationsMap.Equal, new ConstantTerm("MyText"))
+                           ContextTerm.Root,
+                           new PropertyTerm(nameof(CompileTestClass.StringProperty)),
+                           new MethodTerm(OperationsMap.Equal, new ConstantTerm("MyText"))
                        )
                    )
                 ),
-                new MethodTerm(OperationsMap.New, new MethodTerm(OperationsMap.Context), 
+                new MethodTerm(OperationsMap.New, 
+                    ContextTerm.Result, 
                     new SequenceTerm(
-                        new MethodTerm(OperationsMap.Context),
+                        ContextTerm.Result,
                         new MethodTerm(OperationsMap.Count)
                     )
                 )

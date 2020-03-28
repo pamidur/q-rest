@@ -21,6 +21,6 @@ namespace QRest.Core.Linq
             return base.Accept(visitor);
         }
 
-        public override string ToString() => OperationsMap.Root.Key;
+        public override string ToString() => "$";
     }
 }

@@ -11,7 +11,7 @@ namespace QRest.Core.Operations.Aggregations
 
         public override string Key { get; } = "any";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssembler assembler)
+        protected override Expression CreateExpression(Expression context, Type element, LambdaExpression argument, IAssembler assembler)
         {
             var exp = (Expression)Expression.Call(QueryableType, nameof(Queryable.Any), new Type[] { element }, new[] { context, argument });
             return assembler.SetName(exp, Key);

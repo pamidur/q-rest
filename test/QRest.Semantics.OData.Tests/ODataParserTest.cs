@@ -15,7 +15,7 @@ namespace QRest.OData.Tests
         public void ShouldParseFilterQueryOption(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
         [Fact]
@@ -23,7 +23,7 @@ namespace QRest.OData.Tests
         {
             var input = @"$filter = not contains(param,'b')";
             ITerm exp = Parse(input);
-            Assert.Equal("value=-where(:param-has('b')-not)", exp.SharedView);
+            Assert.Equal("value=-where(:param-has('b')-not)", exp.ViewQuery);
 
         }
 
@@ -33,7 +33,7 @@ namespace QRest.OData.Tests
         public void ShouldParseCount(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
 
@@ -41,7 +41,7 @@ namespace QRest.OData.Tests
         public void ShouldParseEmptyString()
         {
             ITerm exp = Parse(string.Empty);
-            Assert.Equal("value=-$$", exp.SharedView);
+            Assert.Equal("value=$$", exp.ViewQuery);
         }
 
         [Theory]
@@ -51,7 +51,7 @@ namespace QRest.OData.Tests
         public void ShouldParseDateTimeOffset(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
         [Theory]
@@ -59,7 +59,7 @@ namespace QRest.OData.Tests
         public void ShouldParseNotEqual(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
         [Theory]
@@ -69,7 +69,7 @@ namespace QRest.OData.Tests
         public void ShouldParseGuid(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
         [Theory]
@@ -78,7 +78,7 @@ namespace QRest.OData.Tests
         public void ShouldParseEach(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
         [Theory]
@@ -86,7 +86,7 @@ namespace QRest.OData.Tests
         public void ShouldParseTopSkip(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
         [Theory]
@@ -95,35 +95,35 @@ namespace QRest.OData.Tests
         public void ShouldParseLambda(string expected, string input)
         {
             ITerm exp = Parse(input); 
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
 
         [Theory]
-        [InlineData("value=-order(:f1-$$)", @"$orderby=f1 asc")]
-        [InlineData("value=-order(:f1-$$,:f2-$$)", @"$orderby=f1,f2")]
-        [InlineData("value=-order(:f1-$$,:f2-$$,:f3-$$)", @"$orderby=f1,f2,f3")]
-        [InlineData("value=-order(:f1-$$,:f2-desc)", @"$orderby=f1 asc,f2 desc")]
-        [InlineData("value=-order(:f1-$$,:f2-desc);count=-count", @"$orderby=f1 asc,f2 desc&$count=true")]
-        [InlineData("value=-order(:f1-$$);count=-count", @"$orderby=f1 asc&$count=true")]
+        [InlineData("value=-order(:f1)", @"$orderby=f1 asc")]
+        [InlineData("value=-order(:f1,:f2)", @"$orderby=f1,f2")]
+        [InlineData("value=-order(:f1,:f2,:f3)", @"$orderby=f1,f2,f3")]
+        [InlineData("value=-order(:f1,:f2-desc)", @"$orderby=f1 asc,f2 desc")]
+        [InlineData("value=-order(:f1,:f2-desc);count=-count", @"$orderby=f1 asc,f2 desc&$count=true")]
+        [InlineData("value=-order(:f1);count=-count", @"$orderby=f1 asc&$count=true")]
         public void ShouldParseOrderBy(string expected, string input)
         {
             ITerm exp = Parse(input);
-            Assert.Equal(expected, exp.SharedView);
+            Assert.Equal(expected, exp.ViewQuery);
         }
 
         [Fact]
         public void ShouldParseBool()
         {
             ITerm exp = Parse(@"$filter = a eq false");
-            Assert.Equal("value=-where(:a-eq(false))", exp.SharedView);
+            Assert.Equal("value=-where(:a-eq(false))", exp.ViewQuery);
         }
 
         [Fact]
         public void ShouldParseNull()
         {
             ITerm exp = Parse(@"$filter = a eq null");
-            Assert.Equal("value=-where(:a-eq(null))", exp.SharedView);
+            Assert.Equal("value=-where(:a-eq(null))", exp.ViewQuery);
         }
 
         private static ITerm Parse(string input)

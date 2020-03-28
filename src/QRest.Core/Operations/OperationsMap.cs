@@ -1,7 +1,6 @@
 ﻿using QRest.Core.Operations.Aggregations;
 using QRest.Core.Operations.Boolean;
 using QRest.Core.Operations.Query;
-using QRest.Core.Operations.Selectors;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,8 +37,6 @@ namespace QRest.Core.Operations
         public static readonly IOperation Reverse = RegisterOperation(new ReverseOrderOperation());
 
         public static readonly IOperation New = RegisterOperation(new NewOperation());
-        public static readonly IOperation Context = RegisterOperation(new ContextOperation());
-        public static readonly IOperation Root = RegisterOperation(new RootOperation());
 
 
         public static IOperation RegisterOperation(IOperation operation)

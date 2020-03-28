@@ -31,6 +31,7 @@ namespace QRest.Core.Parsing
         internal static readonly Parser<char> PropertyNavigator = Read.Char('.');
 
         internal static readonly Parser<char> NameIndicator = Read.Char('@');
+        internal static readonly Parser<char> ContextIndicator = Read.Char('$');
 
 
         internal static readonly Parser<IEnumerable<char>> NullConstantString = Read.String("null").Token();
@@ -50,7 +51,6 @@ namespace QRest.Core.Parsing
         internal Parser<ITerm> Property;
         internal Parser<LambdaTerm> Lambda;
         internal Parser<ITerm> RootProperty;
-        internal Parser<ITerm> SequenceRoot;
         internal Parser<ConstantTerm> Constant;
         internal Parser<ConstantTerm> ArrayConstant;
         internal Parser<ConstantTerm> NumberConstant;
@@ -59,6 +59,7 @@ namespace QRest.Core.Parsing
         internal Parser<ConstantTerm> NullConstant;
         internal Parser<NameTerm> Name;
         internal Parser<string> MemberName;
+        internal Parser<ContextTerm> Context;
 
         public TermParser(
             DefferedConstantParsing defferedParsing,
@@ -66,13 +67,14 @@ namespace QRest.Core.Parsing
             Func<string, IOperation> selector)
         {
             _defferedParsing = defferedParsing;
-            _operations = operations.OrderByDescending(o=>o).ToArray();
+            _operations = operations.OrderByDescending(o => o).ToArray();
             _selector = selector;
         }
 
         public Parser<ITerm> Build()
         {
             MemberName = BuildMemberNameParser().Named("Member Name");
+            Context = BuildContextTermParser().Named("Context Name");
 
             BoolConstant = BuildBoolConstantParser().Named("Boolean Constant");
             NullConstant = BuildNullConstantParser().Named("Null Constant");
@@ -91,28 +93,19 @@ namespace QRest.Core.Parsing
 
             Name = BuildNameTermParser().Named("Name");
 
-            SequenceRoot = BuildSequenceRootParser();
             CallArguments = BuildCallArgumentsParser().Named("Call Arguments");
             Sequence = BuildSequenceParser();
 
             return Sequence.End();
         }
 
-        internal Parser<ITerm> BuildTopLambdaParser() =>
-          from seq in Sequence
-          select seq;
-
-        internal Parser<ITerm> BuildSequenceRootParser() =>
-          from root in Call.XOr<ITerm>(Lambda).XOr(Constant)
-          select root;
-
         internal Parser<ITerm> BuildSequenceParser() =>
-          from root in SequenceRoot.XOr(RootProperty)
+          from root in Call.XOr<ITerm>(Context).XOr(Constant).XOr(RootProperty)
           from chunks in SubProperty.XOr(Call).XOr(Name).XMany()
           select chunks.Any() ? new SequenceTerm(new[] { root }.Concat(chunks).ToArray()) : root;
 
         internal Parser<ITerm[]> BuildCallArgumentsParser() => Read.Ref(() =>
-            from parameters in Read.Contained(Read.XDelimitedBy(Sequence, ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)
+            from parameters in Read.Contained(Read.XDelimitedBy(Lambda.XOr(Sequence), ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)
             select parameters.GetOrDefault()?.Where(r => r != null)?.ToArray() ?? new ITerm[] { }
             );
 
@@ -155,7 +148,7 @@ namespace QRest.Core.Parsing
 
         internal Parser<ITerm> BuildRootPropertyParser() =>
              from prop in Property
-             select new SequenceTerm(new[] { new MethodTerm(OperationsMap.Root), prop });
+             select new SequenceTerm(new[] { ContextTerm.Root, prop });
 
         internal Parser<ITerm> BuildPropertyParser() =>
              from name in MemberName
@@ -196,6 +189,11 @@ namespace QRest.Core.Parsing
             from at in NameIndicator
             from name in MemberName
             select new NameTerm(name);
+
+        protected Parser<ContextTerm> BuildContextTermParser() =>
+            from at in ContextIndicator
+            from name in Read.XOr(ContextIndicator.Once().Text(), MemberName).Optional()
+            select new ContextTerm(name.GetOrDefault());
 
         protected Parser<string> BuildMemberNameParser() =>
             from str1 in Read.Letter.Once().Text()

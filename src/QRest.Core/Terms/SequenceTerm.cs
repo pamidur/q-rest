@@ -12,20 +12,16 @@ namespace QRest.Core.Terms
 
         public SequenceTerm(params ITerm[] terms)
         {
-            AddTerms(terms);
-
-            SharedView = FormatView(_sequence, t=>t.SharedView);
-            KeyView = FormatView(_sequence, t=>t.KeyView);
-            DebugView = $"#{string.Join("", _sequence.Select(t => t.DebugView))}";
+            AddTerms(terms);            
         }
 
         public ITerm Root => _sequence.First.Value;
         public ITerm Last => _sequence.Last.Value;
         public bool IsEmpty => !_sequence.Any();
 
-        public string SharedView { get; }
-        public string KeyView { get; }
-        public string DebugView { get; }
+        public string ViewQuery { get; private set; }
+        public string ViewKey { get; private set; }
+        public string ViewDebug { get; private set; }
 
         public SequenceTerm Append(params ITerm[] terms)
         {
@@ -46,7 +42,7 @@ namespace QRest.Core.Terms
         private void AddTerms(IEnumerable<ITerm> terms)
         {
             foreach (var term in terms.Where(t => t != null))
-                AddTerm(term);
+                AddTerm(term);           
         }
 
         private void CheckAndAddLast(ITerm term)
@@ -57,7 +53,14 @@ namespace QRest.Core.Terms
             if ((term is NameTerm) && _sequence.Count == 0)
                 throw new InvalidOperationException($"Cannot start sequence with '{term.GetType().Name}'.");
 
+            if ((term is ContextTerm) && _sequence.Count > 0)
+                throw new InvalidOperationException($"Context cannot be changed in the mid of the sequence.");
+
             _sequence.AddLast(term);
+
+            ViewQuery = FormatView(_sequence, t => t.ViewQuery);
+            ViewKey = FormatView(_sequence, t => t.ViewKey);
+            ViewDebug = $"#{string.Join("", _sequence.Select(t => t.ViewDebug))}";
         }
 
         public IEnumerator<ITerm> GetEnumerator()
@@ -72,13 +75,13 @@ namespace QRest.Core.Terms
 
         public ITerm Clone() => new SequenceTerm(_sequence.Select(t => t.Clone()).ToArray());
 
-        public override string ToString() => SharedView;
+        public override string ToString() => ViewQuery;
 
         private static string FormatView(ICollection<ITerm> sequence, Func<ITerm, string> selector)
         {
             var terms = sequence.ToArray();
 
-            if (terms.Length != 1 && terms[0] is MethodTerm mt && mt.Operation.Key == OperationsMap.Root.Key)
+            if (terms.Length != 1 && terms[0] is ContextTerm ct && ct.IsRoot)
                 terms = terms.Skip(1).ToArray();
 
             var data = terms.Select(selector).ToArray();

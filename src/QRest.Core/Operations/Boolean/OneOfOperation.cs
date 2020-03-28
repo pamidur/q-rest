@@ -11,7 +11,7 @@ namespace QRest.Core.Operations.Boolean
 
         public override string Key { get; } = "oneof";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        public override Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count < 1)
                 throw new CompilationException("Expected 1 or more parameters");

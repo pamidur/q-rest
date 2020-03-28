@@ -6,7 +6,7 @@ namespace QRest.Core.Operations
 {
     public abstract class CompareOperationBase : OperationBase
     {    
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        public override Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 1)
                 throw new CompilationException("Expected 1 parameter");

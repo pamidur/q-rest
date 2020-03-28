@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Compilation.Visitors
 {
-    public class AssemblingVisitor : TermVisitor<AssemblerContext>
+    public class AssemblingVisitor : TermVisitor<AssemblerState>
     {
         private readonly IContainerFactory _containerFactory;
         private readonly ITypeConverter _typeConverter;
@@ -29,35 +29,31 @@ namespace QRest.Core.Compilation.Visitors
             _terminateSelects = terminateSelects;
         }
 
-        public (LambdaExpression Lambda, IReadOnlyList<ConstantExpression> Constants)
+        public (LambdaExpression Lambda, IReadOnlyDictionary<ParameterExpression, ConstantExpression> Constants)
             Assemble(ITerm term, ParameterExpression root, Type expectedType = null)
         {
-            var assembled = Visit(term, new AssemblerContext { Root = root, Context = root, ContainerFactory = _containerFactory, TypeConverter = _typeConverter });
+            var assembled = Visit(term, AssemblerState.New(root, new AssemblerServices(_containerFactory, _typeConverter)));
 
             var expression = assembled.Context;
 
             if (expectedType != null)
                 expression = Expression.Convert(expression, expectedType);
 
-            var resultLambda = Expression.Lambda(expression, new[] { root }.Concat(assembled.Parameters));
+            var resultLambda = Expression.Lambda(expression, new[] { root }.Concat(assembled.Constants.Keys));
             return (resultLambda, assembled.Constants);
         }
 
-        protected override AssemblerContext VisitConstant(ConstantTerm c, AssemblerContext assembler)
+        protected override AssemblerState VisitConstant(ConstantTerm c, in AssemblerState state)
         {
             var constant = Expression.Constant(c.Value);
             var param = Expression.Parameter(constant.Type, "v");
 
-            assembler.Constants.Add(constant);
-            assembler.Parameters.Add(param);
-            assembler.Context = param;
-
-            return assembler;
+            return state.WithConstant(constant, param).WithResult(param);
         }
 
-        protected override AssemblerContext VisitProperty(PropertyTerm p, AssemblerContext assembler)
+        protected override AssemblerState VisitProperty(PropertyTerm p, in AssemblerState state)
         {
-            var ctx = assembler.Context;
+            var ctx = state.Context;
 
             Expression exp;
 
@@ -70,28 +66,26 @@ namespace QRest.Core.Compilation.Visitors
                 exp = Expression.PropertyOrField(ctx, p.Name);
             }
 
-            assembler.Context = exp;
-
-            return assembler;
+            return state.WithResult(exp);
         }
 
-        protected override AssemblerContext VisitMethod(MethodTerm m, AssemblerContext assembler)
+        protected override AssemblerState VisitMethod(MethodTerm m, in AssemblerState state)
         {
-            var args = new List<Expression>();
+            var methodState = state;
 
+            var argResults = new List<Expression>();
             if (m.Arguments.Count != 0)
             {
-                var origCtx = assembler.Context;
-
+                var argCtx = state.Fork();
                 foreach (var arg in m.Arguments)
                 {
-                    assembler = Visit(arg, assembler);
-                    args.Add(assembler.Context);
-                    assembler.Context = origCtx;
+                    var argState = Visit(arg, in argCtx);
+                    argResults.Add(argState.Result);
+                    methodState = methodState.Merge(argState);
                 }
             }
 
-            var exp = m.Operation.CreateExpression(assembler.Root, assembler.Context, args, assembler);
+            var exp = m.Operation.CreateExpression(state.Context, argResults, state.Services);
 
             if (_terminateSelects && !(exp is TerminationExpression))
             {
@@ -103,43 +97,51 @@ namespace QRest.Core.Compilation.Visitors
                     exp = TerminationExpression.Create(exp);
             }
 
-            assembler.Context = exp;
-
-            return assembler;
+            return methodState.WithResult(exp);
         }
 
-        protected override AssemblerContext VisitName(NameTerm n, AssemblerContext assembler)
+        protected override AssemblerState VisitName(NameTerm n, in AssemblerState state)
         {
-            assembler.Context = NamedExpression.Create(assembler.Context, n.Name);
-            return assembler;
+            return state.WithResult(NamedExpression.Create(state.Context, n.Name));
         }
 
-        protected override AssemblerContext VisitSequence(SequenceTerm s, AssemblerContext assembler)
+        protected override AssemblerState VisitSequence(SequenceTerm s, in AssemblerState state)
         {
-            var result = base.VisitSequence(s, assembler);
+            var result = base.VisitSequence(s, state);
 
             if (!_allowUncompletedQueries)
-                result.Context = TerminationExpression.Create(result.Context);
+                result = result.WithResult(TerminationExpression.Create(result.Context));
 
             return result;
         }
 
-        protected override AssemblerContext VisitLambda(LambdaTerm l, AssemblerContext assembler)
+        protected override AssemblerState VisitLambda(LambdaTerm l, in AssemblerState state)
         {
-            if (!assembler.Context.Type.TryGetCollectionElement(out var element))
-                throw new CompilationException($"Cannot compile lambda '{l.SharedView}' against non-collection type '{assembler.Context.Type}'.");
+            if (!state.Context.Type.TryGetCollectionElement(out var element))
+                throw new CompilationException($"Cannot compile lambda '{l.ViewQuery}' against non-collection type '{state.Context.Type}'.");
 
-            var origroot = assembler.Root;
 
-            assembler.Root = Expression.Parameter(element.type, "e");
-            assembler.Context = assembler.Root;
+            var lambdaContext = state.Fork(Expression.Parameter(element.type, "e"));
+            var lambdaResult = Visit(l.Term, lambdaContext);
+            var lambdaExp = Expression.Lambda(lambdaResult.Context, lambdaResult.Root);
 
-            assembler = Visit(l.Term, assembler);
+            return state
+                .Merge(lambdaResult)
+                .WithResult(lambdaExp);
+        }
 
-            assembler.Context = Expression.Lambda(assembler.Context, assembler.Root);
-            assembler.Root = origroot;
+        protected override AssemblerState VisitContext(ContextTerm x, in AssemblerState state)
+        {
+            if (x.IsRoot)
+            {
+                return state.Context != state.Root ? state.WithContext(state.Root) : state;
+            }
+            if (x.IsResult)
+            {
+                return state.Context != state.Result ? state.WithContext(state.Result) : state;
+            }
 
-            return assembler;
-        }        
+            throw new NotSupportedException("Named contexts are not supported yet");
+        }
     }
 }

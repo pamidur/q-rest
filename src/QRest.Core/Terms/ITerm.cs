@@ -3,8 +3,8 @@
     public interface ITerm
     {
         ITerm Clone();
-        string DebugView { get; }
-        string SharedView { get; }
-        string KeyView { get; }
+        string ViewDebug { get; }
+        string ViewQuery { get; }
+        string ViewKey { get; }
     }
 }
