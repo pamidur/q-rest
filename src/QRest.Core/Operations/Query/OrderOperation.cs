@@ -9,8 +9,7 @@ namespace QRest.Core.Operations.Query
 {
     internal class ReverseOrderExpression : ProxyExpression
     {
-        public static readonly ExpressionType ReverseOrderNodeType = (ExpressionType)1100;
-        public ReverseOrderExpression(Expression expression) : base(expression, ReverseOrderNodeType) { }
+        public ReverseOrderExpression(Expression expression) : base(expression) { }
     }
 
     public sealed class OrderOperation : QueryOperationBase
@@ -29,7 +28,7 @@ namespace QRest.Core.Operations.Query
             {
                 var lambda = (LambdaExpression)arg;
 
-                var reversed = lambda.Body.NodeType == ReverseOrderExpression.ReverseOrderNodeType;
+                var reversed = lambda.Body is ReverseOrderExpression;
 
                 var method = nameof(Queryable.OrderBy);
 

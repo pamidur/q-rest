@@ -59,5 +59,23 @@ namespace QRest.Semantics.QRest.Tests
 
             Assert.Equal("#$$-map(:#$$.Data)", term.ViewDebug);
         }
+
+        [Fact]
+        public void Can_Convert_Simple_Skip_Query()
+        {
+            var exp = _testQuery.Skip(10).Expression;
+            var term = _converter.Convert<string>(exp);
+
+            Assert.Equal("#$$-skip('10')", term.ViewDebug);
+        }
+
+        [Fact]
+        public void Can_Convert_Simple_Take_Query()
+        {
+            var exp = _testQuery.Take(10).Expression;
+            var term = _converter.Convert<string>(exp);
+
+            Assert.Equal("#$$-take('10')", term.ViewDebug);
+        }        
     }
 }
