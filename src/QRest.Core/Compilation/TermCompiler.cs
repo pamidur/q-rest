@@ -16,7 +16,7 @@ namespace QRest.Core.Compilation
         public static TermCompiler Default { get; } =
             new TermCompiler(
                 new AssemblingVisitor(
-                    new DynamicContainerFactory(),
+                    new EmitContainerFactory(),
                     new DefaultTypeConverter(CultureInfo.InvariantCulture, parseStrings: true, assumeDateTimeKind: DateTimeKind.Utc),
                     allowUncompletedQueries: false,
                     terminateSelects: true

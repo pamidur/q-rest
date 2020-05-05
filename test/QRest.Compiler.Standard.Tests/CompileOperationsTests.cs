@@ -32,7 +32,6 @@ namespace QRest.Compiler.Standard.Tests
 
             dynamic dynamicResult = compiled(data);
 
-            Assert.True(dynamicResult is DynamicObject);
             Assert.Equal("MyText", dynamicResult.StringProperty);
             Assert.Equal("MyText", dynamicResult.NewName);
             Assert.Equal(1, dynamicResult.IntProperty);
@@ -59,9 +58,9 @@ namespace QRest.Compiler.Standard.Tests
 
             var result = compiled(data);
 
-            Assert.True(result is IQueryable<DynamicObject>);
+            Assert.True(result is IQueryable);
 
-            var resultdata = (IQueryable<DynamicObject>)result;
+            var resultdata = ((IQueryable)result).Cast<object>();
 
             Assert.Equal(2, resultdata.Count());
 
@@ -104,7 +103,6 @@ namespace QRest.Compiler.Standard.Tests
 
             var result = compiled(data);
 
-            Assert.True(result is DynamicObject);
             dynamic dynamicResult = result;
 
             Assert.Equal(1, dynamicResult.count);

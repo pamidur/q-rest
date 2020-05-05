@@ -118,12 +118,13 @@ namespace QRest.Core.Compilation.Visitors
         protected override AssemblerState VisitLambda(LambdaTerm l, in AssemblerState state)
         {
             if (!state.Result.Type.TryGetCollectionElement(out var element))
-                throw new CompilationException($"Cannot compile lambda '{l.ViewQuery}' against non-collection type '{state.Result.Type}'.");
+                throw new CompilationException($"Cannot compile lambda '{l.ViewQuery}' against non-collection type '{state.Context.Type}'.");
 
+            var paramName = state.Services.GetName(state.Result)[0].ToString().ToLowerInvariant();
 
-            var lambdaContext = state.Fork(Expression.Parameter(element.type, "e"));
+            var lambdaContext = state.Fork(Expression.Parameter(element.type, paramName));
             var lambdaResult = Visit(l.Term, lambdaContext);
-            var lambdaExp = Expression.Lambda(lambdaResult.Context, lambdaResult.Root);
+            var lambdaExp = Expression.Lambda(lambdaResult.Context.StripProxy(), lambdaResult.Root);
 
             return state
                 .Merge(lambdaResult)

@@ -13,7 +13,7 @@ namespace QRest.Core.Compilation.Expressions
         }
 
         public override bool CanReduce => true;
-        public override Expression Reduce() => OriginalExpression.CanReduce ? OriginalExpression.Reduce() : OriginalExpression;
+        public override Expression Reduce() => OriginalExpression;
         public override ExpressionType NodeType => ExpressionType.Extension;
         public override Type Type => OriginalExpression.Type;
         public override string ToString() => OriginalExpression.ToString();

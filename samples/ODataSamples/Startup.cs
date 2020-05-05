@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using ODataSamples.Contexts;
 
 namespace ODataSamples
@@ -19,8 +20,8 @@ namespace ODataSamples
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DatabaseCS")));
+            services.                
+                AddDbContext<DataContext>(o => o.UseInMemoryDatabase("TestDb"));
 
             services
                .AddQRest()
@@ -30,22 +31,31 @@ namespace ODataSamples
                    cpl.UseCompilerCache = false;
                });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc();
 
             var resolver = services.BuildServiceProvider();
             var ctx = resolver.GetService<DataContext>();
-            ctx.Database.Migrate();
+            //ctx.Database.Migrate();
             
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

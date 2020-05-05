@@ -21,7 +21,7 @@ namespace QRest.AspNetCore.Native
             var converter = new DefaultTypeConverter(_options.CultureInfo, true, _options.AssumeDateTimeKind);
 
             _compiler = new TermCompiler(
-                new AssemblingVisitor(new DynamicContainerFactory(), converter, allowUncompletedQueries: false, terminateSelects: true),
+                new AssemblingVisitor(new EmitContainerFactory(), converter, allowUncompletedQueries: false, terminateSelects: true),
                 new ConstantsCollectingVisitor(),
                 useCompilerCache: _options.UseCompilerCache);
         }
