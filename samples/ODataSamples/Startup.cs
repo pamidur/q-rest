@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ODataSamples.Contexts;
+using System;
 
 namespace ODataSamples
 {
@@ -38,24 +39,22 @@ namespace ODataSamples
             //ctx.Database.Migrate();
             
         }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
+            app.Use(async (context, next) =>
             {
-                endpoints.MapControllers();
+                Console.WriteLine($"{context.Request.Path}{context.Request.QueryString}");
+                await next.Invoke();
             });
+
+
+            app.UseODataMetadata();
+            app.UseMvc();
         }
     }
 }
