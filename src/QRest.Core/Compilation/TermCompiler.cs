@@ -62,7 +62,7 @@ namespace QRest.Core.Compilation
             {
                 var (lambda, consts) = _assemblingVisitor.Assemble(rootTerm, root, typeof(object));
 
-                constants = consts.Values.ToArray();
+                constants = consts.Select(c => c.Value).ToArray();
                 compiled = Expression.Constant(lambda.Compile());
 
                 if (_useCompilerCache)

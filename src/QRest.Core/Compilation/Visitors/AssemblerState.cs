@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq.Expressions;
 using QRest.Core.Compilation.Containers;
 using QRest.Core.Compilation.Expressions;
@@ -46,7 +45,7 @@ namespace QRest.Core.Compilation.Visitors
     {
         private AssemblerState(
             ParameterExpression root, Expression result, Expression context,
-            ImmutableDictionary<ParameterExpression, ConstantExpression> constants,
+            in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)> constants,
             AssemblerServices services)
         {
             Root = root;
@@ -59,22 +58,22 @@ namespace QRest.Core.Compilation.Visitors
         public readonly Expression Context;
         public readonly Expression Result;
         public readonly ParameterExpression Root;
-        public readonly ImmutableDictionary<ParameterExpression, ConstantExpression> Constants;
+        public readonly ImmutableArray<(ParameterExpression Param, ConstantExpression Value)> Constants;
         public readonly AssemblerServices Services;
 
         public static AssemblerState New(ParameterExpression root, AssemblerServices services)
         {
-            return new AssemblerState(root, root, root, ImmutableDictionary.Create<ParameterExpression, ConstantExpression>(), services);
+            return new AssemblerState(root, root, root, in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)>.Empty, services);
         }
 
         public AssemblerState Fork(ParameterExpression root)
         {
-            return new AssemblerState(root, root, root, ImmutableDictionary.Create<ParameterExpression, ConstantExpression>(), Services);
+            return new AssemblerState(root, root, root, in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)>.Empty, Services);
         }
 
         public AssemblerState Fork()
         {
-            return new AssemblerState(Root, Result, Root, ImmutableDictionary.Create<ParameterExpression, ConstantExpression>(), Services);
+            return new AssemblerState(Root, Result, Root, in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)>.Empty, Services);
         }
 
         public AssemblerState Merge(in AssemblerState state)
@@ -84,15 +83,15 @@ namespace QRest.Core.Compilation.Visitors
 
         public AssemblerState WithResult(Expression result)
         {
-            return new AssemblerState(Root, result, result, Constants, Services);
+            return new AssemblerState(Root, result, result, in Constants, Services);
         }
         public AssemblerState WithContext(Expression context)
         {
-            return new AssemblerState(Root, Result, context, Constants, Services);
+            return new AssemblerState(Root, Result, context, in Constants, Services);
         }
         public AssemblerState WithConstant(ConstantExpression constant, ParameterExpression parameter)
         {
-            return new AssemblerState(Root, Result, Context, Constants.Add(parameter, constant), Services);
+            return new AssemblerState(Root, Result, Context, Constants.Add((parameter, constant)), Services);
         }
     }
 }

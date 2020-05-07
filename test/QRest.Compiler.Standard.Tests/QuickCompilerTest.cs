@@ -96,8 +96,21 @@ namespace QRest.Compiler.Standard.Tests
 
             var result = (temp as IEnumerable<Entity>).ToArray();
 
-            Assert.Contains(result, e => e.Contacts.Any(s=>s.Text == "qwerty"));
+            Assert.Contains(result, e => e.Contacts.Any(s => s.Text == "qwerty"));
             Assert.Single(result);
+        }
+
+        [Fact]
+        public void TestTakeSkipMethod()
+        {
+            var term = TermParser.Default.Parse("-where(:Text-eq('AAA'))-skip(1)-take(2)");
+            var temp = TermCompiler.Default.Compile<IQueryable<Entity>>(term)(_data);
+
+            var result = (temp as IEnumerable<Entity>).ToArray();
+
+            Assert.Contains(result, e => e.Number == 43);
+            Assert.Contains(result, e => e.Number == 54);
+            Assert.Equal(2, result.Length);
         }
     }
 }

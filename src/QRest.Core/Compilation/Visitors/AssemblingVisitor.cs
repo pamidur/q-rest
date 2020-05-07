@@ -29,7 +29,7 @@ namespace QRest.Core.Compilation.Visitors
             _terminateSelects = terminateSelects;
         }
 
-        public (LambdaExpression Lambda, IReadOnlyDictionary<ParameterExpression, ConstantExpression> Constants)
+        public (LambdaExpression Lambda, IReadOnlyList<(ParameterExpression Param, ConstantExpression Value)> Constants)
             Assemble(ITerm term, ParameterExpression root, Type expectedType = null)
         {
             var assembled = Visit(term, AssemblerState.New(root, new AssemblerServices(_containerFactory, _typeConverter)));
@@ -39,7 +39,7 @@ namespace QRest.Core.Compilation.Visitors
             if (expectedType != null)
                 expression = Expression.Convert(expression, expectedType);
 
-            var resultLambda = Expression.Lambda(expression, new[] { root }.Concat(assembled.Constants.Keys));
+            var resultLambda = Expression.Lambda(expression, new[] { root }.Concat(assembled.Constants.Select(c => c.Param)));
             return (resultLambda, assembled.Constants);
         }
 
