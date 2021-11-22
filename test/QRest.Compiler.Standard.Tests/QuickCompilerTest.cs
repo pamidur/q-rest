@@ -1,10 +1,12 @@
 ﻿using QRest.Core.Compilation;
+using QRest.Core.Linq;
 using QRest.Core.Parsing;
 using Sprache;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace QRest.Compiler.Standard.Tests
@@ -68,9 +70,9 @@ namespace QRest.Compiler.Standard.Tests
         public void TestProperty()
         {
             var term = TermParser.Default.Parse("-where(:Number-eq(121))");
-            var func = TermCompiler.Default.Compile<IQueryable<Entity>>(term);
+            var func = TermCompiler.Default.Compile<IQueryable<Entity>, IQueryable<Entity>>(term);
 
-            var result = (func(_data) as IQueryable<Entity>).ToArray();
+            var result = func(_data).ToArray();
 
             Assert.Contains(result, e => e.Number == 121);
             Assert.Single(result);
@@ -80,9 +82,9 @@ namespace QRest.Compiler.Standard.Tests
         public void TestSubProperty()
         {
             var term = TermParser.Default.Parse("-where(:Sub.Text-eq('SubrrText2'))");
-            var temp = TermCompiler.Default.Compile<IQueryable<Entity>>(term)(_data);
+            var temp = TermCompiler.Default.Compile<IQueryable<Entity>, IQueryable<Entity>>(term)(_data);
 
-            var result = (temp as IEnumerable<Entity>).ToArray();
+            var result = temp.ToArray();
 
             Assert.Contains(result, e => e.Sub?.Text == "SubrrText2");
             Assert.Single(result);
@@ -91,10 +93,10 @@ namespace QRest.Compiler.Standard.Tests
         [Fact]
         public void TestOwnMethod()
         {
-            var term = TermParser.Default.Parse("-where(:Contacts-any(:Text-eq('qwerty')))");
-            var temp = TermCompiler.Default.Compile<IQueryable<Entity>>(term)(_data);
+            var term = TermParser.Default.Parse("-where(:Contacts-includes(:Text-eq('qwerty')))");
+            var temp = TermCompiler.Default.Compile<IQueryable<Entity>, IQueryable<Entity>>(term)(_data);
 
-            var result = (temp as IEnumerable<Entity>).ToArray();
+            var result = temp.ToArray();
 
             Assert.Contains(result, e => e.Contacts.Any(s => s.Text == "qwerty"));
             Assert.Single(result);
@@ -104,13 +106,43 @@ namespace QRest.Compiler.Standard.Tests
         public void TestTakeSkipMethod()
         {
             var term = TermParser.Default.Parse("-where(:Text-eq('AAA'))-skip(1)-take(2)");
-            var temp = TermCompiler.Default.Compile<IQueryable<Entity>>(term)(_data);
+            var temp = TermCompiler.Default.Compile<IQueryable<Entity>, IQueryable<Entity>>(term)(_data);
 
-            var result = (temp as IEnumerable<Entity>).ToArray();
+            var result = temp.ToArray();
 
             Assert.Contains(result, e => e.Number == 43);
             Assert.Contains(result, e => e.Number == 54);
             Assert.Equal(2, result.Length);
+        } 
+
+        [Fact]
+        public void TestWithLinq()
+        {
+            IQueryable<Entity> Query(IQueryable<Entity> input)
+            {
+                return input.Where(e => e.Number > 54 && e.Sub.Text != "cc").Skip(1).Take(2);
+            }
+
+            var r1 = Query(_data).ToArray();
+
+            var r2 = Query(new QRestQueryProvider(new DefaultExpressionToTermConverter(), new LocalTermExecutor<IQueryable<Entity>>(_data)).CreateQuery<Entity>()).ToArray();
+
+            Assert.Equal(r1, r2);
+        }
+
+        [Fact]
+        public void TestWithLinqResult()
+        {
+            int Query(IQueryable<Entity> input)
+            {
+                return input.Where(e => e.Number > 54 && e.Sub.Text != "cc").Skip(1).Take(2).Count();
+            }
+
+            var r1 = Query(_data);
+
+            var r2 = Query(new QRestQueryProvider(new DefaultExpressionToTermConverter(), new LocalTermExecutor<IQueryable<Entity>>(_data)).CreateQuery<Entity>());
+
+            Assert.Equal(r1, r2);
         }
     }
 }

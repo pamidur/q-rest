@@ -28,7 +28,7 @@ namespace QRest.AspNetCore.Native
 
         public Func<TRoot, object> Compile<TRoot>(ITerm sequence)
         {
-            return _compiler.Compile<TRoot>(sequence);
+            return _compiler.Compile<TRoot, object>(sequence);
         }
     }
 }

@@ -54,6 +54,7 @@ namespace QRest.Core.Linq
                 case nameof(Queryable.Take): return OperationsMap.Take;
                 case nameof(Queryable.OrderBy): return OperationsMap.Order;
                 case nameof(Queryable.OrderByDescending): return OperationsMap.Order;
+                case nameof(Queryable.Count): return OperationsMap.Count;
                 default: throw new NotSupportedException($"Method {node.Method.Name} not supported.");
             }
         }
@@ -92,8 +93,8 @@ namespace QRest.Core.Linq
                 case ExpressionType.LessThanOrEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.LessThanOrEqual, right));
                 case ExpressionType.GreaterThan: return new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThan, right));
                 case ExpressionType.GreaterThanOrEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThanOrEqual, right));
-                case ExpressionType.OrElse: return new MethodTerm(OperationsMap.OneOf, left, right);
-                case ExpressionType.AndAlso: return new MethodTerm(OperationsMap.Every, left, right);
+                case ExpressionType.OrElse: return new MethodTerm(OperationsMap.Or, left, right);
+                case ExpressionType.AndAlso: return new MethodTerm(OperationsMap.And, left, right);
                 default: throw new NotSupportedException($"Operation {node.NodeType} is not supported.");
             }
         }

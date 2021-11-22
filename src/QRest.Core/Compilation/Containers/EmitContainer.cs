@@ -83,7 +83,7 @@ namespace QRest.Core.Compilation.Containers
 
         public Expression CreateReadProperty(Expression context, string name)
         {
-            throw new NotSupportedException();
+            return Expression.PropertyOrField(context, name);
         }
 
         public bool IsContainerExpression(Expression expression)

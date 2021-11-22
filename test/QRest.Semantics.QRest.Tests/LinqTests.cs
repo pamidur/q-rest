@@ -48,7 +48,7 @@ namespace QRest.Semantics.QRest.Tests
             var exp = _testQuery.Where(t => t.Data == "ololo" || t.Data != "123").Expression;
             var term = _converter.Convert<string>(exp);
 
-            Assert.Equal("#$$-where(:-oneof(#$$.Data-eq('ololo'),#$$.Data-ne('123')))", term.ViewDebug);
+            Assert.Equal("#$$-where(:-any(#$$.Data-eq('ololo'),#$$.Data-ne('123')))", term.ViewDebug);
         }
 
         [Fact]

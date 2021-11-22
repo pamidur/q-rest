@@ -10,7 +10,7 @@ namespace QRest.OData.Tests
         [Theory]
         [InlineData("value=-where(:param1-eq('[L72]'))", @"$filter =   param1 eq '[L72]'")]
         [InlineData("value=-where(:'L72'-eq(param1))", @"$filter =  'L72' eq param1 ")]
-        [InlineData("value=-where(:-every(param1-eq('L72'),-oneof(param2-eq('qwerty'),param3-eq('asdf'))))",
+        [InlineData("value=-where(:-all(param1-eq('L72'),-any(param2-eq('qwerty'),param3-eq('asdf'))))",
             @"$filter = param1 eq 'L72' AND (param2 eq 'qwerty' OR param3 eq 'asdf') ")]
         public void ShouldParseFilterQueryOption(string expected, string input)
         {
@@ -90,8 +90,8 @@ namespace QRest.OData.Tests
         }
 
         [Theory]
-        [InlineData("value=-where(:Contacts-any(:-every(Email-eq('test@gmail.com'),-eq('test1@gmail.com'))))", @"$filter = Contacts/any(c: c/Email eq 'test@gmail.com' and c eq 'test1@gmail.com')")]
-        [InlineData("value=-where(:Contacts-all(:-oneof(Email-eq('test@gmail.com'),-eq('test1@gmail.com'))))", @"$filter = Contacts/all(c: c/Email eq 'test@gmail.com' or c eq 'test1@gmail.com')")]
+        [InlineData("value=-where(:Contacts-includes(:-all(Email-eq('test@gmail.com'),-eq('test1@gmail.com'))))", @"$filter = Contacts/any(c: c/Email eq 'test@gmail.com' and c eq 'test1@gmail.com')")]
+        [InlineData("value=-where(:Contacts-consists(:-any(Email-eq('test@gmail.com'),-eq('test1@gmail.com'))))", @"$filter = Contacts/all(c: c/Email eq 'test@gmail.com' or c eq 'test1@gmail.com')")]
         public void ShouldParseLambda(string expected, string input)
         {
             ITerm exp = Parse(input); 
@@ -128,7 +128,7 @@ namespace QRest.OData.Tests
 
         private static ITerm Parse(string input)
         {
-            ICharStream stream = CharStreams.fromstring(input);
+            ICharStream stream = CharStreams.fromString(input);
             ITokenSource lexer = new ODataGrammarLexer(stream);
             ITokenStream tokens = new CommonTokenStream(lexer);
 

@@ -28,7 +28,7 @@ namespace QRest.Compiler.Standard.Tests
                 );
 
             var data = new CompileTestClass { IntProperty = 1, StringProperty = "MyText", DateTimeProperty = DateTime.Now };
-            var compiled = _compiler.Compile<CompileTestClass>(tree);
+            var compiled = _compiler.Compile<CompileTestClass,object>(tree);
 
             dynamic dynamicResult = compiled(data);
 
@@ -54,7 +54,7 @@ namespace QRest.Compiler.Standard.Tests
                 new CompileTestClass { IntProperty = 2, StringProperty = "AnotherText", DateTimeProperty = DateTime.Now },
             }.AsQueryable();
 
-            var compiled = _compiler.Compile<IQueryable<CompileTestClass>>(tree);
+            var compiled = _compiler.Compile<IQueryable<CompileTestClass>,object>(tree);
 
             var result = compiled(data);
 
@@ -99,7 +99,7 @@ namespace QRest.Compiler.Standard.Tests
                 new CompileTestClass { IntProperty = 2, StringProperty = "AnotherText", DateTimeProperty = DateTime.Now },
             }.AsQueryable();
 
-            var compiled = _compiler.Compile<IQueryable<CompileTestClass>>(tree);
+            var compiled = _compiler.Compile<IQueryable<CompileTestClass>,object>(tree);
 
             var result = compiled(data);
 

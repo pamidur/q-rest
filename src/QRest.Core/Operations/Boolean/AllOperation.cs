@@ -5,11 +5,11 @@ using System.Linq.Expressions;
 
 namespace QRest.Core.Operations.Boolean
 {
-    public sealed class EveryOperation : OperationBase
+    public sealed class AllOperation : OperationBase
     {
-        internal EveryOperation() { }
+        internal AllOperation() { }
 
-        public override string Key { get; } = "every";
+        public override string Key { get; } = "all";
 
         public override Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {

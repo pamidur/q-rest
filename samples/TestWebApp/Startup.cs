@@ -29,7 +29,7 @@ namespace TestWebApp
                 .UseNativeSemantics()
                 .UseStandardCompiler(cpl =>
                 {
-                    cpl.UseCompilerCache = false;
+                    cpl.UseCompilerCache = true;
                 });
 
             services

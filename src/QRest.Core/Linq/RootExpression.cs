@@ -12,7 +12,7 @@ namespace QRest.Core.Linq
         }
 
         public override Type Type { get; }
-        public override ExpressionType NodeType =>ExpressionType.Extension;
+        public override ExpressionType NodeType => ExpressionType.Extension;
 
         protected override Expression Accept(ExpressionVisitor visitor)
         {

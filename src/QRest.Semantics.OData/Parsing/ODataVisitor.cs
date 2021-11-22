@@ -172,10 +172,10 @@ namespace QRest.Semantics.OData.Parsing
             switch (node.Symbol.Type)
             {
                 case ODataGrammarParser.AND:
-                    operation = OperationsMap.Every;
+                    operation = OperationsMap.And;
                     break;
                 case ODataGrammarParser.OR:
-                    operation = OperationsMap.OneOf;
+                    operation = OperationsMap.Or;
                     break;
 
                 case ODataGrammarParser.EQ:
@@ -333,7 +333,7 @@ namespace QRest.Semantics.OData.Parsing
                 //case "IsEmpty":
                 //    return typeof(string).GetMethod("IsNullOrWhiteSpace", new Type[] { typeof(string) });
                 case "contains":
-                    operation = OperationsMap.Has;
+                    operation = OperationsMap.Contains;
                     break;
                 default:
                     throw new Exception($"Function {funcName} not found");
