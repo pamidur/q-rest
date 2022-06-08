@@ -25,8 +25,8 @@ namespace TestWebApp
             services
                 .AddDbContext<DataContext>(o => o.UseInMemoryDatabase("TestDb"))
                 .AddQRest()
-                //.UseODataSemantics()
-                .UseNativeSemantics()
+                .UseODataSemantics()
+                //.UseNativeSemantics()
                 .UseStandardCompiler(cpl =>
                 {
                     cpl.UseCompilerCache = true;

@@ -82,10 +82,10 @@ namespace TestWebApp.Controllers
 
         public ValuesController(DataContext ctx)
         {
-            var client = new MongoClient("mongodb://test:test@server:27017/test");
-            collection = client.GetDatabase("test").GetCollection<Entity>("entities");
+            //var client = new MongoClient("mongodb://test:test@server:27017/test");
+            //collection = client.GetDatabase("test").GetCollection<Entity>("entities");
             //collection.InsertMany(_data);
-            _source = collection.AsQueryable();
+            //_source = collection.AsQueryable();
             _context = ctx;
             _context.Database.EnsureCreated();
         }
@@ -110,7 +110,7 @@ namespace TestWebApp.Controllers
                 return BadRequest(ModelState);
             }
 
-            var aresult = query.ToActionResult(_source);
+            var aresult = query.ToActionResult(_context.Orders);
             return aresult;
         }
 

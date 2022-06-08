@@ -1,12 +1,10 @@
-﻿using QRest.Core.Compilation;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using QRest.Core.Compilation;
 using QRest.Core.Linq;
 using QRest.Core.Parsing;
 using Sprache;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace QRest.Compiler.Standard.Tests

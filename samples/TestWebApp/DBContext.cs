@@ -19,6 +19,8 @@ namespace ODataSamples.Contexts
         public int Id { get; set; }
         public string Title { get; set; }
         public DateTimeOffset OrderDate { get; set; }
+        public DateTime? OrderDateNullable { get; set; }
+
         public int CustomerId { get; set; }
         public virtual Customer Customer { get; set; }
     }
@@ -58,6 +60,7 @@ namespace ODataSamples.Contexts
                 {
                     Id = 1,
                     OrderDate = new DateTimeOffset(DateTime.Now.AddDays(-2)),
+                    OrderDateNullable = DateTime.Now.AddDays(-2),
                     CustomerId = 1,
                     Title = "Candies"
                 },

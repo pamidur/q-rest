@@ -111,12 +111,12 @@ namespace QRest.Semantics.OData.Parsing
 
         public override ITerm VisitDecimalExpression([NotNull] ODataGrammarParser.DecimalExpressionContext context)
         {
-            return new ConstantTerm(decimal.Parse(context.GetText()));
+            return new ConstantTerm(context.GetText());
         }
 
         public override ITerm VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context)
         {
-            return new ConstantTerm(int.Parse(context.GetText()));
+            return new ConstantTerm(context.GetText());
         }
 
         public override ITerm VisitComparatorExpression([NotNull] ODataGrammarParser.ComparatorExpressionContext context)
