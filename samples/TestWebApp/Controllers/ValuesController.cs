@@ -6,7 +6,6 @@ using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using ODataSamples.Contexts;
 using QRest.AspNetCore;
-using SQLitePCL;
 using System;
 using System.Collections.Generic;
 using System.Linq;

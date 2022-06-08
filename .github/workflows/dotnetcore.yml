@@ -1,45 +1,53 @@
 name: Main
 env:
-  NUGETURL: https://api.nuget.org/v3/index.json
-  NUGET_TOKEN: ${{ secrets.nuget }}
-  MODE: Release
-  CODACY_TOKEN: ${{ secrets.codacy }}
- 
-on: [push]
+  app_release: false
+  app_conf: Release
+  nuget_url: https://api.nuget.org/v3/index.json 
+  
+on:
+  push:
+    branches: 
+        - master
+    tags: 
+        - '**'
+  pull_request:  
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+        fetch-depth: 0
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x
     - name: Configure
       run: |
-        TAG=$([[ $GITHUB_REF == refs/tags/* ]] && echo ${GITHUB_REF:10} || echo "")
-        VERSION=${TAG:-0.0.0-dev}
-        echo ::set-env name=TAG::$TAG
-        echo ::set-env name=VERSION::$VERSION
-        echo ::set-env name=VERSIONFULL::$(echo $VERSION:$GITHUB_SHA)
-        echo ::set-env name=ISRELEASE::$(test -z "$TAG")
-    - name: Checkout
-      uses: actions/checkout@v1
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 2.2.402
+        echo "app_version=`git describe --tags`" >> $GITHUB_ENV
+        echo "app_release=`(git describe --tags --exact-match>/dev/null 2>&1 && echo true) || echo false`" >> $GITHUB_ENV
+    - name: Status
+      run: echo "Release=$app_release, version=$app_version" 
     - name: Build
-      run: dotnet build ./ -c $MODE -p:Version=$VERSION -p:InformationalVersion=$VERSIONFULL
+      run: dotnet build -c $app_conf -p:Version=$app_version -p:InformationalVersion="$app_version:$GITHUB_SHA"
     - name: Test
-      run: dotnet test ./ -c $MODE --no-build
-    - name: Submit coverage
-      run: |
-        curl -Ls "https://github.com/codacy/csharp-codacy-coverage/releases/download/1.0.7/Codacy.CSharpCoverage_linux-x64" --output codacy
-        chmod +x ./codacy
-        coverfiles=$(find . -type f -name coverage.opencover.xml)
-        for coverfile in $coverfiles; do
-        ./codacy -c $GITHUB_SHA -t $CODACY_TOKEN -r "$coverfile" -e opencover -p
-        done
-        if [ -n "$coverfiles" ]; then
-        ./codacy -c $GITHUB_SHA -t $CODACY_TOKEN -f
-        fi
+      run: dotnet test -c $app_conf --no-build
+    - name: Pack
+      working-directory: nuget
+      run: dotnet pack -c $app_conf --no-build -o ./artifacts -p:Version=$app_version -p:CommitSHA=$GITHUB_SHA
+    - uses: actions/upload-artifact@v1
+      with:
+        name: artifacts
+        path: ./artifacts
+    - name: Publish
+      if: env.app_release == 'true'
+      env:
+        NUGETKEY: ${{ secrets.NUGET_KEY }}
+      working-directory: ./artifacts
+      run: dotnet nuget push *.nupkg -s $nuget_url -k $NUGETKEY   
+
 

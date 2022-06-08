@@ -32,31 +32,33 @@ namespace TestWebApp
                     cpl.UseCompilerCache = true;
                 });
 
-            services
-                .AddMvc()
-                .AddJsonOptions(options => { 
-                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
-                });
+            //services
+            //    .AddJsonOptions(options => { 
+            //        //options.JsonSerializerOptions.ContractResolver = new DefaultContractResolver();
+            //        //options.JsonSerializerOptions.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            //    });
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
+            app.UseDeveloperExceptionPage();
             app.Use(async (context, next) =>
             {
                 Console.WriteLine($"{context.Request.Path}{context.Request.QueryString}");
                 await next.Invoke();
             });
 
+            app.UseRouting();
+
 
             app.UseODataMetadata();
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
         }
     }
 }
