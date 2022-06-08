@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}"
 EndProject
@@ -20,25 +20,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solution", ".solution", "{68EFFEF7-800B-4592-BE7B-9D9568083814}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData", "src\QRest.Semantics.OData\QRest.Semantics.OData.csproj", "{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Semantics.OData.Tests", "test\QRest.Semantics.OData.Tests\QRest.Semantics.OData.Tests.csproj", "{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{F592F579-DB0F-4E74-B79D-D921DEDBE4B2}"
-	ProjectSection(SolutionItems) = preProject
-		LICENSE = LICENSE
-		README.md = README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{3D211EBB-5B03-4FDF-B7BA-E1B36958F523}"
-	ProjectSection(SolutionItems) = preProject
-		.travis.yml = .travis.yml
-		after.QRest.sln.targets = after.QRest.sln.targets
-		Directory.Build.props = Directory.Build.props
-		Directory.build.targets = Directory.build.targets
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.Compiler.Standard.Tests", "test\QRest.Compiler.Standard.Tests\QRest.Compiler.Standard.Tests.csproj", "{DA987B08-765B-46E2-ADB7-6D739B95A4F0}"
 EndProject
@@ -99,8 +88,6 @@ Global
 		{284FC041-7F0D-4F0C-8F49-71A52E92E46D} = {7D715283-67A8-43E2-938E-6CB12ACD30F8}
 		{F6B5672A-F0E1-4D0D-9E5C-31CB4F50DC90} = {2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}
 		{12DB82BA-C9AE-43DC-8181-9A33F4FAC55F} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
-		{F592F579-DB0F-4E74-B79D-D921DEDBE4B2} = {68EFFEF7-800B-4592-BE7B-9D9568083814}
-		{3D211EBB-5B03-4FDF-B7BA-E1B36958F523} = {68EFFEF7-800B-4592-BE7B-9D9568083814}
 		{DA987B08-765B-46E2-ADB7-6D739B95A4F0} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
 		{766A94A2-5A5C-45B9-94C9-A5B06338CEE8} = {CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}
 		{B20B30E5-98CB-4C33-805C-921DA5CFAAD4} = {7D715283-67A8-43E2-938E-6CB12ACD30F8}
