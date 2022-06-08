@@ -22,12 +22,14 @@ jobs:
         fetch-depth: 0
     - uses: actions/setup-dotnet@v1
       with:
+        dotnet-version: 3.1.x
+    - uses: actions/setup-dotnet@v1
+      with:
         dotnet-version: 6.0.x
     - name: Configure
       run: |
         echo "app_version=`git describe --tags`" >> $GITHUB_ENV
         echo "app_release=`(git describe --tags --exact-match>/dev/null 2>&1 && echo true) || echo false`" >> $GITHUB_ENV
-        echo "Release=$app_release, version=$app_version"
     - name: Status
       run: echo "Release=$app_release, version=$app_version" 
     - name: Build
