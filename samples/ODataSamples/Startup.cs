@@ -21,7 +21,7 @@ namespace ODataSamples
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.                
+            services.
                 AddDbContext<DataContext>(o => o.UseInMemoryDatabase("TestDb"));
 
             services
@@ -32,29 +32,31 @@ namespace ODataSamples
                    cpl.UseCompilerCache = false;
                });
 
-            services.AddMvc();
+            services.AddControllers();
 
             var resolver = services.BuildServiceProvider();
             var ctx = resolver.GetService<DataContext>();
             //ctx.Database.Migrate();
-            
-        }
-        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
 
+        }
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+
+            app.UseDeveloperExceptionPage();
             app.Use(async (context, next) =>
             {
                 Console.WriteLine($"{context.Request.Path}{context.Request.QueryString}");
                 await next.Invoke();
             });
 
+            app.UseRouting();
+
 
             app.UseODataMetadata();
-            app.UseMvc();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

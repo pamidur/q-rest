@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -23,8 +24,23 @@ namespace QRest.Core.Compilation.TypeConverters
 
         public bool TryConvert(Expression expression, Type target, out Expression result)
         {
+            if (expression.Type == target)
+            {
+                result = expression;
+                return true;
+            }
+
             result = null;
             var key = (expression.Type, target);
+
+            if (target.IsConstructedGenericType && target.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                if (TryConvert(expression, target.GetGenericArguments()[0], out result))
+                {
+                    result = Expression.New(target.GetConstructors().First(c => c.GetParameters().Length == 1), result);
+                    return true;
+                }
+            }
 
             if (_converters.TryGetValue(key, out var converter))
                 result = converter(expression, _format);

@@ -56,9 +56,9 @@ namespace TestWebApp
 
             app.UseODataMetadata();
             app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

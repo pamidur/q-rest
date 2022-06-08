@@ -60,7 +60,7 @@ namespace ODataSamples.Contexts
                 {
                     Id = 1,
                     OrderDate = new DateTimeOffset(DateTime.Now.AddDays(-2)),
-                    OrderDateNullable = DateTime.Now.AddDays(-2),
+                    OrderDateNullable = DateTime.Parse("2022-04-17T13:56:39.6094222"),
                     CustomerId = 1,
                     Title = "Candies"
                 },

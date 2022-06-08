@@ -7,8 +7,7 @@ using QRest.AspNetCore;
 namespace ODataSamples.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class MemoryController : ControllerBase
+    public class MemoryController : Controller
     {
         [HttpGet("{query?}")]
         public ActionResult<IQueryable<Domain.Order>> Get(Query query)
