@@ -37,7 +37,7 @@ namespace QRest.Core.Compilation.TypeConverters
             {
                 if (TryConvert(expression, target.GetGenericArguments()[0], out result))
                 {
-                    result = Expression.New(target.GetConstructors().First(c => c.GetParameters().Length == 1), result);
+                    result = Expression.Convert(result, target);// Expression.New(target.GetConstructors().First(c => c.GetParameters().Length == 1), result);
                     return true;
                 }
             }
