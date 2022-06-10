@@ -45,7 +45,7 @@ namespace QRest.Core.Compilation.Visitors
     {
         private AssemblerState(
             ParameterExpression root, Expression result, Expression context,
-            in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)> constants,
+            in ImmutableList<(ParameterExpression Param, ConstantExpression Value)> constants,
             AssemblerServices services)
         {
             Root = root;
@@ -58,22 +58,22 @@ namespace QRest.Core.Compilation.Visitors
         public readonly Expression Context;
         public readonly Expression Result;
         public readonly ParameterExpression Root;
-        public readonly ImmutableArray<(ParameterExpression Param, ConstantExpression Value)> Constants;
+        public readonly ImmutableList<(ParameterExpression Param, ConstantExpression Value)> Constants;
         public readonly AssemblerServices Services;
 
         public static AssemblerState New(ParameterExpression root, AssemblerServices services)
         {
-            return new AssemblerState(root, root, root, in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)>.Empty, services);
+            return new AssemblerState(root, root, root, in ImmutableList<(ParameterExpression Param, ConstantExpression Value)>.Empty, services);
         }
 
         public AssemblerState Fork(ParameterExpression root)
         {
-            return new AssemblerState(root, root, root, in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)>.Empty, Services);
+            return new AssemblerState(root, root, root, in ImmutableList<(ParameterExpression Param, ConstantExpression Value)>.Empty, Services);
         }
 
         public AssemblerState Fork()
         {
-            return new AssemblerState(Root, Result, Root, in ImmutableArray<(ParameterExpression Param, ConstantExpression Value)>.Empty, Services);
+            return new AssemblerState(Root, Result, Root, in ImmutableList<(ParameterExpression Param, ConstantExpression Value)>.Empty, Services);
         }
 
         public AssemblerState Merge(in AssemblerState state)
