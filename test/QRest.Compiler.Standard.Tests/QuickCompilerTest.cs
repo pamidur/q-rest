@@ -21,7 +21,7 @@ namespace QRest.Compiler.Standard.Tests
         public DateTimeOffset Datetimeoffset { get; set; } = DateTimeOffset.Now;
         public SubEntity Sub { get; set; }
 
-        public string[] Emails { get; set; } = new string[] { };
+        public string[] Emails { get; set; } = Array.Empty<string>();
 
         public IEnumerable<SubEntity> Contacts { get; set; } = new List<SubEntity> { };
 
@@ -45,7 +45,7 @@ namespace QRest.Compiler.Standard.Tests
     }
     public class QuickCompilerTest
     {
-        private static IQueryable<Entity> _data = new List<Entity>
+        private static readonly IQueryable<Entity> _data = new List<Entity>
             {
                 new Entity { Number = 21, Text = "CCC", Sub = new SubEntity { Text = "SubText" }  },
                 new Entity { Number = 32, Text = "AAA",  Sub = new SubEntity { Text = "ret" } },

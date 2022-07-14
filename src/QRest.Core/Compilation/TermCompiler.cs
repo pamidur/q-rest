@@ -18,7 +18,7 @@ namespace QRest.Core.Compilation
                 new AssemblingVisitor(
                     new EmitContainerFactory(),
                     new DefaultTypeConverter(CultureInfo.InvariantCulture, parseStrings: true, assumeDateTimeKind: DateTimeKind.Utc),
-                    allowUncompletedQueries: false,
+                    allowIncompleQueries: false,
                     terminateSelects: true
                     ),
                 new ConstantsCollectingVisitor(),

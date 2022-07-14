@@ -7,36 +7,17 @@ namespace QRest.Core.Terms
     {
         protected virtual T Visit(ITerm term, in T state)
         {
-            T result;
-
-            switch (term)
+            var result = term switch
             {
-                case ConstantTerm c:
-                    result = VisitConstant(c, in state);
-                    break;
-                case PropertyTerm p:
-                    result = VisitProperty(p, in state);
-                    break;
-                case NameTerm n:
-                    result = VisitName(n, in state);
-                    break;
-                case ContextTerm x:
-                    result = VisitContext(x, in state);
-                    break;
-                case MethodTerm m:
-                    result = VisitMethod(m, in state);
-                    break;
-                case LambdaTerm l:
-                    result = VisitLambda(l, in state);
-                    break;
-                case SequenceTerm s:
-                    result = VisitSequence(s, in state);
-                    break;
-                default:
-                    result = VisitCustom(term, in state);
-                    break;
-            }
-
+                ConstantTerm c => VisitConstant(c, in state),
+                PropertyTerm p => VisitProperty(p, in state),
+                NameTerm n => VisitName(n, in state),
+                ContextTerm x => VisitContext(x, in state),
+                MethodTerm m => VisitMethod(m, in state),
+                LambdaTerm l => VisitLambda(l, in state),
+                SequenceTerm s => VisitSequence(s, in state),
+                _ => VisitCustom(term, in state),
+            };
             return result;
         }
 
@@ -57,7 +38,7 @@ namespace QRest.Core.Terms
         {
             var ctx = state;
             foreach (var term in m.Arguments)
-                ctx = Visit(term, ctx);
+                ctx = Visit(term, in ctx);
             return ctx;
         }
 

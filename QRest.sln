@@ -6,6 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2EC1DEC4-46D5-4A50-B6D4-A031FFC1D1F5}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{CAA9FEEA-7A2A-41FB-9423-DDFC633830ED}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
+		test\Directory.Build.targets = test\Directory.Build.targets
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRest.AspNetCore", "src\QRest.AspNetCore\QRest.AspNetCore.csproj", "{B1F307E4-905C-44F3-ADCD-4D2C85645C48}"
 EndProject

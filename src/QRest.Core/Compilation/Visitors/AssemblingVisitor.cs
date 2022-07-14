@@ -14,18 +14,18 @@ namespace QRest.Core.Compilation.Visitors
         private readonly IContainerFactory _containerFactory;
         private readonly ITypeConverter _typeConverter;
         private readonly bool _terminateSelects;
-        private readonly bool _allowUncompletedQueries;
+        private readonly bool _allowIncompleQueries;
 
         public AssemblingVisitor(
             IContainerFactory containerFactory,
             ITypeConverter typeConverter,
-            bool allowUncompletedQueries,
+            bool allowIncompleQueries,
             bool terminateSelects
             )
         {
             _containerFactory = containerFactory;
             _typeConverter = typeConverter;
-            _allowUncompletedQueries = allowUncompletedQueries;
+            _allowIncompleQueries = allowIncompleQueries;
             _terminateSelects = terminateSelects;
         }
 
@@ -56,17 +56,7 @@ namespace QRest.Core.Compilation.Visitors
         protected override AssemblerState VisitProperty(PropertyTerm p, in AssemblerState state)
         {
             var ctx = state.Context;
-
-            Expression exp;
-
-            if (_containerFactory.IsContainerExpression(ctx))
-            {
-                exp = _containerFactory.CreateReadProperty(ctx, p.Name);
-            }
-            else
-            {
-                exp = Expression.PropertyOrField(ctx, p.Name);
-            }
+            var exp = Expression.PropertyOrField(ctx, p.Name);
 
             return state.WithResult(exp);
         }
@@ -83,7 +73,7 @@ namespace QRest.Core.Compilation.Visitors
                 {
                     var argState = Visit(arg, in argCtx);
                     argResults.Add(argState.Result);
-                    methodState = methodState.Merge(argState);
+                    methodState = methodState.Merge(in argState);
                 }
             }
 
@@ -109,9 +99,9 @@ namespace QRest.Core.Compilation.Visitors
 
         protected override AssemblerState VisitSequence(SequenceTerm s, in AssemblerState state)
         {
-            var result = base.VisitSequence(s, state);
+            var result = base.VisitSequence(s, in state);
 
-            if (!_allowUncompletedQueries)
+            if (!_allowIncompleQueries)
                 result = result.WithResult(TerminationExpression.Create(result.Context));
 
             return result;
@@ -125,11 +115,11 @@ namespace QRest.Core.Compilation.Visitors
             var paramName = char.ToLowerInvariant(state.Services.GetName(state.Result)[0]).ToString();
 
             var lambdaContext = state.Fork(Expression.Parameter(element.type, paramName));
-            var lambdaResult = Visit(l.Term, lambdaContext);
+            var lambdaResult = Visit(l.Term, in lambdaContext);
             var lambdaExp = Expression.Lambda(lambdaResult.Context, lambdaResult.Root);
 
             return state
-                .Merge(lambdaResult)
+                .Merge(in lambdaResult)
                 .WithResult(lambdaExp);
         }
 

@@ -223,7 +223,7 @@ namespace QRest.Core.Parsing
             if (_defferedParsing == DefferedConstantParsing.Strings)
                 return source;
 
-            throw new NotSupportedException($"Cannot parse type of {type.ToString()}");
+            throw new NotSupportedException($"Cannot parse type of {type}");
         }
     }
 }

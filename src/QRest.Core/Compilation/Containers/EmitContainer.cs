@@ -80,15 +80,5 @@ namespace QRest.Core.Compilation.Containers
         {
             return properties.Keys.Aggregate(0, (a, v) => unchecked(a + v.GetHashCode()));
         }
-
-        public Expression CreateReadProperty(Expression context, string name)
-        {
-            return Expression.PropertyOrField(context, name);
-        }
-
-        public bool IsContainerExpression(Expression expression)
-        {
-            return false;
-        }
     }
 }
