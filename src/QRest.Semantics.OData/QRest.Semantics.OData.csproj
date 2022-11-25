@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.9.3" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.ApiExplorer" Version="2.2.0" />
-    <PackageReference Include="Microsoft.OData.Edm" Version="7.12.0" />
+    <PackageReference Include="Microsoft.OData.Edm" Version="7.12.5" />
   </ItemGroup>
 
   <ItemGroup>
