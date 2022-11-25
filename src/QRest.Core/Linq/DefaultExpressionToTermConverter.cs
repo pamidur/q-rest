@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace QRest.Core.Linq
 {
@@ -37,26 +36,60 @@ namespace QRest.Core.Linq
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            var param = Visit(node.Arguments).Cast<TermExpression>().Select(te => te.Term).ToArray();
-            return new TermExpression(new SequenceTerm(param[0], new MethodTerm(SelectQueryOperation(node), param.Skip(1).ToArray())));
-        }
-
-        protected virtual IOperation SelectQueryOperation(MethodCallExpression node)
-        {
             if (node.Object != null || !node.Method.IsStatic || node.Method.DeclaringType != typeof(Queryable))
                 throw new NotSupportedException("Only Queryable extension method are supported yet");
 
-            switch (node.Method.Name)
+            var parameters = Visit(node.Arguments).Cast<TermExpression>().Select(te => te.Term).ToArray();
+
+            return node.Method.Name switch
             {
-                case nameof(Queryable.Where): return OperationsMap.Where;
-                case nameof(Queryable.Select): return OperationsMap.Map;
-                case nameof(Queryable.Skip): return OperationsMap.Skip;
-                case nameof(Queryable.Take): return OperationsMap.Take;
-                case nameof(Queryable.OrderBy): return OperationsMap.Order;
-                case nameof(Queryable.OrderByDescending): return OperationsMap.Order;
-                case nameof(Queryable.Count): return OperationsMap.Count;
-                default: throw new NotSupportedException($"Method {node.Method.Name} not supported.");
-            }
+                nameof(Queryable.Where) => MakeGenericMethodTerm(OperationsMap.Where, parameters),
+                nameof(Queryable.Select) => MakeGenericMethodTerm(OperationsMap.Map, parameters),
+                nameof(Queryable.Skip) => MakeGenericMethodTerm(OperationsMap.Skip, parameters),
+                nameof(Queryable.Take) => MakeGenericMethodTerm(OperationsMap.Take, parameters),
+                nameof(Queryable.OrderBy) => CreateOrderTerm(parameters, reverse: false),
+                nameof(Queryable.OrderByDescending) => CreateOrderTerm(parameters, reverse: true),
+                nameof(Queryable.ThenBy) => AppendOrderTerm(parameters, reverse: false),
+                nameof(Queryable.ThenByDescending) => AppendOrderTerm(parameters, reverse: true),
+                nameof(Queryable.Count) => parameters.Length == 2 ?
+                   MakeGenericMethodTerm(OperationsMap.Where, parameters, new MethodTerm(OperationsMap.Count)) :
+                   MakeGenericMethodTerm(OperationsMap.Count, parameters),
+                nameof(Queryable.First) => parameters.Length == 2 ?
+                   MakeGenericMethodTerm(OperationsMap.Where, parameters, new MethodTerm(OperationsMap.First)) :
+                   MakeGenericMethodTerm(OperationsMap.First, parameters),
+                nameof(Queryable.FirstOrDefault) => parameters.Length == 2 ?
+                   MakeGenericMethodTerm(OperationsMap.Where, parameters, new MethodTerm(OperationsMap.First)) :
+                   MakeGenericMethodTerm(OperationsMap.First, parameters),
+
+                _ => throw new NotSupportedException($"Method {node.Method.Name} not supported."),
+            };
+        }
+
+        private Expression CreateOrderTerm(ITerm[] parameters, bool reverse)
+        {
+            if (reverse)
+                parameters[1] = new LambdaTerm(((LambdaTerm)parameters[1]).Term.Chain(new MethodTerm(OperationsMap.Reverse)));
+            return new TermExpression(new SequenceTerm(parameters[0], new MethodTerm(OperationsMap.Order, parameters[1..^0])));
+        }
+
+        private Expression AppendOrderTerm(ITerm[] parameters, bool reverse)
+        {
+            var chain = (SequenceTerm)parameters[0];
+            var arg = (LambdaTerm)parameters[1];
+
+            var prevs = chain.ToArray()[0..^1];
+            var order = (MethodTerm)chain[^1];
+
+            if (reverse)
+                arg = new LambdaTerm(arg.Term.Chain(new MethodTerm(OperationsMap.Reverse)));
+
+            var call = new MethodTerm(OperationsMap.Order, order.Arguments.Concat(new[] { arg }).ToArray());
+            return new TermExpression(new SequenceTerm(prevs).Chain(call));
+        }
+
+        private Expression MakeGenericMethodTerm(IOperation op, ITerm[] parameters, ITerm modifier = null)
+        {
+            return new TermExpression(new SequenceTerm(parameters[0], new MethodTerm(op, parameters[1..^0]), modifier));
         }
 
         protected override Expression VisitConstant(ConstantExpression node)
@@ -85,18 +118,18 @@ namespace QRest.Core.Linq
 
         protected virtual ITerm SelectBooleanOperation(BinaryExpression node, ITerm left, ITerm right)
         {
-            switch (node.NodeType)
+            return node.NodeType switch
             {
-                case ExpressionType.Equal: return new SequenceTerm(left, new MethodTerm(OperationsMap.Equal, right));
-                case ExpressionType.NotEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.NotEqual, right));
-                case ExpressionType.LessThan: return new SequenceTerm(left, new MethodTerm(OperationsMap.LessThan, right));
-                case ExpressionType.LessThanOrEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.LessThanOrEqual, right));
-                case ExpressionType.GreaterThan: return new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThan, right));
-                case ExpressionType.GreaterThanOrEqual: return new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThanOrEqual, right));
-                case ExpressionType.OrElse: return new MethodTerm(OperationsMap.Or, left, right);
-                case ExpressionType.AndAlso: return new MethodTerm(OperationsMap.And, left, right);
-                default: throw new NotSupportedException($"Operation {node.NodeType} is not supported.");
-            }
+                ExpressionType.Equal => new SequenceTerm(left, new MethodTerm(OperationsMap.Equal, right)),
+                ExpressionType.NotEqual => new SequenceTerm(left, new MethodTerm(OperationsMap.NotEqual, right)),
+                ExpressionType.LessThan => new SequenceTerm(left, new MethodTerm(OperationsMap.LessThan, right)),
+                ExpressionType.LessThanOrEqual => new SequenceTerm(left, new MethodTerm(OperationsMap.LessThanOrEqual, right)),
+                ExpressionType.GreaterThan => new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThan, right)),
+                ExpressionType.GreaterThanOrEqual => new SequenceTerm(left, new MethodTerm(OperationsMap.GreaterThanOrEqual, right)),
+                ExpressionType.OrElse => new MethodTerm(OperationsMap.Or, left, right),
+                ExpressionType.AndAlso => new MethodTerm(OperationsMap.And, left, right),
+                _ => throw new NotSupportedException($"Operation {node.NodeType} is not supported."),
+            };
         }
 
         protected override Expression VisitLambda<T>(Expression<T> node)
@@ -126,6 +159,22 @@ namespace QRest.Core.Linq
         protected internal virtual Expression VisitRoot()
         {
             return new TermExpression(ContextTerm.Root);
+        }
+
+        protected override Expression VisitNew(NewExpression node)
+        {
+            var args = new List<ITerm>();
+
+            for (int i = 0; i < node.Members.Count; i++)
+            {
+                var member = node.Members[i];
+                var arg = ((TermExpression)Visit(node.Arguments[i])).Term;
+
+                args.Add(new SequenceTerm(arg, new NameTerm(member.Name)));
+            }
+
+            var nexExp = new MethodTerm(OperationsMap.New, args.ToArray());
+            return new TermExpression(nexExp);
         }
     }
 }

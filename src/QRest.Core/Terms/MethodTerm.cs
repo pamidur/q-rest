@@ -30,7 +30,5 @@ namespace QRest.Core.Terms
         public string ViewQuery { get; }
         public string ViewDebug { get; }
         public string ViewKey { get; }
-
-        public ITerm Clone() => new MethodTerm(Operation, Arguments.Select(a => a.Clone()).ToArray());
     }
 }

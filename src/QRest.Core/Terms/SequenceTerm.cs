@@ -1,64 +1,39 @@
-﻿using QRest.Core.Operations;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace QRest.Core.Terms
 {
-    public sealed class SequenceTerm : IEnumerable<ITerm>, ITerm
+    public sealed class SequenceTerm : IReadOnlyList<ITerm>, ITerm
     {
-        private readonly LinkedList<ITerm> _sequence = new LinkedList<ITerm>();
+        private readonly ImmutableList<ITerm> _sequence;
+        public ITerm Root => _sequence[0];
+        public ITerm Last => _sequence[^1];
 
         public SequenceTerm(params ITerm[] terms)
+           : this(terms == null || terms.Length == 0 ? 
+                 throw new InvalidOperationException($"Sequence MUST contain at least one element.")
+                 : BuildSequence(terms))
         {
-            AddTerms(terms);            
         }
 
-        public ITerm Root => _sequence.First.Value;
-        public ITerm Last => _sequence.Last.Value;
-        public bool IsEmpty => !_sequence.Any();
+        private SequenceTerm(ImmutableList<ITerm> terms)
+        {
+            _sequence = terms;
+            ViewQuery = FormatView(_sequence, t => t.ViewQuery);
+            ViewKey = FormatView(_sequence, t => t.ViewKey);
+            ViewDebug = $"#{string.Join("", _sequence.Select(t => t.ViewDebug))}";
+        }        
 
         public string ViewQuery { get; private set; }
         public string ViewKey { get; private set; }
         public string ViewDebug { get; private set; }
+      
 
-        public SequenceTerm Append(params ITerm[] terms)
-        {
-            var clone = (SequenceTerm)Clone();
-            clone.AddTerms(terms);
-
-            return clone;
-        }
-
-        private void AddTerms(IEnumerable<ITerm> terms)
-        {
-            foreach (var term in terms)
-            {
-                if (term is SequenceTerm s)
-                    AddTerms(s);
-                else if (term != null)
-                    CheckAndAddLast(term);
-            }
-        }
-
-        private void CheckAndAddLast(ITerm term)
-        {
-            if ((term is ConstantTerm || term is LambdaTerm) && _sequence.Count != 0)
-                throw new InvalidOperationException($"Cannot chain '{term.GetType().Name}' is the middle of sequence.");
-
-            if ((term is NameTerm) && _sequence.Count == 0)
-                throw new InvalidOperationException($"Cannot start sequence with '{term.GetType().Name}'.");
-
-            if ((term is ContextTerm) && _sequence.Count > 0)
-                throw new InvalidOperationException($"Context cannot be changed in the mid of the sequence.");
-
-            _sequence.AddLast(term);
-
-            ViewQuery = FormatView(_sequence, t => t.ViewQuery);
-            ViewKey = FormatView(_sequence, t => t.ViewKey);
-            ViewDebug = $"#{string.Join("", _sequence.Select(t => t.ViewDebug))}";
-        }
+        public int Count => _sequence.Count;
+        public ITerm this[int index] => _sequence.ElementAt(index);
 
         public IEnumerator<ITerm> GetEnumerator()
         {
@@ -70,11 +45,9 @@ namespace QRest.Core.Terms
             return _sequence.GetEnumerator();
         }
 
-        public ITerm Clone() => new SequenceTerm(_sequence.Select(t => t.Clone()).ToArray());
-
         public override string ToString() => ViewQuery;
 
-        private static string FormatView(ICollection<ITerm> sequence, Func<ITerm, string> selector)
+        private static string FormatView(IReadOnlyCollection<ITerm> sequence, Func<ITerm, string> selector)
         {
             var terms = sequence.ToArray();
 
@@ -88,6 +61,32 @@ namespace QRest.Core.Terms
                 data[0] = data[0].Substring(1);
 
             return $"{string.Join("", data)}";
+        }
+
+        private static ImmutableList<ITerm> BuildSequence(ITerm[] terms)
+        {
+            var builder = ImmutableList.CreateBuilder<ITerm>();
+
+            foreach (var term in terms)
+            {
+                if (term is SequenceTerm s)
+                    builder.AddRange(s._sequence);
+                else if (term != null)
+                {
+                    if ((term is ConstantTerm || term is LambdaTerm) && builder.Count != 0)
+                        throw new InvalidOperationException($"Cannot chain '{term.GetType().Name}' is the middle of sequence.");
+
+                    if ((term is NameTerm) && builder.Count == 0)
+                        throw new InvalidOperationException($"Cannot start sequence with '{term.GetType().Name}'.");
+
+                    if ((term is ContextTerm) && builder.Count > 0)
+                        throw new InvalidOperationException($"Context cannot be changed in the mid of the sequence.");
+
+                    builder.Add(term);
+                }
+            }
+
+            return builder.ToImmutable();
         }
     }
 }

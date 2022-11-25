@@ -35,8 +35,7 @@ namespace QRest.Core.Operations
             var namePrefix = initialName;
             var ind = 0;
 
-            var name = "";
-
+            string name;
             do
             {
                 name = $"{namePrefix}{ind++}";

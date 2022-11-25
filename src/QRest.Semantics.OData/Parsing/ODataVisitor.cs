@@ -247,7 +247,7 @@ namespace QRest.Semantics.OData.Parsing
                 );
 
             if (context.ChildCount > 1)
-                ordersq = ordersq.Append(Visit(context.children[1]));
+                ordersq = ordersq.Chain(Visit(context.children[1]));
 
             return ordersq;
         }

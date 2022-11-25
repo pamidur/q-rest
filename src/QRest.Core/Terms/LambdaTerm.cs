@@ -16,6 +16,5 @@
         public string ViewDebug { get; }
         public string ViewQuery { get; }
         public string ViewKey { get; }
-        public ITerm Clone() => new LambdaTerm(Term.Clone());
     }
 }
