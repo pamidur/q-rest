@@ -1,9 +1,9 @@
 {  
-  "profiles": {    
+  "profiles": {
     "TestWebApp": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "api/values/fromdb/-where(:Contacts-any(:Text-eq('qwerty')))",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

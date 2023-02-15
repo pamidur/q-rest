@@ -24,7 +24,7 @@ namespace QRest.Semantics.OData.Parsing
         public override ITerm VisitParse([NotNull] ParseContext context)
         {
             if (context.children.Count < 2)
-                return new ODataTermContainer { Data = new MethodTerm(OperationsMap.Context) };
+                return new ODataTermContainer { Data = ContextTerm.Root };
 
             return Visit(context.queryOptions());
         }
@@ -41,7 +41,7 @@ namespace QRest.Semantics.OData.Parsing
 
         private ITerm BuildTerms(List<ITerm> sortedLambdas)
         {
-            ITerm dataOut = null;
+            ITerm dataOut = ContextTerm.Root;
             ITerm countOut = null;
 
             if (sortedLambdas.Any())
@@ -64,7 +64,7 @@ namespace QRest.Semantics.OData.Parsing
                     dataOut = new SequenceTerm(new[] { dataOut }.Concat(sortedLambdas).ToArray());
             }
 
-            return new ODataTermContainer() { Data = dataOut ?? new MethodTerm(OperationsMap.Context), Count = countOut };
+            return new ODataTermContainer() { Data = dataOut ?? ContextTerm.Root, Count = countOut };
         }
 
         private static QueryOptionContext GetContext<T>(IEnumerable<QueryOptionContext> opts)
@@ -83,14 +83,14 @@ namespace QRest.Semantics.OData.Parsing
         public override ITerm VisitSelect([NotNull] SelectContext context)
         {
             var selectArgs = context.children.OfType<SelectItemContext>().Select(c => Visit(c)).ToList();
-            var select = new MethodTerm(_operations.Select, new[] { new LambdaTerm( new MethodTerm(OperationsMap.New, selectArgs.ToArray())) });
+            var select = new MethodTerm(_operations.Select, new[] { new LambdaTerm(new MethodTerm(OperationsMap.New, selectArgs.ToArray())) });
             return select;
         }
 
         public override ITerm VisitSelectItem([NotNull] SelectItemContext context)
         {
             return new SequenceTerm(
-                new MethodTerm(OperationsMap.Root),
+                ContextTerm.Root, 
                 new PropertyTerm(context.GetText())
             );
         }
@@ -111,12 +111,12 @@ namespace QRest.Semantics.OData.Parsing
 
         public override ITerm VisitDecimalExpression([NotNull] ODataGrammarParser.DecimalExpressionContext context)
         {
-            return new ConstantTerm(decimal.Parse(context.GetText()));
+            return new ConstantTerm(context.GetText());
         }
 
         public override ITerm VisitIntExpression([NotNull] ODataGrammarParser.IntExpressionContext context)
         {
-            return new ConstantTerm(int.Parse(context.GetText()));
+            return new ConstantTerm(context.GetText());
         }
 
         public override ITerm VisitComparatorExpression([NotNull] ODataGrammarParser.ComparatorExpressionContext context)
@@ -137,13 +137,13 @@ namespace QRest.Semantics.OData.Parsing
             if (string.IsNullOrEmpty(_currentContext) || (context.prefix?.Text?.Equals(_currentContext) ?? false))
                 return new SequenceTerm
                 (
-                    new MethodTerm(OperationsMap.Root),
+                    ContextTerm.Root,
                     new PropertyTerm(context.val.Text)
                 );
             else
                 return new SequenceTerm
                 (
-                    new MethodTerm(OperationsMap.Root)
+                    ContextTerm.Root
                 );
         }
 
@@ -172,10 +172,10 @@ namespace QRest.Semantics.OData.Parsing
             switch (node.Symbol.Type)
             {
                 case ODataGrammarParser.AND:
-                    operation = OperationsMap.Every;
+                    operation = OperationsMap.And;
                     break;
                 case ODataGrammarParser.OR:
-                    operation = OperationsMap.OneOf;
+                    operation = OperationsMap.Or;
                     break;
 
                 case ODataGrammarParser.EQ:
@@ -215,7 +215,7 @@ namespace QRest.Semantics.OData.Parsing
 
             return new SequenceTerm(
                 funcRoot
-                ,new MethodTerm(func.Operation, parameters.Skip(1).ToArray())
+                , new MethodTerm(func.Operation, parameters.Skip(1).ToArray())
                 );
         }
 
@@ -241,24 +241,24 @@ namespace QRest.Semantics.OData.Parsing
 
         public override ITerm VisitOrderbyItem([NotNull] OrderbyItemContext context)
         {
-            var order = context.ChildCount > 1 ?
-                Visit(context.children[1])
-                : new MethodTerm(OperationsMap.Context);
+            var ordersq = new SequenceTerm(
+                ContextTerm.Root,
+                new PropertyTerm(context.children[0].GetText())
+                );
 
-            return new SequenceTerm(
-                new MethodTerm(OperationsMap.Root),
-                new PropertyTerm(context.children[0].GetText()),
-                order
-            );
+            if (context.ChildCount > 1)
+                ordersq = ordersq.Chain(Visit(context.children[1]));
+
+            return ordersq;
         }
 
         public override ITerm VisitOrder([NotNull] OrderContext context)
         {
-            MethodTerm method;
+            ITerm method;
             switch (context.GetText())
             {
                 case "asc":
-                    method = new MethodTerm(OperationsMap.Context);
+                    method = null;
                     break;
                 case "desc":
                     method = new MethodTerm(OperationsMap.Reverse);
@@ -300,7 +300,7 @@ namespace QRest.Semantics.OData.Parsing
 
             var field = new SequenceTerm
                 (
-                    new MethodTerm(OperationsMap.Root),
+                    ContextTerm.Root,
                     new PropertyTerm(context.fld.Text)
                 );
 
@@ -333,7 +333,7 @@ namespace QRest.Semantics.OData.Parsing
                 //case "IsEmpty":
                 //    return typeof(string).GetMethod("IsNullOrWhiteSpace", new Type[] { typeof(string) });
                 case "contains":
-                    operation = OperationsMap.Has;
+                    operation = OperationsMap.Contains;
                     break;
                 default:
                     throw new Exception($"Function {funcName} not found");

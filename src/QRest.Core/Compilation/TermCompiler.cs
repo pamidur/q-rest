@@ -16,9 +16,9 @@ namespace QRest.Core.Compilation
         public static TermCompiler Default { get; } =
             new TermCompiler(
                 new AssemblingVisitor(
-                    new DynamicContainerFactory(),
+                    new EmitContainerFactory(),
                     new DefaultTypeConverter(CultureInfo.InvariantCulture, parseStrings: true, assumeDateTimeKind: DateTimeKind.Utc),
-                    allowUncompletedQueries: false,
+                    allowIncompleQueries: false,
                     terminateSelects: true
                     ),
                 new ConstantsCollectingVisitor(),
@@ -37,23 +37,22 @@ namespace QRest.Core.Compilation
             _useCompilerCache = useCompilerCache;
         }
 
-        public Func<TRoot, object> Compile<TRoot>(ITerm sequence)
+        public Func<TSource, TResult> Compile<TSource, TResult>(ITerm sequence)
         {
-            var exp = Assemble<TRoot>(sequence);
+            var exp = Assemble<TSource, TResult>(sequence);
             var compiled = exp.Compile();
-            return (TRoot root) => compiled(root);
+            return compiled;
         }
 
-        public Expression<Func<TRoot, object>> Assemble<TRoot>(ITerm rootTerm)
+        public Expression<Func<TSource, TResult>> Assemble<TSource, TResult>(ITerm rootTerm)
         {
-            ConstantExpression compiled = null;
-            IReadOnlyList<ConstantExpression> constants = null;
-
-            var rootType = typeof(TRoot);
+            var rootType = typeof(TSource);
 
             var root = Expression.Parameter(rootType, "r");
-            var cacheKey = $"{rootType.ToString()}++{rootTerm.KeyView}";
+            var cacheKey = $"{rootType}++{rootTerm.ViewKey}";
 
+            IReadOnlyList<ConstantExpression> constants;
+            ConstantExpression compiled;
             if (_useCompilerCache && _cache.TryGetValue(cacheKey, out var @delegate))
             {
                 compiled = @delegate;
@@ -61,9 +60,9 @@ namespace QRest.Core.Compilation
             }
             else
             {
-                var (lambda, consts) = _assemblingVisitor.Assemble(rootTerm, root, typeof(object));
+                var (lambda, consts) = _assemblingVisitor.Assemble(rootTerm, root, typeof(TResult));
 
-                constants = consts;
+                constants = consts.Select(c => c.Value).ToArray();
                 compiled = Expression.Constant(lambda.Compile());
 
                 if (_useCompilerCache)
@@ -72,7 +71,7 @@ namespace QRest.Core.Compilation
 
             var resultInvokeParams = new Expression[] { root }.Concat(constants).ToArray();
 
-            var topLambda = Expression.Lambda<Func<TRoot, object>>(Expression.Invoke(compiled, resultInvokeParams), root);
+            var topLambda = Expression.Lambda<Func<TSource, TResult>>(Expression.Invoke(compiled, resultInvokeParams), root);
 
             return topLambda;
         }

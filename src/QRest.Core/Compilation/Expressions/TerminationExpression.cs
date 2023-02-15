@@ -6,11 +6,10 @@ namespace QRest.Core.Compilation.Expressions
 {
     public class TerminationExpression : ProxyExpression
     {
-        public static readonly ExpressionType ExpressionNodeType = (ExpressionType)2100;
         private readonly Type _element;
         private readonly Type _type;
 
-        private TerminationExpression(Expression expression, Type element) : base(expression, ExpressionNodeType)
+        private TerminationExpression(Expression expression, Type element) : base(expression)
         {
             _element = element;
             _type = typeof(IQueryable<>).MakeGenericType(_element);
@@ -28,7 +27,7 @@ namespace QRest.Core.Compilation.Expressions
 
         public static Expression Create(Expression expression)
         {
-            if (expression.NodeType == ExpressionNodeType)
+            if (expression is TerminationExpression)
                 return expression;
 
             if (expression.Type.TryGetCollectionElement(out var element) && element.queryable)

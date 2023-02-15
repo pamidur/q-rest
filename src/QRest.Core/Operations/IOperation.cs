@@ -6,7 +6,7 @@ namespace QRest.Core.Operations
 {
     public interface IOperation
     {
-        Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler);
+        Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler);
         string Key { get; }
     }
 }

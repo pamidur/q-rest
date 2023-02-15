@@ -12,6 +12,7 @@ namespace QRest.Semantics.QRest.Tests
         private readonly Mock<IOperation> _opration;
 
         private static readonly string _testUniversalOperationName = "test";
+        private static readonly string _testUniversalPropertName = "data";
         private TermParser _parser;
 
         public ParserTests()
@@ -77,7 +78,7 @@ namespace QRest.Semantics.QRest.Tests
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
             Assert.Equal(567, (int)actual.Value.Value);
-        }    
+        }
 
         [Fact(DisplayName = "Parsed Method Without Params and Brakets")]
         public void MethodWithoutParamsAndBrakets()
@@ -121,10 +122,26 @@ namespace QRest.Semantics.QRest.Tests
             Assert.Empty(actual.Expectations);
             Assert.True(actual.WasSuccessful);
 
-            var method = (MethodTerm) actual.Value.Term;
+            var method = (MethodTerm)actual.Value.Term;
 
             Assert.Equal(_testUniversalOperationName, method.Operation.Key);
             Assert.Empty(method.Arguments);
+        }
+
+        [Fact(DisplayName = "Root Property Is Parsed")]
+        public void PropertyParseTest()
+        {
+            var actual = _parser.RootProperty.TryParse($"{_testUniversalPropertName}");
+
+            Assert.Empty(actual.Expectations);
+            Assert.True(actual.WasSuccessful);
+
+            var sequence = (SequenceTerm)actual.Value;
+
+            Assert.True(sequence.Root is ContextTerm);
+            Assert.Equal(ContextTerm.Root.Name, ((ContextTerm)sequence.Root).Name);
+            Assert.True(sequence.Last is PropertyTerm);
+            Assert.Equal(_testUniversalPropertName, ((PropertyTerm)sequence.Last).Name);
         }
     }
 }

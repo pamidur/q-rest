@@ -28,11 +28,10 @@ namespace QRest.Compiler.Standard.Tests
                 );
 
             var data = new CompileTestClass { IntProperty = 1, StringProperty = "MyText", DateTimeProperty = DateTime.Now };
-            var compiled = _compiler.Compile<CompileTestClass>(tree);
+            var compiled = _compiler.Compile<CompileTestClass,object>(tree);
 
             dynamic dynamicResult = compiled(data);
 
-            Assert.True(dynamicResult is DynamicObject);
             Assert.Equal("MyText", dynamicResult.StringProperty);
             Assert.Equal("MyText", dynamicResult.NewName);
             Assert.Equal(1, dynamicResult.IntProperty);
@@ -55,13 +54,13 @@ namespace QRest.Compiler.Standard.Tests
                 new CompileTestClass { IntProperty = 2, StringProperty = "AnotherText", DateTimeProperty = DateTime.Now },
             }.AsQueryable();
 
-            var compiled = _compiler.Compile<IQueryable<CompileTestClass>>(tree);
+            var compiled = _compiler.Compile<IQueryable<CompileTestClass>,object>(tree);
 
             var result = compiled(data);
 
-            Assert.True(result is IQueryable<DynamicObject>);
+            Assert.True(result is IQueryable);
 
-            var resultdata = (IQueryable<DynamicObject>)result;
+            var resultdata = ((IQueryable)result).Cast<object>();
 
             Assert.Equal(2, resultdata.Count());
 
@@ -70,6 +69,44 @@ namespace QRest.Compiler.Standard.Tests
             Assert.Equal("MyText", dynamicResult.StringProperty);
             Assert.Equal("MyText", dynamicResult.NewName);
             Assert.Equal(1, dynamicResult.IntProperty);
+        }
+
+        [Fact(DisplayName = "Can compile Context Operation")]
+        public void Context()
+        {
+            var tree = new SequenceTerm(
+                new MethodTerm(OperationsMap.Where,
+                   new LambdaTerm(
+                       new SequenceTerm(
+                           ContextTerm.Root,
+                           new PropertyTerm(nameof(CompileTestClass.StringProperty)),
+                           new MethodTerm(OperationsMap.Equal, new ConstantTerm("MyText"))
+                       )
+                   )
+                ),
+                new MethodTerm(OperationsMap.New, 
+                    ContextTerm.Result, 
+                    new SequenceTerm(
+                        ContextTerm.Result,
+                        new MethodTerm(OperationsMap.Count)
+                    )
+                )
+            );
+
+            var data = new[]
+            {
+                new CompileTestClass { IntProperty = 1, StringProperty = "MyText", DateTimeProperty = DateTime.Now },
+                new CompileTestClass { IntProperty = 2, StringProperty = "AnotherText", DateTimeProperty = DateTime.Now },
+            }.AsQueryable();
+
+            var compiled = _compiler.Compile<IQueryable<CompileTestClass>,object>(tree);
+
+            var result = compiled(data);
+
+            dynamic dynamicResult = result;
+
+            Assert.Equal(1, dynamicResult.count);
+            Assert.Equal("MyText", Enumerable.First(dynamicResult.data).StringProperty);
         }
     }
 }

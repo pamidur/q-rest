@@ -10,7 +10,7 @@ namespace QRest.Core.Operations.Boolean
 
         public override string Key { get; } = "not";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        public override Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 0)
                 throw new CompilationException("Expected 0 parameters");

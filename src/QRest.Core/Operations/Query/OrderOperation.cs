@@ -9,8 +9,7 @@ namespace QRest.Core.Operations.Query
 {
     internal class ReverseOrderExpression : ProxyExpression
     {
-        public static readonly ExpressionType ReverseOrderNodeType = (ExpressionType)1100;
-        public ReverseOrderExpression(Expression expression) : base(expression, ReverseOrderNodeType) { }
+        public ReverseOrderExpression(Expression expression) : base(expression) { }
     }
 
     public sealed class OrderOperation : QueryOperationBase
@@ -19,7 +18,7 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "order";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        protected override Expression CreateExpression(Expression context, Type collection, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             var exp = context;
 
@@ -29,7 +28,7 @@ namespace QRest.Core.Operations.Query
             {
                 var lambda = (LambdaExpression)arg;
 
-                var reversed = lambda.Body.NodeType == ReverseOrderExpression.ReverseOrderNodeType;
+                var reversed = lambda.Body is ReverseOrderExpression;
 
                 var method = nameof(Queryable.OrderBy);
 
@@ -46,7 +45,7 @@ namespace QRest.Core.Operations.Query
                         method = nameof(Queryable.ThenByDescending);
                 }
 
-                exp = Expression.Call(QueryableType, method, new Type[] { lambda.Parameters[0].Type, lambda.ReturnType }, exp, lambda);
+                exp = Expression.Call(collection, method, new Type[] { lambda.Parameters[0].Type, lambda.ReturnType }, exp, lambda);
             }
 
             return assembler.SetName(exp, "data");
@@ -59,7 +58,7 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "desc";
 
-        public override Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        public override Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 0)
                 throw new CompilationException("Expected 0 parameters");

@@ -11,14 +11,14 @@ namespace QRest.Core.Terms
         {
             Value = value;
 
-            SharedView = GetValueRepresentation();
-            KeyView = $"[{Value?.GetType() ?? typeof(object)}]";
-            DebugView = SharedView;
+            ViewQuery = GetValueRepresentation();
+            ViewKey = $"[{Value?.GetType() ?? typeof(object)}]";
+            ViewDebug = ViewQuery;
         }
 
-        public string DebugView { get; }
-        public string SharedView { get; }
-        public string KeyView { get; }
+        public string ViewDebug { get; }
+        public string ViewQuery { get; }
+        public string ViewKey { get; }
         public ITerm Clone() => new ConstantTerm(Value);
 
         private string GetValueRepresentation()

@@ -1,22 +1,22 @@
 ﻿using QRest.Core.Terms;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq.Expressions;
 
 namespace QRest.Core.Compilation.Visitors
-{
-    public class ConstantsCollectingVisitor : TermVisitor<List<ConstantExpression>>
+{    
+    public class ConstantsCollectingVisitor : TermVisitor<ImmutableArray<ConstantExpression>>
     {
         public IReadOnlyList<ConstantExpression> Collect(ITerm lambda)
         {
-            var list = Visit(lambda,new List<ConstantExpression>());
-            return list.ToArray();
+            var list = Visit(lambda, ImmutableArray<ConstantExpression>.Empty);
+            return list;
         }
 
-        protected override List<ConstantExpression> VisitConstant(ConstantTerm c, List<ConstantExpression> context)
+        protected override ImmutableArray<ConstantExpression> VisitConstant(ConstantTerm c, in ImmutableArray<ConstantExpression> state)
         {
             var constant = Expression.Constant(c.Value);
-            context.Add(constant);
-            return context;
+            return state.Add(constant);
         }
     }
 }

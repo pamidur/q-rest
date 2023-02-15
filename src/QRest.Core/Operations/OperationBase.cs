@@ -8,6 +8,6 @@ namespace QRest.Core.Operations
     {
         public abstract string Key { get; }
         public override string ToString() => Key;
-        public abstract Expression CreateExpression(ParameterExpression root, Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler);
+        public abstract Expression CreateExpression(Expression context, IReadOnlyList<Expression> arguments, IAssembler assembler);
     }
 }

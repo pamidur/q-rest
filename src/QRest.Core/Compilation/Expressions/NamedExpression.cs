@@ -4,9 +4,7 @@ namespace QRest.Core.Compilation.Expressions
 {
     public class NamedExpression : ProxyExpression
     {
-        public static readonly ExpressionType ExpressionNodeType = (ExpressionType)2101;
-
-        private NamedExpression(Expression expression, string name) : base(expression, ExpressionNodeType)
+        private NamedExpression(Expression expression, string name) : base(expression)
         {
             Name = name;
         }

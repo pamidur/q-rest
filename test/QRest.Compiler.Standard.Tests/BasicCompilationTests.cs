@@ -31,10 +31,10 @@ namespace QRest.Compiler.Standard.Tests
                         new ConstantTerm("Ololo")
                     });
 
-            var result = _compiler.Assemble<string>(seq);
+            var result = _compiler.Assemble<string, bool>(seq);
             var compiled = result.Compile();
 
-            Assert.True((bool)compiled("Ololo"));
+            Assert.True(compiled("Ololo"));
         }
 
         [Fact]
@@ -44,17 +44,17 @@ namespace QRest.Compiler.Standard.Tests
                 new MethodTerm(OperationsMap.Where,
                     new[] {
                         new LambdaTerm(new SequenceTerm(
-                            new MethodTerm(OperationsMap.Root),
+                            ContextTerm.Root,
                             new PropertyTerm(nameof(TestEntity.IntProperty)),
                             new MethodTerm(OperationsMap.Equal, new[]{ new ConstantTerm(1) })
                             )
                         )
                     });
 
-            var result = _compiler.Assemble<IQueryable<TestEntity>>(seq);
+            var result = _compiler.Assemble<IQueryable<TestEntity>, IQueryable<TestEntity>>(seq);
             var compiled = result.Compile();
 
-            var executed = (IQueryable<TestEntity>)compiled(new List<TestEntity> { new TestEntity { IntProperty = 1 }, new TestEntity { IntProperty = 2 } }.AsQueryable());
+            var executed = compiled(new List<TestEntity> { new TestEntity { IntProperty = 1 }, new TestEntity { IntProperty = 2 } }.AsQueryable());
 
             Assert.Contains(executed, e => e.IntProperty == 1);
             Assert.Single(executed);

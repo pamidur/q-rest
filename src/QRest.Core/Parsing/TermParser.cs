@@ -13,7 +13,8 @@ namespace QRest.Core.Parsing
     {
         public static Parser<ITerm> Default { get; }
 
-        static TermParser() => Default = new TermParser(DefferedConstantParsing.StringsAndNumbers, OperationsMap.GetRegisteredOperationNames(), OperationsMap.LookupOperation).Build();
+        static TermParser()
+            => Default = new TermParser(DefferedConstantParsing.StringsAndNumbers, OperationsMap.GetRegisteredOperationNames(), OperationsMap.LookupOperation).Build();
 
         internal static readonly Parser<char> StringDelimiter = Read.Char('\'');
         internal static readonly Parser<char> ArgumentDelimiter = Read.Char(',');
@@ -30,6 +31,7 @@ namespace QRest.Core.Parsing
         internal static readonly Parser<char> PropertyNavigator = Read.Char('.');
 
         internal static readonly Parser<char> NameIndicator = Read.Char('@');
+        internal static readonly Parser<char> ContextIndicator = Read.Char('$');
 
 
         internal static readonly Parser<IEnumerable<char>> NullConstantString = Read.String("null").Token();
@@ -42,14 +44,13 @@ namespace QRest.Core.Parsing
         private readonly IReadOnlyList<string> _operations;
         private readonly Func<string, IOperation> _selector;
 
-        internal Parser<ITerm> CallChain;
+        internal Parser<ITerm> Sequence;
         internal Parser<MethodTerm> Call;
         internal Parser<ITerm[]> CallArguments;
         internal Parser<ITerm> SubProperty;
         internal Parser<ITerm> Property;
         internal Parser<LambdaTerm> Lambda;
         internal Parser<ITerm> RootProperty;
-        internal Parser<ITerm> ChainRoot;
         internal Parser<ConstantTerm> Constant;
         internal Parser<ConstantTerm> ArrayConstant;
         internal Parser<ConstantTerm> NumberConstant;
@@ -58,6 +59,7 @@ namespace QRest.Core.Parsing
         internal Parser<ConstantTerm> NullConstant;
         internal Parser<NameTerm> Name;
         internal Parser<string> MemberName;
+        internal Parser<ContextTerm> Context;
 
         public TermParser(
             DefferedConstantParsing defferedParsing,
@@ -65,13 +67,14 @@ namespace QRest.Core.Parsing
             Func<string, IOperation> selector)
         {
             _defferedParsing = defferedParsing;
-            _operations = operations.OrderByDescending(o=>o).ToArray();
+            _operations = operations.OrderByDescending(o => o).ToArray();
             _selector = selector;
         }
 
         public Parser<ITerm> Build()
         {
             MemberName = BuildMemberNameParser().Named("Member Name");
+            Context = BuildContextTermParser().Named("Context Name");
 
             BoolConstant = BuildBoolConstantParser().Named("Boolean Constant");
             NullConstant = BuildNullConstantParser().Named("Null Constant");
@@ -90,34 +93,25 @@ namespace QRest.Core.Parsing
 
             Name = BuildNameTermParser().Named("Name");
 
-            ChainRoot = BuildChainRootParser();
             CallArguments = BuildCallArgumentsParser().Named("Call Arguments");
-            CallChain = BuildCallChainParser();
+            Sequence = BuildSequenceParser();
 
-            return CallChain.End();
+            return Sequence.End();
         }
 
-        internal Parser<ITerm> BuildTopLambdaParser() =>
-          from seq in CallChain
-          select seq;
-
-        internal Parser<ITerm> BuildChainRootParser() =>
-          from root in Call.XOr<ITerm>(Lambda).XOr(Constant)
-          select root;
-
-        internal Parser<ITerm> BuildCallChainParser() =>
-          from root in ChainRoot.XOr(RootProperty)
+        internal Parser<ITerm> BuildSequenceParser() =>
+          from root in Call.XOr<ITerm>(Context).XOr(Constant).XOr(RootProperty)
           from chunks in SubProperty.XOr(Call).XOr(Name).XMany()
           select chunks.Any() ? new SequenceTerm(new[] { root }.Concat(chunks).ToArray()) : root;
 
         internal Parser<ITerm[]> BuildCallArgumentsParser() => Read.Ref(() =>
-            from parameters in Read.Contained(Read.XDelimitedBy(CallChain, ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)
+            from parameters in Read.Contained(Read.XDelimitedBy(Lambda.XOr(Sequence), ArgumentDelimiter).XOptional(), CallOpenBracket, CallCloseBracket)
             select parameters.GetOrDefault()?.Where(r => r != null)?.ToArray() ?? new ITerm[] { }
             );
 
         internal Parser<LambdaTerm> BuildLambdaParser() =>
             from semic in LambdaIndicator
-            from seq in CallChain
+            from seq in Sequence
             select new LambdaTerm(seq);
 
         internal Parser<MethodTerm> BuildMethodParser(Parser<IOperation> operationFactoryParser) =>
@@ -154,7 +148,7 @@ namespace QRest.Core.Parsing
 
         internal Parser<ITerm> BuildRootPropertyParser() =>
              from prop in Property
-             select new SequenceTerm(new[] { new MethodTerm(OperationsMap.Root), prop });
+             select new SequenceTerm(new[] { ContextTerm.Root, prop });
 
         internal Parser<ITerm> BuildPropertyParser() =>
              from name in MemberName
@@ -196,6 +190,11 @@ namespace QRest.Core.Parsing
             from name in MemberName
             select new NameTerm(name);
 
+        protected Parser<ContextTerm> BuildContextTermParser() =>
+            from at in ContextIndicator
+            from name in Read.XOr(ContextIndicator.Once().Text(), MemberName).Optional()
+            select new ContextTerm(name.GetOrDefault());
+
         protected Parser<string> BuildMemberNameParser() =>
             from str1 in Read.Letter.Once().Text()
             from str2 in Read.LetterOrDigit.XMany().Text().Optional()
@@ -224,7 +223,7 @@ namespace QRest.Core.Parsing
             if (_defferedParsing == DefferedConstantParsing.Strings)
                 return source;
 
-            throw new NotSupportedException($"Cannot parse type of {type.ToString()}");
+            throw new NotSupportedException($"Cannot parse type of {type}");
         }
     }
 }

@@ -14,7 +14,7 @@ namespace QRest.AspNetCore.Native
 {
     public class NativeSemantics : ISemantics
     {
-        private static readonly NativeQueryStructure _default = new NativeQueryStructure { Data = new MethodTerm(OperationsMap.Root) };
+        private static readonly NativeQueryStructure _default = new NativeQueryStructure { Data = ContextTerm.Root };
 
         private readonly Lazy<Parser<ITerm>> _parser;
 

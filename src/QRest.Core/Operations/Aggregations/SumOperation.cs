@@ -12,12 +12,12 @@ namespace QRest.Core.Operations.Aggregations
 
         public override string Key { get; } = "sum";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
+        protected override Expression CreateExpression(Expression context, Type collection, Type element, IReadOnlyList<Expression> arguments, IAssembler assembler)
         {
             if (arguments.Count != 0)
                 throw new CompilationException($"Method '{Key}' expects to have no parameters.");
 
-            var exp = Expression.Call(QueryableType, nameof(Queryable.Sum), new Type[] { }, context);
+            var exp = Expression.Call(collection, nameof(Queryable.Sum), new Type[] { }, context);
 
             return assembler.SetName(exp, Key);
         }

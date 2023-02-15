@@ -11,9 +11,9 @@ namespace QRest.Core.Operations.Query
 
         public override string Key { get; } = "where";
 
-        protected override Expression CreateExpression(ParameterExpression root, Expression context, Type element, LambdaExpression argument, IAssembler assembler)
+        protected override Expression CreateExpression(Expression context, Type collection, Type element, LambdaExpression argument, IAssembler assembler)
         {
-            var exp = Expression.Call(QueryableType, nameof(Queryable.Where), new Type[] { element }, context, argument);
+            var exp = Expression.Call(collection, nameof(Queryable.Where), new Type[] { element }, context, argument);
             return assembler.SetName(exp, "data");
         }       
     }

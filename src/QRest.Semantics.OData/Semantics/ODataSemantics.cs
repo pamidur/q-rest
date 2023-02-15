@@ -32,7 +32,7 @@ namespace QRest.Semantics.OData.Semantics
                 if (request.Query.TryGetValue(c, out var strs))
                     strings.Add($"{c}={strs.First()}");
 
-            ICharStream stream = CharStreams.fromstring(string.Join("&", strings));
+            ICharStream stream = CharStreams.fromString(string.Join("&", strings));
             ITokenSource lexer = new ODataGrammarLexer(stream);
             ITokenStream tokens = new CommonTokenStream(lexer);
 

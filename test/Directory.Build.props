@@ -1,16 +1,12 @@
 <Project>
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
     <CollectCoverage>true</CollectCoverage>
     <CoverletOutputFormat>opencover</CoverletOutputFormat>
     <CoverletOutput>./TestResults/</CoverletOutput>
-  </PropertyGroup>
+  </PropertyGroup>  
 
   <ItemGroup>
-    <PackageReference Include="coverlet.msbuild" Version="2.7.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute" />
   </ItemGroup>
 
 </Project>
