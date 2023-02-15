@@ -18,11 +18,12 @@ namespace QRest.Semantics.OData.Semantics
         static ODataQueryResult()
         {
             _serializer = JsonSerializer.Create(
-                new JsonSerializerSettings {
+                new JsonSerializerSettings
+                {
                     Converters = new List<JsonConverter> {
                         new DateTimeOffsetConverter()
                     },
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore                    
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                 });
         }
 
@@ -35,10 +36,10 @@ namespace QRest.Semantics.OData.Semantics
         public override Task ExecuteResultAsync(ActionContext context)
         {
             context.HttpContext.Response.ContentType = "application/json; odata.metadata=minimal; charset=utf-8";
-            
+
             var response = CreateResponse(context);
 
-            using (var sw = new StreamWriter(context.HttpContext.Response.Body, Encoding.UTF8))
+            using (var sw = new StreamWriter(context.HttpContext.Response.Body, Encoding.UTF8, leaveOpen: true))
                 _serializer.Serialize(sw, response);
 
             return Task.CompletedTask;
